@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres
+    container_name: lms_postgres_db
+    restart: 'always'
+    ports:
+      - ${POSTGRES_PORT}:5432
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3.9.20-management-alpine
+    container_name: rabbitmq
+    ports:
+      - ${FIRST_PORT}:5672
+      - ${SECOND_PORT}:15672
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  postgres_data:
+  rabbitmq_data:

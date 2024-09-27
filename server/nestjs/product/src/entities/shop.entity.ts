@@ -4,7 +4,7 @@ import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 export type ShopDocument = HydratedDocument<Shop>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Shop {
   @Prop({ required: true })
   name: string;
