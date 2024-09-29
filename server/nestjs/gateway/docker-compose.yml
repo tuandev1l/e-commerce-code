@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres
-    container_name: lms_postgres_db
+    container_name: ending_project
     restart: 'always'
     ports:
       - ${POSTGRES_PORT}:5432
@@ -16,8 +16,8 @@ services:
     image: rabbitmq:3.9.20-management-alpine
     container_name: rabbitmq
     ports:
-      - ${FIRST_PORT}:5672
-      - ${SECOND_PORT}:15672
+      - ${RABBITMQ_MAIN_PORT}:5672
+      - ${RABBITMQ_SUB_PORT}:15672
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 

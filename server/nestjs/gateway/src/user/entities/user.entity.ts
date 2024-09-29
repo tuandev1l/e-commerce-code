@@ -48,6 +48,6 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   phoneNumber?: string;
 
-  @Column()
+  @Column({ type: 'json' })
   address: IUserAddress;
 }

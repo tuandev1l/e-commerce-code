@@ -1,8 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductDto } from './dto/product.dto';
+import { PRODUCT_PATTERN } from '@app/constants';
 
 @Controller('product')
 export class ProductController {
@@ -13,29 +13,28 @@ export class ProductController {
   //   return this.productService.insertData();
   // }
 
-  @MessagePattern('createProduct')
-  create(@Payload() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  @MessagePattern(PRODUCT_PATTERN.CREATE_PRODUCT)
+  async create(@Payload() productDto: ProductDto) {
+    return this.productService.create(productDto);
   }
 
-  @Get()
-  @MessagePattern('findAllProduct')
-  findAll() {
+  @MessagePattern(PRODUCT_PATTERN.FIND_ALL_PRODUCT)
+  async findAll() {
     return this.productService.findAll();
   }
 
-  @MessagePattern('findOneProduct')
-  findOne(@Payload() id: number) {
+  @MessagePattern(PRODUCT_PATTERN.FIND_ONE_PRODUCT)
+  async findOne(@Payload() id: string) {
     return this.productService.findOne(id);
   }
 
-  @MessagePattern('updateProduct')
-  update(@Payload() updateProductDto: UpdateProductDto) {
-    return this.productService.update(updateProductDto.id, updateProductDto);
+  @MessagePattern(PRODUCT_PATTERN.UPDATE_PRODUCT)
+  async update(@Payload() productDto: ProductDto) {
+    return this.productService.update(productDto);
   }
 
-  @MessagePattern('removeProduct')
-  remove(@Payload() id: number) {
+  @MessagePattern(PRODUCT_PATTERN.REMOVE_PRODUCT)
+  async remove(@Payload() id: string) {
     return this.productService.remove(id);
   }
 }

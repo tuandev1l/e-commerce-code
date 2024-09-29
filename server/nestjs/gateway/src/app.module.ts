@@ -7,6 +7,7 @@ import { LoggingModule } from '@logging/logging.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JoiConfig, TypeormConfig } from '@config';
 import { ConfigModule } from '@nestjs/config';
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   controllers: [],
@@ -21,6 +22,7 @@ import { ConfigModule } from '@nestjs/config';
       validationSchema: JoiConfig.config,
     }),
     TypeOrmModule.forRootAsync(TypeormConfig.config),
+    GatewayModule,
   ],
   providers: [
     {

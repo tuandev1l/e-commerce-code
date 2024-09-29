@@ -34,8 +34,6 @@ export class AuthService {
     @InjectRepository(User) private readonly repository: Repository<User>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    private readonly emailReg = new RegExp(emailRegex, 'gi'),
-    private readonly phoneReg = new RegExp(phoneRegex, 'gi'),
   ) {}
 
   async generateJwt(user: User): Promise<IAuthRes> {
@@ -109,11 +107,14 @@ export class AuthService {
   }
 
   private validateUsername(username: string) {
-    const isEmail = this.emailReg.test(username);
-    const isPhoneNumber = this.phoneReg.test(username);
+    const emailReg = new RegExp(emailRegex, 'gi');
+    const phoneReg = new RegExp(phoneRegex, 'gi');
+
+    const isEmail = emailReg.test(username);
+    const isPhoneNumber = phoneReg.test(username);
 
     if (!isEmail && !isPhoneNumber) {
-      throw new BadRequestException('Email or phone is invalid');
+      throw new BadRequestException('Username must be either email or phone');
     }
 
     return [isEmail, isPhoneNumber];
