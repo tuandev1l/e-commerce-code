@@ -1,1 +1,1 @@
-export * from '@app/constants/pattern';
+export * from '@constants/pattern';

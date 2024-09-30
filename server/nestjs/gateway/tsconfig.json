@@ -18,6 +18,15 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@libs/product/*": [
+        "libs/product/src/*"
+      ],
+      "@libs/rating/*": [
+        "libs/rating/src/*"
+      ],
+      "@libs/searching/*": [
+        "libs/searching/src/*"
+      ],
       "@*": [
         "src/*"
       ]

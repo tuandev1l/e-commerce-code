@@ -1,28 +1,43 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { PRODUCT_PATTERN, SEARCHING_PATTERN } from '@constants/pattern';
+import { CreateProductDto } from '@libs/product/dto/create-product.dto';
+import { UpdateProductDto } from '@libs/product/dto/update-product.dto';
+import { ISearch } from '@libs/searching/search.interface';
 
 @Injectable()
 export class GatewayService {
   constructor(@Inject('RABBITMQ_PRODUCER') private producer: ClientProxy) {}
 
-  // create(createGatewayDto: CreateGatewayDto) {
-  //   return 'This action adds a new gateway';
-  // }
-
-  findAllProduct() {
-    console.log('producer sent');
-    return this.producer.send('findAllProduct', 'Hello World!');
+  async createProduct(productDto: CreateProductDto) {
+    return this.sendMessage(PRODUCT_PATTERN.CREATE_PRODUCT, productDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} gateway`;
+  async findAllProduct() {
+    return this.sendMessage(PRODUCT_PATTERN.FIND_ALL_PRODUCT);
   }
 
-  // update(id: number, updateGatewayDto: UpdateGatewayDto) {
-  //   return `This action updates a #${id} gateway`;
-  // }
+  async findOneProduct(id: string) {
+    return this.sendMessage(PRODUCT_PATTERN.FIND_ONE_PRODUCT, id);
+  }
 
-  remove(id: number) {
-    return `This action removes a #${id} gateway`;
+  async updateProduct(id: string, productDto: UpdateProductDto) {
+    return this.sendMessage(PRODUCT_PATTERN.UPDATE_PRODUCT, {
+      id,
+      ...productDto,
+    });
+  }
+
+  async removeProduct(id: string) {
+    return this.sendMessage(PRODUCT_PATTERN.REMOVE_PRODUCT, id);
+  }
+
+  searchProductByElasticsearch(search: ISearch) {
+    console.log('im here');
+    return this.sendMessage(SEARCHING_PATTERN.SEARCH_PRODUCTS, search);
+  }
+
+  private async sendMessage(pattern: string, data: unknown = '') {
+    return this.producer.send(pattern, data);
   }
 }

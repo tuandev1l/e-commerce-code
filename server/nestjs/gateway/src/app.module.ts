@@ -6,8 +6,11 @@ import { UserModule } from '@user/user.module';
 import { LoggingModule } from '@logging/logging.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JoiConfig, TypeormConfig } from '@config';
-import { ConfigModule } from '@nestjs/config';
-import { GatewayModule } from './gateway/gateway.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ProductModule } from '@libs/product/product.module';
+import { GatewayModule } from '@gateway/gateway.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ElasticsearchModule } from '@libs/searching';
 
 @Module({
   controllers: [],
@@ -15,6 +18,7 @@ import { GatewayModule } from './gateway/gateway.module';
     AuthModule,
     UserModule,
     LoggingModule,
+    ElasticsearchModule,
     ConfigModule.forRoot({
       envFilePath: ['.env'],
       isGlobal: true,
@@ -23,6 +27,14 @@ import { GatewayModule } from './gateway/gateway.module';
     }),
     TypeOrmModule.forRootAsync(TypeormConfig.config),
     GatewayModule,
+    ProductModule,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        uri: `mongodb+srv://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@products.qevln.mongodb.net/${configService.get('MONGODB_NAME')}`,
+      }),
+    }),
   ],
   providers: [
     {

@@ -3,6 +3,36 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true
+  },
+  "projects": {
+    "product": {
+      "type": "library",
+      "root": "libs/product",
+      "entryFile": "index",
+      "sourceRoot": "libs/product/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/product/tsconfig.lib.json"
+      }
+    },
+    "searching": {
+      "type": "library",
+      "root": "libs/searching",
+      "entryFile": "index",
+      "sourceRoot": "libs/searching/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/searching/tsconfig.lib.json"
+      }
+    },
+    "rating": {
+      "type": "library",
+      "root": "libs/rating",
+      "entryFile": "index",
+      "sourceRoot": "libs/rating/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/rating/tsconfig.lib.json"
+      }
+    }
   }
 }

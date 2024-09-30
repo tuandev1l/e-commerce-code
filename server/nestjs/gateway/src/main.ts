@@ -5,13 +5,26 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { SwaggerConfig } from '@config';
 import { AppModule } from '@app.module';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const gateway = await NestFactory.create(AppModule);
-  const logger = gateway.get(LoggingService).getLogger('app');
-  gateway.setGlobalPrefix('api/v1');
-  gateway.useGlobalInterceptors(new TransformInterceptor());
-  gateway.useGlobalPipes(
+  const app = await NestFactory.create(AppModule);
+
+  await app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: ['amqp://guest:guest@localhost:5672'],
+      queue: 'e-commerce',
+      queueOptions: {
+        durable: true,
+      },
+    },
+  });
+
+  const logger = app.get(LoggingService).getLogger('app');
+  app.setGlobalPrefix('api/v1');
+  app.useGlobalInterceptors(new TransformInterceptor());
+  app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       stopAtFirstError: true,
@@ -19,9 +32,10 @@ async function bootstrap() {
     }),
   );
 
-  const document = SwaggerModule.createDocument(gateway, SwaggerConfig.config);
-  SwaggerModule.setup('apidoc', gateway, document);
-  await gateway.listen(3000);
+  const document = SwaggerModule.createDocument(app, SwaggerConfig.config);
+  SwaggerModule.setup('apidoc', app, document);
+  await app.startAllMicroservices();
+  await app.listen(3000);
   logger.info('Api docs at http://localhost:3000/apidoc');
 }
 
