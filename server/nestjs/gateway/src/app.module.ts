@@ -10,7 +10,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductModule } from '@libs/product/product.module';
 import { GatewayModule } from '@gateway/gateway.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ElasticsearchModule } from '@libs/searching';
+import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
+import { CartModule } from '@libs/cart/cart.module';
+import { OrderModule } from '@libs/order/order.module';
 
 @Module({
   controllers: [],
@@ -28,6 +30,8 @@ import { ElasticsearchModule } from '@libs/searching';
     TypeOrmModule.forRootAsync(TypeormConfig.config),
     GatewayModule,
     ProductModule,
+    CartModule,
+    OrderModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

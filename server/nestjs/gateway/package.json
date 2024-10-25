@@ -98,7 +98,9 @@
     "moduleNameMapper": {
       "^@lib/product/product(|/.*)$": "<rootDir>/libs/product/src/$1",
       "^@libs/searching(|/.*)$": "<rootDir>/libs/searching/src/$1",
-      "^@libs/rating(|/.*)$": "<rootDir>/libs/rating/src/$1"
+      "^@libs/rating(|/.*)$": "<rootDir>/libs/rating/src/$1",
+      "^@lib/cart(|/.*)$": "<rootDir>/libs/cart/src/$1",
+      "^@lib/order(|/.*)$": "<rootDir>/libs/order/src/$1"
     }
   }
 }

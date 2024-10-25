@@ -33,6 +33,24 @@
       "compilerOptions": {
         "tsConfigPath": "libs/rating/tsconfig.lib.json"
       }
+    },
+    "cart": {
+      "type": "library",
+      "root": "libs/cart",
+      "entryFile": "index",
+      "sourceRoot": "libs/cart/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/cart/tsconfig.lib.json"
+      }
+    },
+    "order": {
+      "type": "library",
+      "root": "libs/order",
+      "entryFile": "index",
+      "sourceRoot": "libs/order/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/order/tsconfig.lib.json"
+      }
     }
   }
 }

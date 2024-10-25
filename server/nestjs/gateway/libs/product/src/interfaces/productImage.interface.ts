@@ -1,10 +1,10 @@
 export interface IProductImage {
-  base_url: string;
-  is_gallery: boolean;
+  baseUrl: string;
+  isGallery: boolean;
   label?: string;
-  large_url: string;
-  medium_url: string;
+  largeUrl: string;
+  mediumUrl: string;
   position?: null;
-  small_url: string;
-  thumbnail_url: string;
+  smallUrl: string;
+  thumbnailUrl: string;
 }

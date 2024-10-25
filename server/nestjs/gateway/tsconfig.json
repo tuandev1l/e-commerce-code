@@ -29,6 +29,12 @@
       ],
       "@*": [
         "src/*"
+      ],
+      "@libs/cart/*": [
+        "libs/cart/src/*"
+      ],
+      "@libs/order/*": [
+        "libs/order/src/*"
       ]
     }
   }

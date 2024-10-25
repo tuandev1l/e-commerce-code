@@ -1,9 +1,10 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { Role } from '@auth';
 import { BaseEntity } from '@base/base.entity';
 import { Exclude } from 'class-transformer';
 import { ACCOUNT_TYPE, GENDER } from '@share/enums';
 import { IUserAddress } from '@share/interfaces';
+import { Order } from '@libs/order/entity/order.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -50,4 +51,7 @@ export class User extends BaseEntity {
 
   @Column({ type: 'json' })
   address: IUserAddress;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 }
