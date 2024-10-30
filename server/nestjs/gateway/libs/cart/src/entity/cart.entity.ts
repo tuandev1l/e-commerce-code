@@ -9,6 +9,9 @@ export class Cart {
   @Column({ type: 'int', name: 'customer_id' })
   customerId: number;
 
-  @Column({ type: 'jsonb', name: 'product_items' })
-  productItems: IProductItem[] = [];
+  @Column({ type: 'int', name: 'total', default: 0 })
+  total: number;
+
+  @Column({ type: 'jsonb', name: 'product_items', default: [] })
+  productItems: IProductItem[];
 }

@@ -9,6 +9,6 @@ export class Shipping {
   @Column({ name: 'partner_name' })
   partnerName: string;
 
-  @Column({ enum: ShippingEnum })
+  @Column({ type: 'enum', enum: ShippingEnum, default: ShippingEnum.AVAILABLE })
   status: ShippingEnum;
 }

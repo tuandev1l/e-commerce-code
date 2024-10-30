@@ -1,63 +1,90 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from '@user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from '@libs/cart/entity/cart.entity';
 import { Repository } from 'typeorm';
-import { AddAndDeleteItemFromCartDto } from '@libs/cart/dto/ANDItem.dto';
+import { DelItemDto } from '@libs/cart/dto/delItem.dto';
+import { AddItemDto } from '@libs/cart/dto/addItem.dto';
+import { RpcBadRequest } from '@base/exception/exception.resolver';
+import { ProductService } from '@libs/product/product.service';
+import { IProductItem } from '@libs/product/interfaces';
 
 @Injectable()
 export class CartService {
   constructor(
     @InjectRepository(Cart) private readonly repository: Repository<Cart>,
+    private readonly productService: ProductService,
   ) {}
 
-  async addToCart(cartPayload: AddAndDeleteItemFromCartDto) {
+  async addToCart(cartPayload: AddItemDto) {
+    const product = await this.productService.findOne(cartPayload.productId);
     const cart = await this.getCart(cartPayload.user);
-    const { productItems } = cartPayload;
 
-    productItems.forEach((productItem) => {
-      const productItemIdx = cart.productItems.findIndex(
-        (product) => product._id === productItem._id,
-      );
+    const productItemIdx = cart.productItems.findIndex(
+      (pd) => pd._id === product._id,
+    );
 
-      if (productItemIdx === -1) {
-        cart.productItems.push(productItem);
-      } else {
-        cart.productItems[productItemIdx].quantity++;
-        cart.productItems[productItemIdx].subTotal += productItem.finalPrice;
-      }
-    });
+    const addingPrice = cartPayload.quantity * product.price;
+
+    if (productItemIdx === -1) {
+      const productItem: IProductItem = {
+        _id: product._id,
+        name: product.name,
+        thumbnailUrl: product.thumbnailUrl,
+        discount: product.discount,
+        originalPrice: product.originalPrice,
+        listPrice: product.originalPrice,
+        price: product.price,
+        seller: product.seller,
+        quantity: cartPayload.quantity,
+        subTotal: addingPrice,
+      };
+      cart.productItems.push(productItem);
+    } else {
+      cart.productItems[productItemIdx].quantity += cartPayload.quantity;
+      cart.productItems[productItemIdx].subTotal += addingPrice;
+    }
+    cart.total += addingPrice;
 
     return this.repository.save(cart);
   }
 
-  async deleteFromCart(cartPayload: AddAndDeleteItemFromCartDto) {
+  async deleteFromCart(cartPayload: DelItemDto) {
     const cart = await this.getCart(cartPayload.user);
-    const { productItems } = cartPayload;
+    const { quantity, productId } = cartPayload;
 
-    productItems.forEach((productItem) => {
-      const productItemIdx = cart.productItems.findIndex(
-        (product) => product._id === productItem._id,
-      );
+    const productItemIdx = cart.productItems.findIndex(
+      (product) => product._id.toString() === productId,
+    );
 
-      if (cart.productItems[productItemIdx].quantity === 1) {
-        cart.productItems.splice(productItemIdx, 1);
-      } else {
-        cart.productItems[productItemIdx].quantity--;
-      }
-    });
+    const removePrice = cart.productItems[productItemIdx].price * quantity;
+
+    if (cart.productItems[productItemIdx].quantity - quantity <= 0) {
+      cart.productItems.splice(productItemIdx, 1);
+    } else {
+      cart.productItems[productItemIdx].quantity -= quantity;
+    }
+
+    cart.total -= removePrice;
 
     return this.repository.save(cart);
   }
 
   async createCart(user: User) {
+    const cart = await this.getCart(user);
+    if (cart) {
+      throw new RpcBadRequest('Cart existed');
+    }
     return this.repository.save({ customerId: user.id });
   }
 
   private async getCart(user: User) {
-    const cart = await this.repository.findOneBy({ customerId: user.id });
+    let cart = await this.repository.findOneBy({ customerId: user.id });
     if (!cart) {
-      throw new NotFoundException('There is no cart with this user');
+      cart = await this.repository.save({
+        customerId: user.id,
+        productItems: [],
+      });
     }
     return cart;
   }

@@ -10,7 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductModule } from '@libs/product/product.module';
 import { GatewayModule } from '@gateway/gateway.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
+// import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
 import { CartModule } from '@libs/cart/cart.module';
 import { OrderModule } from '@libs/order/order.module';
 
@@ -20,7 +20,7 @@ import { OrderModule } from '@libs/order/order.module';
     AuthModule,
     UserModule,
     LoggingModule,
-    ElasticsearchModule,
+    // ElasticsearchModule,
     ConfigModule.forRoot({
       envFilePath: ['.env'],
       isGlobal: true,

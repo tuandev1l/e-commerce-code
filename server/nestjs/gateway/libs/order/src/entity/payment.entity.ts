@@ -10,7 +10,7 @@ export class Payment extends BaseEntity {
   @Column({ name: 'is_prepaid' })
   isPrepaid: boolean;
 
-  @Column({ enum: PaymentEnum })
+  @Column({ type: 'enum', enum: PaymentEnum, default: PaymentEnum.AVAILABLE })
   status: PaymentEnum;
 
   @Column()

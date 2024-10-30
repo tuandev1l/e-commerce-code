@@ -1,14 +1,17 @@
 import { Global, Module } from '@nestjs/common';
 import { GatewayService } from './gateway.service';
-import { GatewayController } from './gateway.controller';
+import { GatewayProductController } from './gateway.product.controller';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { ProducerService } from '@gateway/producer.service';
+import { GatewayCartController } from '@gateway/gateway.cart.controller';
 
 @Global()
 @Module({
-  controllers: [GatewayController],
+  controllers: [GatewayProductController, GatewayCartController],
   providers: [
     GatewayService,
+    ProducerService,
     {
       provide: 'RABBITMQ_PRODUCER',
       inject: [ConfigService],
@@ -32,5 +35,6 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
       },
     },
   ],
+  exports: [GatewayModule, GatewayService, ProducerService],
 })
 export class GatewayModule {}

@@ -14,5 +14,4 @@ export interface IProductItem
   > {
   quantity: number;
   subTotal: number;
-  finalPrice: number;
 }

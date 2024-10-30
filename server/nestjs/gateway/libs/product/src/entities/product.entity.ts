@@ -10,6 +10,8 @@ export type ProductDocument = HydratedDocument<Product>;
 
 @Schema({ timestamps: true })
 export class Product {
+  _id: MongooseSchema.Types.ObjectId;
+
   @Prop({ required: true })
   name: string;
 

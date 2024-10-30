@@ -28,12 +28,12 @@ export class CrudBase<E extends BaseEntity> {
   }
 
   async list(): Promise<E[]> {
-    this.logger.debug(`finding all ${this.alias}`);
+    // this.logger.debug(`finding all ${this.alias}`);
     return this.repository.find();
   }
 
   async getOneBy(where: FindOptionsWhere<IRecord>): Promise<E> {
-    this.logger.debug(`getOne ${this.alias}`);
+    // this.logger.debug(`getOne ${this.alias}`);
     return this.repository.findOneBy(where);
   }
 
@@ -59,7 +59,7 @@ export class CrudBase<E extends BaseEntity> {
   }
 
   async create<T extends DeepPartial<E>>(dto: T): Promise<E> {
-    this.logger.debug(`create ${this.alias}`);
+    // this.logger.debug(`create ${this.alias}`);
     dto = await this.actionPreCreate(dto);
     const data = await this.repository.save(dto);
     await this.actionPostCreate(dto);
@@ -71,7 +71,7 @@ export class CrudBase<E extends BaseEntity> {
     where: FindOptionsWhere<IRecord>,
     dto: T,
   ): Promise<E> {
-    this.logger.debug(`updateOne ${this.alias}`);
+    // this.logger.debug(`updateOne ${this.alias}`);
     dto = await this.actionPreUpdate(where, dto);
     await this.repository.update(where, dto);
     const data = await this.getOneBy(where);
@@ -80,7 +80,7 @@ export class CrudBase<E extends BaseEntity> {
   }
 
   async delete(where: FindOptionsWhere<IRecord>) {
-    this.logger.debug(`deleteOne ${this.alias}`);
+    // this.logger.debug(`deleteOne ${this.alias}`);
     return this.repository.delete(where);
   }
 

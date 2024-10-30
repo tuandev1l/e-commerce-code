@@ -38,7 +38,7 @@ export class OrderService {
 
   async cancelOrder(orderPayload: CancelOrderDto) {
     const { user, orderId } = orderPayload;
-    const order = await this.getOrder(user, orderId);
+    const order = await this.getOrder({ user, orderId });
     order.status = ORDER_STATUS.CANCEL;
     return this.repository.save(order);
   }

@@ -49,6 +49,6 @@ export class RatingService {
 
   async deleteRating(getAndDeleteRatingDto: GetAndDeleteRatingDto) {
     const rating = await this.getRating(getAndDeleteRatingDto);
-    void this.repository.delete(rating);
+    void this.repository.delete({ id: rating.id });
   }
 }
