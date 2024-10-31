@@ -8,7 +8,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ORDER_PATTERN } from '@constants';
 import { OrderService } from '@libs/order/order.service';
 import { CancelOrderDto } from '@libs/order/dto/withUser/cancelOrder.dto';
-import { UpdateOrderStatusDto } from '@libs/order/dto/withoutUser/updateOrderStatus.dto';
+import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
 import { User } from '@user/entities/user.entity';
 import { GetOrderDto } from '@libs/order/dto/withUser/getOrder.dto';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';

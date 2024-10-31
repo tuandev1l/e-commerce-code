@@ -9,9 +9,11 @@ import {
   PAYMENT_PREFIX,
   SHIPPING_PREFIX,
 } from '@constants/requestPrefix';
-import { UpdateOrderStatusDto } from '@libs/order/dto/withoutUser/updateOrderStatus.dto';
+import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
 import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
 import { BulkCreateOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/bulkCreateOrder.dto';
+import { Role } from '@auth';
+import { Auth } from '@auth/decorator/auth.decorator';
 
 @ApiTags('Gateway')
 @Controller(ORDER_PREFIX)
@@ -34,10 +36,13 @@ export class GatewayOrderController {
     return this.service.cancelOrder(user, orderPayload);
   }
 
-  // @Auth(Role.ADMIN)
+  @Auth(Role.ADMIN, Role.SHOP)
   @Patch()
-  async updateOrderStatus(@Body() orderPayload: UpdateOrderStatusDto) {
-    return this.service.updateOrderStatus(orderPayload);
+  async updateOrderStatus(
+    @GetUser() user: User,
+    @Body() orderPayload: UpdateOrderStatusDto,
+  ) {
+    return this.service.updateOrderStatus({ user, ...orderPayload });
   }
 
   @Get()

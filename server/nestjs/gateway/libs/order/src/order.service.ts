@@ -7,12 +7,13 @@ import { Shipping } from '@libs/order/entity/shipping.entity';
 import { PaymentEnum } from '@share/enums/payment.enum';
 import { ShippingEnum } from '@share/enums/shipping.enum';
 import { ORDER_STATUS } from '@libs/order/enum';
-import { UpdateOrderStatusDto } from '@libs/order/dto/withoutUser/updateOrderStatus.dto';
+import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
 import { User } from '@user/entities/user.entity';
 import { CancelOrderDto } from '@libs/order/dto/withUser/cancelOrder.dto';
 import { GetOrderDto } from '@libs/order/dto/withUser/getOrder.dto';
-import { RpcNotFound } from '@base/exception/exception.resolver';
+import { RpcBadRequest, RpcNotFound } from '@base/exception/exception.resolver';
 import { BulkCreateOrderDto } from '@libs/order/dto/withUser/bulkCreateOrder.dto';
+import { Role } from '@auth';
 
 @Injectable()
 export class OrderService {
@@ -105,10 +106,14 @@ export class OrderService {
   }
 
   async updateOrderStatus(updateOrderStatusDto: UpdateOrderStatusDto) {
-    const { orderId, status, data } = updateOrderStatusDto;
+    const { orderId, status, data, user } = updateOrderStatusDto;
     const order = await this.repository.findOneBy({ id: orderId });
     if (!order) {
       throw new RpcNotFound('There is no order with this ID');
+    }
+
+    if (user.role === Role.SHOP && order.status !== ORDER_STATUS.SHIPPING) {
+      throw new RpcBadRequest('Insufficient permission');
     }
 
     order.status = status;

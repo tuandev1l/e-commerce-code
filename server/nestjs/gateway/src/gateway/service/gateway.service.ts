@@ -13,7 +13,7 @@ import { DelItemWithoutUserDto } from '@libs/cart/dto/withoutUser/delItemWithout
 import { ProducerService } from '@gateway/service/producer.service';
 import { AddItemWithoutUserDto } from '@libs/cart/dto/withoutUser/addItemWithoutUser.dto';
 import { CancelOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/cancelOrder.dto';
-import { UpdateOrderStatusDto } from '@libs/order/dto/withoutUser/updateOrderStatus.dto';
+import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
 import { GetOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/getOrder.dto';
 import { BulkCreateOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/bulkCreateOrder.dto';
 
