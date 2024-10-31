@@ -1,18 +1,18 @@
-import { Body, Controller, Delete, Post } from '@nestjs/common';
-import { GatewayService } from '@gateway/gateway.service';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
+import { GatewayService } from '@gateway/service/gateway.service';
 import { CART_PREFIX } from '@constants/requestPrefix';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from '@user/entities/user.entity';
-import { DelItemWithoutUserDto } from '@libs/cart/dto/delItemWithoutUser.dto';
+import { DelItemWithoutUserDto } from '@libs/cart/dto/withoutUser/delItemWithoutUser.dto';
 import { GetUser } from '@auth/decorator/get-user.decorator';
-import { AddItemWithoutUserDto } from '@libs/cart/dto/addItemWithoutUser.dto';
+import { AddItemWithoutUserDto } from '@libs/cart/dto/withoutUser/addItemWithoutUser.dto';
 
 @ApiTags('Gateway')
-@Controller()
+@Controller(CART_PREFIX)
 export class GatewayCartController {
   constructor(private readonly service: GatewayService) {}
 
-  @Post(`${CART_PREFIX}/add-to-cart`)
+  @Post('add-to-cart')
   async addToCart(
     @Body() cartPayload: AddItemWithoutUserDto,
     @GetUser() user: User,
@@ -20,7 +20,7 @@ export class GatewayCartController {
     return this.service.addToCart(user, cartPayload);
   }
 
-  @Delete(`${CART_PREFIX}/delete-from-cart`)
+  @Delete('delete-from-cart')
   async deleteFromCart(
     @GetUser() user: User,
     @Body() cartPayload: DelItemWithoutUserDto,
@@ -28,8 +28,13 @@ export class GatewayCartController {
     return this.service.deleteFromCart(user, cartPayload);
   }
 
-  @Post(`${CART_PREFIX}`)
+  @Post()
   async createCart(@GetUser() user: User) {
     return this.service.createCart(user);
+  }
+
+  @Get()
+  async getCart(@GetUser() user: User) {
+    return this.service.getCart(user);
   }
 }

@@ -4,9 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from '@libs/order/entity/order.entity';
 import { Payment } from '@libs/order/entity/payment.entity';
 import { Shipping } from '@libs/order/entity/shipping.entity';
+import { OrderController } from '@libs/order/order.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, Payment, Shipping])],
+  controllers: [OrderController],
   providers: [OrderService],
 })
 export class OrderModule implements OnModuleInit {

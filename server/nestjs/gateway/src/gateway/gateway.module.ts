@@ -1,14 +1,19 @@
 import { Global, Module } from '@nestjs/common';
-import { GatewayService } from './gateway.service';
-import { GatewayProductController } from './gateway.product.controller';
+import { GatewayService } from './service/gateway.service';
+import { GatewayProductController } from './controller/gateway.product.controller';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
-import { ProducerService } from '@gateway/producer.service';
-import { GatewayCartController } from '@gateway/gateway.cart.controller';
+import { ProducerService } from '@gateway/service/producer.service';
+import { GatewayCartController } from '@gateway/controller/gateway.cart.controller';
+import { GatewayOrderController } from '@gateway/controller/gateway.order.controller';
 
 @Global()
 @Module({
-  controllers: [GatewayProductController, GatewayCartController],
+  controllers: [
+    GatewayProductController,
+    GatewayCartController,
+    GatewayOrderController,
+  ],
   providers: [
     GatewayService,
     ProducerService,

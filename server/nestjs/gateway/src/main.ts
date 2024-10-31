@@ -1,11 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { TransformInterceptor } from '@middlewares/interceptor/transform.interceptor';
 import { LoggingService } from '@logging/logging.service';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { SwaggerConfig } from '@config';
 import { AppModule } from '@app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { TransformInterceptor } from '@middlewares/interceptor/transform.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

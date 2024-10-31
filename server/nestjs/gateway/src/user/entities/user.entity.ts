@@ -1,10 +1,11 @@
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { Role } from '@auth';
 import { BaseEntity } from '@base/base.entity';
 import { Exclude } from 'class-transformer';
 import { ACCOUNT_TYPE, GENDER } from '@share/enums';
 import { IUserAddress } from '@share/interfaces';
 import { Order } from '@libs/order/entity/order.entity';
+import { Cart } from '@libs/cart/entity/cart.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -49,9 +50,14 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   phoneNumber?: string;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'jsonb', nullable: true })
   address: IUserAddress;
 
+  @Exclude()
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
+
+  @Exclude()
+  @OneToOne(() => Cart, (cart) => cart.user)
+  cart: Cart;
 }

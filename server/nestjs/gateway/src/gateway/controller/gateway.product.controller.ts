@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
-import { GatewayService } from '@gateway/gateway.service';
+import { GatewayService } from '@gateway/service/gateway.service';
 import { CreateProductDto } from '@libs/product/dto/create-product.dto';
 import { UpdateProductDto } from '@libs/product/dto/update-product.dto';
 import { PRODUCT_PREFIX, SEARCHING_PREFIX } from '@constants/requestPrefix';
@@ -17,31 +17,31 @@ import { ISearch } from '@libs/searching/search.interface';
 
 @SkipAuth()
 @ApiTags('Gateway')
-@Controller()
+@Controller(PRODUCT_PREFIX)
 export class GatewayProductController {
   constructor(private readonly service: GatewayService) {}
 
-  @Post(`${SEARCHING_PREFIX}`)
+  @Post(SEARCHING_PREFIX)
   async searchProducts(@Body() search: ISearch) {
     return this.service.searchProductByElasticsearch(search);
   }
 
-  @Get(`${PRODUCT_PREFIX}`)
+  @Get()
   async findAllProducts() {
     return this.service.findAllProduct();
   }
 
-  @Get(`${PRODUCT_PREFIX}/:id`)
+  @Get(':id')
   async findOneProduct(@Param('id') id: string) {
     return this.service.findOneProduct(id);
   }
 
-  @Post(`${PRODUCT_PREFIX}`)
+  @Post()
   async createProduct(@Body() productDto: CreateProductDto) {
     return this.service.createProduct(productDto);
   }
 
-  @Patch(`${PRODUCT_PREFIX}/:id`)
+  @Patch(':id')
   async updateProduct(
     @Param('id') id: string,
     @Body() productDto: UpdateProductDto,
@@ -49,7 +49,7 @@ export class GatewayProductController {
     return this.service.updateProduct(id, productDto);
   }
 
-  @Delete(`${PRODUCT_PREFIX}/:id`)
+  @Delete(':id')
   async removeProduct(@Param('id') id: string) {
     return this.service.removeProduct(id);
   }

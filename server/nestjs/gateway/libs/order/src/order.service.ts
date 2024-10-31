@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Order } from '@libs/order/entity/order.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Payment } from '@libs/order/entity/payment.entity';
@@ -7,11 +7,12 @@ import { Shipping } from '@libs/order/entity/shipping.entity';
 import { PaymentEnum } from '@share/enums/payment.enum';
 import { ShippingEnum } from '@share/enums/shipping.enum';
 import { ORDER_STATUS } from '@libs/order/enum';
-import { UpdateOrderStatusDto } from '@libs/order/dto/updateOrderStatus.dto';
+import { UpdateOrderStatusDto } from '@libs/order/dto/withoutUser/updateOrderStatus.dto';
 import { User } from '@user/entities/user.entity';
-import { CreateOrderDto } from '@libs/order/dto/createOrder.dto';
-import { CancelOrderDto } from '@libs/order/dto/cancelOrder.dto';
-import { GetOrderDto } from '@libs/order/dto/getOrder.dto';
+import { CancelOrderDto } from '@libs/order/dto/withUser/cancelOrder.dto';
+import { GetOrderDto } from '@libs/order/dto/withUser/getOrder.dto';
+import { RpcNotFound } from '@base/exception/exception.resolver';
+import { BulkCreateOrderDto } from '@libs/order/dto/withUser/bulkCreateOrder.dto';
 
 @Injectable()
 export class OrderService {
@@ -24,14 +25,23 @@ export class OrderService {
   ) {}
 
   async getAllOrders(user: User) {
-    return this.repository.findBy({ user });
+    return this.repository.find({
+      where: { userId: user.id },
+      relations: ['shipping', 'payment'],
+    });
   }
 
   async getOrder(getOrderDto: GetOrderDto) {
     const { user, orderId } = getOrderDto;
-    const order = await this.repository.findOneBy({ user, id: orderId });
+    const order = await this.repository.findOne({
+      where: {
+        userId: user.id,
+        id: orderId,
+      },
+      relations: ['shipping', 'payment'],
+    });
     if (!order) {
-      throw new NotFoundException('There is no order with this ID');
+      throw new RpcNotFound('There is no order with this ID');
     }
     return order;
   }
@@ -43,17 +53,17 @@ export class OrderService {
     return this.repository.save(order);
   }
 
-  async createOrder(orderPayload: CreateOrderDto) {
+  async createOrder(orderPayload: BulkCreateOrderDto) {
     const { user, orders } = orderPayload;
     const orderEntities = orders.map((order) => {
       return this.repository.create({
         status: ORDER_STATUS.PREPARED,
         invoice: order.invoice,
-        payment: order.payment,
-        shipping: order.shipping,
-        items: order.items,
-        statusHistories: order.statusHistories,
-        user,
+        paymentId: order.paymentId,
+        shippingId: order.shippingId,
+        item: order.item,
+        statusHistories: [],
+        userId: user.id,
       });
     });
 
@@ -98,7 +108,7 @@ export class OrderService {
     const { orderId, status, data } = updateOrderStatusDto;
     const order = await this.repository.findOneBy({ id: orderId });
     if (!order) {
-      throw new NotFoundException('There is no order with this ID');
+      throw new RpcNotFound('There is no order with this ID');
     }
 
     order.status = status;
@@ -109,5 +119,29 @@ export class OrderService {
     });
 
     return this.repository.save(order);
+  }
+
+  async getAllShippingMethod() {
+    return this.shippingRepo.find();
+  }
+
+  async getAllPaymentMethod() {
+    return this.paymentRepo.find();
+  }
+
+  async getShippingMethod(id: number) {
+    const shippingMethod = this.shippingRepo.findOneBy({ id });
+    if (!shippingMethod) {
+      throw new RpcNotFound('There is no shipping with this ID');
+    }
+    return shippingMethod;
+  }
+
+  async getPaymentMethod(id: number) {
+    const paymentMethod = this.paymentRepo.findOneBy({ id });
+    if (!paymentMethod) {
+      throw new RpcNotFound('There is no payment with this ID');
+    }
+    return paymentMethod;
   }
 }

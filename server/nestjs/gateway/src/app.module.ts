@@ -13,6 +13,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 // import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
 import { CartModule } from '@libs/cart/cart.module';
 import { OrderModule } from '@libs/order/order.module';
+import { RoleGuard } from '@guard/role.guard';
 
 @Module({
   controllers: [],
@@ -44,6 +45,10 @@ import { OrderModule } from '@libs/order/order.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
     },
   ],
 })

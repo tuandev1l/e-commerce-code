@@ -1,6 +1,7 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '@base/base.entity';
 import { PaymentEnum } from '@share/enums/payment.enum';
+import { Order } from '@libs/order/entity/order.entity';
 
 @Entity()
 export class Payment extends BaseEntity {
@@ -15,4 +16,7 @@ export class Payment extends BaseEntity {
 
   @Column()
   description: string;
+
+  @OneToMany(() => Order, (order) => order.payment)
+  order: Order;
 }

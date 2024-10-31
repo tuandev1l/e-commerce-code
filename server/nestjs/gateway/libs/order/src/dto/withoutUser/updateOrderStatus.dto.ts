@@ -1,13 +1,13 @@
-import { ORDER_STATUS } from '@libs/order/enum';
 import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { ORDER_STATUS } from '@libs/order/enum';
 
 export class UpdateOrderStatusDto {
   @IsNumber()
   @IsNotEmpty()
   orderId: number;
 
-  @IsEnum(ORDER_STATUS)
   @IsNotEmpty()
+  @IsEnum(ORDER_STATUS)
   status: ORDER_STATUS;
 
   @IsString()

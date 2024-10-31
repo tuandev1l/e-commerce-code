@@ -3,8 +3,8 @@ import { User } from '@user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from '@libs/cart/entity/cart.entity';
 import { Repository } from 'typeorm';
-import { DelItemDto } from '@libs/cart/dto/delItem.dto';
-import { AddItemDto } from '@libs/cart/dto/addItem.dto';
+import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
+import { AddItemDto } from '@libs/cart/dto/withUser/addItem.dto';
 import { RpcBadRequest } from '@base/exception/exception.resolver';
 import { ProductService } from '@libs/product/product.service';
 import { IProductItem } from '@libs/product/interfaces';
@@ -80,14 +80,16 @@ export class CartService {
     if (cart) {
       throw new RpcBadRequest('Cart existed');
     }
-    return this.repository.save({ customerId: user.id });
+    return this.repository.save({ userId: user.id });
   }
 
-  private async getCart(user: User) {
-    let cart = await this.repository.findOneBy({ customerId: user.id });
+  async getCart(user: User) {
+    let cart = await this.repository.findOne({
+      where: { userId: user.id },
+    });
     if (!cart) {
       cart = await this.repository.save({
-        customerId: user.id,
+        userId: user.id,
         productItems: [],
       });
     }
