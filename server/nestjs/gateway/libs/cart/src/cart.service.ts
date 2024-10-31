@@ -17,16 +17,17 @@ export class CartService {
   ) {}
 
   async addToCart(cartPayload: AddItemDto) {
-    const product = await this.productService.findOne(cartPayload.productId);
     const cart = await this.getCart(cartPayload.user);
 
-    const productItemIdx = cart.productItems.findIndex(
-      (pd) => pd._id === product._id,
+    const productItem = cart.productItems.find(
+      (pd) => pd._id.toString() === cartPayload.productId,
     );
 
-    const addingPrice = cartPayload.quantity * product.price;
+    let addingPrice;
+    if (!productItem) {
+      const product = await this.productService.findOne(cartPayload.productId);
 
-    if (productItemIdx === -1) {
+      addingPrice = cartPayload.quantity * product.price;
       const productItem: IProductItem = {
         _id: product._id,
         name: product.name,
@@ -41,8 +42,9 @@ export class CartService {
       };
       cart.productItems.push(productItem);
     } else {
-      cart.productItems[productItemIdx].quantity += cartPayload.quantity;
-      cart.productItems[productItemIdx].subTotal += addingPrice;
+      productItem.quantity += cartPayload.quantity;
+      addingPrice = cartPayload.quantity * productItem.price;
+      productItem.subTotal += addingPrice;
     }
     cart.total += addingPrice;
 
@@ -57,14 +59,17 @@ export class CartService {
       (product) => product._id.toString() === productId,
     );
 
-    const removePrice = cart.productItems[productItemIdx].price * quantity;
+    const productItem = cart.productItems[productItemIdx];
 
-    if (cart.productItems[productItemIdx].quantity - quantity <= 0) {
+    if (productItem.quantity - quantity < 0) {
+      throw new RpcBadRequest('Quantity of product is not enough');
+    } else if (productItem.quantity - quantity == 0) {
       cart.productItems.splice(productItemIdx, 1);
     } else {
-      cart.productItems[productItemIdx].quantity -= quantity;
+      productItem.quantity -= quantity;
     }
 
+    const removePrice = productItem.price * quantity;
     cart.total -= removePrice;
 
     return this.repository.save(cart);
