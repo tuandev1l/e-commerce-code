@@ -3,6 +3,7 @@ import {
   CART_PATTERN,
   ORDER_PATTERN,
   PRODUCT_PATTERN,
+  RATING_PATTERN,
   SEARCHING_PATTERN,
 } from '@constants/pattern';
 import { CreateProductDto } from '@libs/product/dto/create-product.dto';
@@ -16,6 +17,9 @@ import { CancelOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/cancelOrd
 import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
 import { GetOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/getOrder.dto';
 import { BulkCreateOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/bulkCreateOrder.dto';
+import { CreateRatingDto } from '@libs/rating/dto/withUser/createRating.dto';
+import { UpdateRatingDto } from '@libs/rating/dto/withUser/updateRating.dto';
+import { GetAndDeleteRatingDto } from '@libs/rating/dto/withUser/getAndDeleteRating.dto';
 
 @Injectable()
 export class GatewayService {
@@ -122,5 +126,48 @@ export class GatewayService {
 
   async getShippingMethod(id: number) {
     return this.producer.sendMessage(ORDER_PATTERN.GET_SHIPPING_METHOD, id);
+  }
+
+  // RATING
+  async createRating(createRatingDto: CreateRatingDto) {
+    return this.producer.sendMessage(
+      RATING_PATTERN.CREATE_RATING,
+      createRatingDto,
+    );
+  }
+
+  async updateRating(updateRatingDto: UpdateRatingDto) {
+    return this.producer.sendMessage(
+      RATING_PATTERN.UPDATE_RATING,
+      updateRatingDto,
+    );
+  }
+
+  async deleteRating(getAndDeleteRatingDto: GetAndDeleteRatingDto) {
+    return this.producer.sendMessage(
+      RATING_PATTERN.DELETE_RATING,
+      getAndDeleteRatingDto,
+    );
+  }
+
+  async getAllRatingsOfProduct(productId: string) {
+    return this.producer.sendMessage(
+      RATING_PATTERN.GET_ALL_RATING_OF_PRODUCT,
+      productId,
+    );
+  }
+
+  async getRating(getAndDeleteRatingDto: GetAndDeleteRatingDto) {
+    return this.producer.sendMessage(
+      RATING_PATTERN.GET_RATING,
+      getAndDeleteRatingDto,
+    );
+  }
+
+  async getAllRatingOfUser(user: User) {
+    return this.producer.sendMessage(
+      RATING_PATTERN.GET_ALL_RATING_OF_USER,
+      user,
+    );
   }
 }

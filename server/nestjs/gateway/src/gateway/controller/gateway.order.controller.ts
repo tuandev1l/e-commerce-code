@@ -4,16 +4,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { User } from '@user/entities/user.entity';
 import { CancelOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/cancelOrder.dto';
 import { GetUser } from '@auth/decorator/get-user.decorator';
-import {
-  ORDER_PREFIX,
-  PAYMENT_PREFIX,
-  SHIPPING_PREFIX,
-} from '@constants/requestPrefix';
-import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
-import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
+import { ORDER_PREFIX } from '@constants/requestPrefix';
 import { BulkCreateOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/bulkCreateOrder.dto';
-import { Role } from '@auth';
-import { Auth } from '@auth/decorator/auth.decorator';
+import { UpdateOrderStatusDtoWithoutUser } from '@libs/order/dto/withoutUser/updateOrderStatus.dto';
 
 @ApiTags('Gateway')
 @Controller(ORDER_PREFIX)
@@ -36,11 +29,11 @@ export class GatewayOrderController {
     return this.service.cancelOrder(user, orderPayload);
   }
 
-  @Auth(Role.ADMIN, Role.SHOP)
+  // @Auth(Role.ADMIN, Role.SHOP)
   @Patch()
   async updateOrderStatus(
     @GetUser() user: User,
-    @Body() orderPayload: UpdateOrderStatusDto,
+    @Body() orderPayload: UpdateOrderStatusDtoWithoutUser,
   ) {
     return this.service.updateOrderStatus({ user, ...orderPayload });
   }
@@ -51,31 +44,7 @@ export class GatewayOrderController {
   }
 
   @Get(':id')
-  async getOrder(@GetUser() user: User, @Param() id: string) {
+  async getOrder(@GetUser() user: User, @Param('id') id: string) {
     return this.service.getOrder(user, { orderId: +id });
-  }
-
-  @SkipAuth()
-  @Get(`${PAYMENT_PREFIX}`)
-  async getAllPaymentMethod() {
-    return this.service.getAllPaymentMethod();
-  }
-
-  @SkipAuth()
-  @Get(`${PAYMENT_PREFIX}/:id`)
-  async getPaymentMethod(@Param() id: string) {
-    return this.service.getPaymentMethod(+id);
-  }
-
-  @SkipAuth()
-  @Get(`${SHIPPING_PREFIX}`)
-  async getAllShippingMethod() {
-    return this.service.getAllShippingMethod();
-  }
-
-  @SkipAuth()
-  @Get(`${SHIPPING_PREFIX}/:id`)
-  async getShippingMethod(@Param() id: string) {
-    return this.service.getShippingMethod(+id);
   }
 }

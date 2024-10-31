@@ -1,14 +1,10 @@
 import { IsNotEmpty } from 'class-validator';
 import { Type } from 'class-transformer';
-import { Rating } from '@libs/rating/entity/rating.entity';
 import { User } from '@user/entities/user.entity';
+import { CreateRatingDtoWithoutUser } from '@libs/rating/dto/withoutUser/createRating.dto';
 
-export class CreateRatingDto {
+export class CreateRatingDto extends CreateRatingDtoWithoutUser {
   @IsNotEmpty()
   @Type(() => User)
   user: User;
-
-  @IsNotEmpty()
-  @Type(() => Rating)
-  rating: Rating;
 }

@@ -14,6 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { CartModule } from '@libs/cart/cart.module';
 import { OrderModule } from '@libs/order/order.module';
 import { RoleGuard } from '@guard/role.guard';
+import { RatingModule } from '@libs/rating/rating.module';
 
 @Module({
   controllers: [],
@@ -33,6 +34,7 @@ import { RoleGuard } from '@guard/role.guard';
     ProductModule,
     CartModule,
     OrderModule,
+    RatingModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

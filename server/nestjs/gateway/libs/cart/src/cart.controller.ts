@@ -1,4 +1,9 @@
-import { Controller, UseFilters } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  UseFilters,
+  UseInterceptors,
+} from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CART_PATTERN } from '@constants';
 import { CartService } from '@libs/cart/cart.service';
@@ -7,8 +12,9 @@ import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
 import { AddItemDto } from '@libs/cart/dto/withUser/addItem.dto';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
 
-@UseFilters(new ExceptionFilter())
 @Controller()
+@UseFilters(new ExceptionFilter())
+@UseInterceptors(ClassSerializerInterceptor)
 export class CartController {
   constructor(private readonly service: CartService) {}
 

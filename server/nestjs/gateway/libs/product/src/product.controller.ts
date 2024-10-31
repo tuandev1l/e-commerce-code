@@ -1,11 +1,19 @@
-import { Controller } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  UseFilters,
+  UseInterceptors,
+} from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ProductService } from '@libs/product/product.service';
 import { CreateProductDto } from '@libs/product/dto/create-product.dto';
 import { UpdateProductDto } from '@libs/product/dto/update-product.dto';
 import { PRODUCT_PATTERN } from '@constants/pattern';
+import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
 
 @Controller()
+@UseFilters(new ExceptionFilter())
+@UseInterceptors(ClassSerializerInterceptor)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 

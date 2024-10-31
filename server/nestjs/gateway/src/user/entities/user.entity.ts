@@ -6,6 +6,7 @@ import { ACCOUNT_TYPE, GENDER } from '@share/enums';
 import { IUserAddress } from '@share/interfaces';
 import { Order } from '@libs/order/entity/order.entity';
 import { Cart } from '@libs/cart/entity/cart.entity';
+import { Rating } from '@libs/rating/entity/rating.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
@@ -60,4 +61,8 @@ export class User extends BaseEntity {
   @Exclude()
   @OneToOne(() => Cart, (cart) => cart.user)
   cart: Cart;
+
+  @Exclude()
+  @OneToMany(() => Rating, (rating) => rating.user)
+  ratings: Rating[];
 }

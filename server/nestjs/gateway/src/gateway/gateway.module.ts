@@ -6,6 +6,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { ProducerService } from '@gateway/service/producer.service';
 import { GatewayCartController } from '@gateway/controller/gateway.cart.controller';
 import { GatewayOrderController } from '@gateway/controller/gateway.order.controller';
+import { GatewayRatingController } from '@gateway/controller/gateway.rating.controller';
 
 @Global()
 @Module({
@@ -13,6 +14,7 @@ import { GatewayOrderController } from '@gateway/controller/gateway.order.contro
     GatewayProductController,
     GatewayCartController,
     GatewayOrderController,
+    GatewayRatingController,
   ],
   providers: [
     GatewayService,

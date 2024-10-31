@@ -1,13 +1,21 @@
-import { Controller } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  UseFilters,
+  UseInterceptors,
+} from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RatingService } from '@libs/rating/rating.service';
-import { CreateRatingDto } from '@libs/rating/dto/createRating.dto';
-import { UpdateRatingDto } from '@libs/rating/dto/updateRating.dto';
-import { GetAndDeleteRatingDto } from '@libs/rating/dto/getAndDeleteRating.dto';
+import { CreateRatingDto } from '@libs/rating/dto/withUser/createRating.dto';
+import { UpdateRatingDto } from '@libs/rating/dto/withUser/updateRating.dto';
 import { User } from '@user/entities/user.entity';
 import { RATING_PATTERN } from '@constants';
+import { GetAndDeleteRatingDto } from '@libs/rating/dto/withUser/getAndDeleteRating.dto';
+import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
 
 @Controller()
+@UseFilters(new ExceptionFilter())
+@UseInterceptors(ClassSerializerInterceptor)
 export class RatingController {
   constructor(private readonly service: RatingService) {}
 
@@ -27,7 +35,7 @@ export class RatingController {
   }
 
   @MessagePattern(RATING_PATTERN.GET_ALL_RATING_OF_PRODUCT)
-  async getAllRatingOfProduct(@Payload() productId: number) {
+  async getAllRatingOfProduct(@Payload() productId: string) {
     return this.service.getAllRatingsOfProduct(productId);
   }
 
