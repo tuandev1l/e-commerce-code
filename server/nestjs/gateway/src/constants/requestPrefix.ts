@@ -1,4 +1,7 @@
 export const PRODUCT_PREFIX = 'product';
+export const BRAND_PREFIX = 'brand';
+export const CATEGORY_PREFIX = 'categoru';
+export const SHOP_PREFIX = 'shop';
 export const SEARCHING_PREFIX = 'searching';
 
 export const CART_PREFIX = 'cart';

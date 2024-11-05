@@ -54,6 +54,14 @@ export class User extends BaseEntity {
   @Column({ type: 'jsonb', nullable: true })
   address: IUserAddress;
 
+  @Column({ nullable: true })
+  @Exclude()
+  resetToken?: string;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  @Exclude()
+  resetTokenExpired?: Date;
+
   @Exclude()
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];

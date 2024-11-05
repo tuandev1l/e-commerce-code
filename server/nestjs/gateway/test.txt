@@ -1,0 +1,75 @@
+// async insertData() {
+  //   const rawData = await readFile('../../../crawl/data.json', 'utf-8');
+  //   const data = JSON.parse(rawData) as ProductDocument[];
+  //
+  //   const savedData: ProductDocument[] = [];
+  //
+  //   for (const product of data) {
+  //     try {
+  //       product.badges = product['badges_v3'];
+  //       product.rating_average = 0;
+  //       product.review_text = '0';
+  //       product.review_count = 0;
+  //       product.all_time_quantity_sold = 0;
+  //
+  //       const { brand, categories } = product;
+  //       const seller = product['current_seller'];
+  //
+  //       const brandSlug = this.getSlugName(brand.name);
+  //       const brandEntity = await this.brandModel
+  //         .findOne({ slug: brandSlug })
+  //         .exec();
+  //       if (!brandEntity) {
+  //         product.brand = await this.brandModel.create({
+  //           ...brand,
+  //           slug: brandSlug,
+  //         });
+  //       } else {
+  //         product.brand = brandEntity;
+  //       }
+  //
+  //       const categorySlug = this.getSlugName(categories.name);
+  //       const categoryEntity = await this.categoryModel
+  //         .findOne({ slug: categorySlug })
+  //         .exec();
+  //       if (!categoryEntity) {
+  //         product.categories = await this.categoryModel.create({
+  //           ...categories,
+  //           slug: categorySlug,
+  //         });
+  //       } else {
+  //         product.categories = categoryEntity;
+  //       }
+  //
+  //       const shopEntity = await this.shopModel
+  //         .findOne({ name: seller.name })
+  //         .exec();
+  //       if (!shopEntity) {
+  //         const newShop = new Shop();
+  //         newShop.name = seller.name;
+  //         newShop.url = seller['link'];
+  //         newShop.logo = seller.logo;
+  //         newShop.telephone = '';
+  //         newShop.address = {
+  //           streetAddress: '',
+  //           addressLocality: '',
+  //           postalCode: '',
+  //           addressRegion: '',
+  //           addressCountry: '',
+  //         };
+  //
+  //         product.seller = await this.shopModel.create(newShop);
+  //       } else {
+  //         product.seller = shopEntity;
+  //       }
+  //
+  //       const savedProduct = await this.model.create(product);
+  //       savedData.push(savedProduct);
+  //     } catch (e) {
+  //       console.error(`Error at productId: ${product.id}`);
+  //       console.log(e);
+  //     }
+  //   }
+  //
+  //   return savedData;
+  // }

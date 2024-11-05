@@ -15,6 +15,9 @@ import { CartModule } from '@libs/cart/cart.module';
 import { OrderModule } from '@libs/order/order.module';
 import { RoleGuard } from '@guard/role.guard';
 import { RatingModule } from '@libs/rating/rating.module';
+import { BullModule } from '@nestjs/bullmq';
+import { QueueModule } from '@libs/queue';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   controllers: [],
@@ -35,11 +38,38 @@ import { RatingModule } from '@libs/rating/rating.module';
     CartModule,
     OrderModule,
     RatingModule,
+    QueueModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         uri: `mongodb+srv://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@products.qevln.mongodb.net/${configService.get('MONGODB_NAME')}`,
+      }),
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
+          password: configService.get('REDIS_PASSWORD'),
+        },
+      }),
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: {
+          host: configService.get('MAIL_HOST'),
+          secure: true,
+          port: 465,
+          auth: {
+            user: configService.get('MAIL_USERNAME'),
+            pass: configService.get('MAIL_PASSWORD'),
+          },
+        },
       }),
     }),
   ],

@@ -9,30 +9,34 @@ import {
 } from '@nestjs/common';
 import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
 import { GatewayService } from '@gateway/service/gateway.service';
-import { CreateProductDto } from '@libs/product/dto/create-product.dto';
-import { UpdateProductDto } from '@libs/product/dto/update-product.dto';
 import { PRODUCT_PREFIX, SEARCHING_PREFIX } from '@constants/requestPrefix';
 import { ApiTags } from '@nestjs/swagger';
 import { ISearch } from '@libs/searching/search.interface';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
+import { CreateProductDtoWithoutUser } from '@libs/product/dto/product/withoutUser/create-product.dto';
+import { UpdateProductDtoWithoutUser } from '@libs/product/dto/product/withoutUser/update-product.dto';
+import { GetUser } from '@auth/decorator/get-user.decorator';
+import { User } from '@user/entities/user.entity';
 
-@SkipAuth()
 @ApiTags('Gateway')
 @Controller(PRODUCT_PREFIX)
 export class GatewayProductController {
   constructor(private readonly service: GatewayService) {}
 
+  @SkipAuth()
   @Post(SEARCHING_PREFIX)
   async searchProducts(@Body() search: ISearch) {
     return this.service.searchProductByElasticsearch(search);
   }
 
+  @SkipAuth()
   @Get()
   async findAllProducts() {
     return this.service.findAllProduct();
   }
 
+  @SkipAuth()
   @Get(':id')
   async findOneProduct(@Param('id') id: string) {
     return this.service.findOneProduct(id);
@@ -40,17 +44,21 @@ export class GatewayProductController {
 
   @Auth(Role.SHOP)
   @Post()
-  async createProduct(@Body() productDto: CreateProductDto) {
-    return this.service.createProduct(productDto);
+  async createProduct(
+    @GetUser() user: User,
+    @Body() productDto: CreateProductDtoWithoutUser,
+  ) {
+    return this.service.createProduct({ user, ...productDto });
   }
 
   @Auth(Role.SHOP)
   @Patch(':id')
   async updateProduct(
     @Param('id') id: string,
-    @Body() productDto: UpdateProductDto,
+    @GetUser() user: User,
+    @Body() productDto: UpdateProductDtoWithoutUser,
   ) {
-    return this.service.updateProduct(id, productDto);
+    return this.service.updateProduct({ productId: id, user, ...productDto });
   }
 
   @Auth(Role.ADMIN, Role.SHOP)

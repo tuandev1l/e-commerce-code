@@ -8,12 +8,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '@user/entities/user.entity';
 import { AuthController } from '@auth/auth.controller';
 import { JwtStrategy } from '@auth/jwt.strategy';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     UserModule,
     PassportModule,
+    BullModule.registerQueue({
+      name: 'mail-queue',
+    }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

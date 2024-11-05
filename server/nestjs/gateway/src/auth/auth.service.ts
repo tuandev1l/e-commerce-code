@@ -14,6 +14,12 @@ import { JwtService } from '@nestjs/jwt';
 import { ApiProperty } from '@nestjs/swagger';
 import { emailRegex, phoneRegex } from '@share/regex';
 import { ACCOUNT_TYPE } from '@share/enums';
+import { ChangePasswordDto } from '@auth/dto/changePassword.dto';
+import { ForgotPasswordDto } from '@auth/dto/forgotPassword.dto';
+import { ResetPasswordDto } from '@auth/dto/resetPassword.dto';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import * as crypto from 'crypto';
 
 export class IAuthRes {
   @ApiProperty()
@@ -34,6 +40,7 @@ export class AuthService {
     @InjectRepository(User) private readonly repository: Repository<User>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    @InjectQueue('mail-queue') private readonly queue: Queue,
   ) {}
 
   async generateJwt(user: User): Promise<IAuthRes> {
@@ -48,50 +55,41 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const { username, password } = loginDto;
+    const { email, password } = loginDto;
 
-    const [isEmail] = this.validateUsername(username);
-    const user = await this.findUserByUsername(username, isEmail);
+    const user = await this.repository.findOneBy({ email });
     if (!user) {
       throw new NotFoundException('There is no user with this ID');
     }
     if (!(await bcrypt.compare(password, user.password))) {
       throw new BadRequestException('Wrong username or password');
     }
+
+    if (!user.isEmailVerified && !user.isPhoneVerified) {
+      throw new BadRequestException(
+        `Please verify ${user.email ? 'email' : 'phone'} first`,
+      );
+    }
+
     return this.generateJwt(user);
   }
 
   async signup(signupDto: SignupDto) {
-    const { username, password, name, birthday, address, gender, avatarUrl } =
+    const { email, password, name, birthday, address, gender, avatarUrl } =
       signupDto;
 
-    const [isEmail, isPhoneNumber] = this.validateUsername(username);
+    const resetToken = await this.createToken();
 
-    let email = '',
-      phoneNumber = '',
-      accountType = ACCOUNT_TYPE.OTHER;
-
-    if (isEmail) {
-      email = username;
-      accountType = ACCOUNT_TYPE.EMAIL;
-    } else if (isPhoneNumber) {
-      phoneNumber = username;
-      accountType = ACCOUNT_TYPE.PHONE;
-    }
-
-    const isExisted = await this.findUserByUsername(username, isEmail);
-    if (isExisted) {
+    const existedUser = await this.repository.findOneBy({ email });
+    if (existedUser && existedUser.isEmailVerified) {
       throw new BadRequestException(
-        'Please choose another email or phone number',
+        'Email existed, please choose another email',
       );
     }
 
-    const hashPassword = await bcrypt.hash(
-      password,
-      this.configService.get('PASSWORD_SALT_LENGTH'),
-    );
+    const hashPassword = await this.hashPassword(password);
     const user = this.repository.create({
-      accountType,
+      accountType: ACCOUNT_TYPE.EMAIL,
       birthday,
       gender,
       address,
@@ -99,11 +97,84 @@ export class AuthService {
       password: hashPassword,
       name,
       email,
-      phoneNumber,
+      resetToken: resetToken,
+      resetTokenExpired: new Date(Date.now() + 10 * 60 * 1000),
     });
 
     await this.repository.save(user);
-    return this.generateJwt(user);
+
+    const html = `Activate your Account
+        To activate your account we just need to confirm your email address... It only takes a minute!
+        Confirm Email Address: <a href="http://localhost:5173/auth/verify/${resetToken}">LINK<a>`;
+    // sending email to verify user
+    void this.sendingEmail(
+      email,
+      'ACTIVATE YOUR ACCOUNT (ONLY VALID ON 10 MINS)',
+      html,
+    );
+  }
+
+  async changePassword(user, changePasswordDto: ChangePasswordDto) {
+    console.log(user);
+    const { password, newPassword } = changePasswordDto;
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new BadRequestException('Wrong password');
+    }
+
+    user.password = await this.hashPassword(newPassword);
+
+    void this.repository.save(user);
+  }
+
+  async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
+    const { email } = forgotPasswordDto;
+    const user = await this.repository.findOneBy({ email });
+
+    if (!user) {
+      throw new NotFoundException('There is no user with this email');
+    }
+
+    const token = await this.createToken();
+    const html = `Forgot your password? Submit a PATCH request with your new password and password confirm to: <a href="http://localhost:5173/auth/reset-password/${token}">LINK</a>. If you didn't forget your password, please ignore this email.`;
+
+    user.resetToken = token;
+    user.resetTokenExpired = new Date(Date.now() + 10 * 60 * 1000);
+    await this.repository.save(user);
+    void this.sendingEmail(
+      email,
+      'PASSWORD RESET TOKEN (ONLY VALID ON 10 MINS)',
+      html,
+    );
+  }
+
+  async verifyUser(token: string) {
+    const user = await this.repository.findOneBy({ resetToken: token });
+    if (!user) {
+      throw new NotFoundException(
+        'Verify fail, there is no user with this token',
+      );
+    }
+
+    user.isEmailVerified = true;
+    user.resetToken = undefined;
+    user.resetTokenExpired = undefined;
+    void this.repository.save(user);
+    return true;
+  }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const { newPassword, resetToken } = resetPasswordDto;
+    const user = await this.repository.findOneBy({ resetToken });
+
+    if (!user) {
+      throw new NotFoundException('There is no user with this resetToken');
+    }
+
+    user.password = await this.hashPassword(newPassword);
+    user.resetToken = undefined;
+    user.resetTokenExpired = undefined;
+    void this.repository.save(user);
   }
 
   private validateUsername(username: string) {
@@ -120,11 +191,31 @@ export class AuthService {
     return [isEmail, isPhoneNumber];
   }
 
-  private async findUserByUsername(username: string, isEmail): Promise<User> {
-    if (isEmail) {
-      return this.repository.findOneBy({ email: username });
-    }
+  private async hashPassword(password: string) {
+    return bcrypt.hash(
+      password,
+      this.configService.get('PASSWORD_SALT_LENGTH'),
+    );
+  }
 
-    return this.repository.findOneBy({ phoneNumber: username });
+  // private async findUserByUsername(username: string, isEmail): Promise<User> {
+  //   if (isEmail) {
+  //     return this.repository.findOneBy({ email: username });
+  //   }
+  //
+  //   return this.repository.findOneBy({ phoneNumber: username });
+  // }
+
+  private async createToken() {
+    const randomString = crypto.randomBytes(32).toString('hex');
+    return crypto.createHash('sha256').update(randomString).digest('hex');
+  }
+
+  private async sendingEmail(toEmail: string, subject: string, html?: string) {
+    await this.queue.add('send-email', {
+      toEmail,
+      subject,
+      html,
+    });
   }
 }

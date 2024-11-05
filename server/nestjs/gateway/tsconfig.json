@@ -35,6 +35,12 @@
       ],
       "@libs/order/*": [
         "libs/order/src/*"
+      ],
+      "@libs/queue": [
+        "libs/queue/src"
+      ],
+      "@libs/queue/*": [
+        "libs/queue/src/*"
       ]
     }
   }

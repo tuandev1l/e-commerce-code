@@ -1,14 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { LoggingService } from '@logging/logging.service';
-import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { SwaggerConfig } from '@config';
 import { AppModule } from '@app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { TransformInterceptor } from '@middlewares/interceptor/transform.interceptor';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.enableCors();
 
   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,

@@ -20,6 +20,8 @@
     "@lib/cart/(.*)": "<rootDir>/../libs/cart/src/$1",
     "@lib/cart": "<rootDir>/../libs/cart/src",
     "@lib/order/(.*)": "<rootDir>/../libs/order/src/$1",
-    "@lib/order": "<rootDir>/../libs/order/src"
+    "@lib/order": "<rootDir>/../libs/order/src",
+    "@queue/queue/(.*)": "<rootDir>/../libs/queue/src/$1",
+    "@queue/queue": "<rootDir>/../libs/queue/src"
   }
 }

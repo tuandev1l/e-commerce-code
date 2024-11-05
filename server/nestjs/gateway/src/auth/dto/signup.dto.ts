@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
 } from 'class-validator';
 import { GENDER } from '@share/enums';
 import { IUserAddress } from '@share/interfaces';
@@ -28,6 +27,5 @@ export class SignupDto extends LoginDto {
   avatarUrl?: string;
 
   @IsNotEmpty()
-  @ValidateNested()
   address: IUserAddress;
 }

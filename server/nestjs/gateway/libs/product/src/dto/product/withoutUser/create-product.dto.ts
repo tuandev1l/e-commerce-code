@@ -15,7 +15,7 @@ import { Shop } from '@libs/product/entities/shop.entity';
 import { Brand } from '@libs/product/entities/brand.entity';
 import { Category } from '@libs/product/entities/category.entity';
 
-export class CreateProductDto {
+export class CreateProductDtoWithoutUser {
   @IsNotEmpty()
   @IsString()
   name: string;
