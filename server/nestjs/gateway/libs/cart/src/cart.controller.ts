@@ -11,6 +11,7 @@ import { User } from '@user/entities/user.entity';
 import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
 import { AddItemDto } from '@libs/cart/dto/withUser/addItem.dto';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
+import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityInCart.dto';
 
 @Controller()
 @UseFilters(new ExceptionFilter())
@@ -21,6 +22,11 @@ export class CartController {
   @MessagePattern(CART_PATTERN.ADD_TO_CART)
   async addToCart(@Payload() cartPayload: AddItemDto) {
     return this.service.addToCart(cartPayload);
+  }
+
+  @MessagePattern(CART_PATTERN.CHANGE_QUANTITY)
+  async changeQuantity(@Payload() changeQuantityDto: ChangeQuantityInCartDto) {
+    return this.service.changeQuantity(changeQuantityDto);
   }
 
   @MessagePattern(CART_PATTERN.DELETE_FROM_CART)

@@ -8,6 +8,8 @@ import { AddItemDto } from '@libs/cart/dto/withUser/addItem.dto';
 import { RpcBadRequest } from '@base/exception/exception.resolver';
 import { ProductService } from '@libs/product/product.service';
 import { IProductItem } from '@libs/product/interfaces';
+import { v4 as uuidv4 } from 'uuid';
+import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityInCart.dto';
 
 @Injectable()
 export class CartService {
@@ -20,7 +22,10 @@ export class CartService {
     const cart = await this.getCart(cartPayload.user);
 
     const productItem = cart.productItems.find(
-      (pd) => pd._id.toString() === cartPayload.productId,
+      (pd) =>
+        pd._id.toString() === cartPayload.productId &&
+        pd.color === cartPayload.color &&
+        pd.size === cartPayload.size,
     );
 
     let addingPrice;
@@ -30,6 +35,7 @@ export class CartService {
       addingPrice = cartPayload.quantity * product.price;
       const productItem: IProductItem = {
         _id: product._id,
+        uuid: uuidv4(),
         name: product.name,
         thumbnailUrl: product.thumbnailUrl,
         discount: product.discount,
@@ -39,6 +45,8 @@ export class CartService {
         seller: product.seller,
         quantity: cartPayload.quantity,
         subTotal: addingPrice,
+        color: cartPayload.color,
+        size: cartPayload.size,
       };
       cart.productItems.push(productItem);
     } else {
@@ -48,6 +56,16 @@ export class CartService {
     }
     cart.total += addingPrice;
 
+    await this.repository.save(cart);
+    return this.getCart(cartPayload.user);
+  }
+
+  async changeQuantity(changeQuantityDto: ChangeQuantityInCartDto) {
+    const { quantity, productId, user } = changeQuantityDto;
+    const cart = await this.getCart(user);
+
+    const product = cart.productItems.find((pd) => pd.uuid === productId);
+    product.quantity = quantity;
     return this.repository.save(cart);
   }
 

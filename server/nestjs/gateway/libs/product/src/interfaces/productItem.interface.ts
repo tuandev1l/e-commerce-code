@@ -12,6 +12,9 @@ export interface IProductItem
     | 'discount'
     | 'thumbnailUrl'
   > {
+  uuid: string;
+  color?: string;
+  size?: string;
   quantity: number;
   subTotal: number;
 }

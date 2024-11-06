@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class AddItemWithoutUserDto {
   @IsNotEmpty()
@@ -8,4 +8,12 @@ export class AddItemWithoutUserDto {
   @IsNotEmpty()
   @IsNumber()
   quantity: number;
+
+  @IsOptional()
+  @IsString()
+  color?: string;
+
+  @IsOptional()
+  @IsString()
+  size?: string;
 }

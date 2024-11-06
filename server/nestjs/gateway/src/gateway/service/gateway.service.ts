@@ -29,6 +29,7 @@ import { CreateCategoryDto } from '@libs/product/dto/category/create-category.dt
 import { UpdateCategoryDto } from '@libs/product/dto/category/update-category.dto';
 import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
 import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
+import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityInCart.dto';
 
 @Injectable()
 export class GatewayService {
@@ -71,6 +72,13 @@ export class GatewayService {
       user,
       ...cartPayload,
     });
+  }
+
+  async changeQuantity(changeQuantityDto: ChangeQuantityInCartDto) {
+    return this.producer.sendMessage(
+      CART_PATTERN.CHANGE_QUANTITY,
+      changeQuantityDto,
+    );
   }
 
   async deleteFromCart(user: User, cartPayload: DelItemWithoutUserDto) {

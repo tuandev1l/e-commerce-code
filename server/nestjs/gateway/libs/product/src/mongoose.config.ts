@@ -14,6 +14,7 @@ export const productConfig = [
       const schema = ProductSchema;
       schema.pre('findOne', function (next) {
         this.populate('brand', 'slug name __v');
+        this.populate('seller');
         next();
       });
       return schema;

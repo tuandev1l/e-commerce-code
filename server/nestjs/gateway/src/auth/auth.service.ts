@@ -115,7 +115,6 @@ export class AuthService {
   }
 
   async changePassword(user, changePasswordDto: ChangePasswordDto) {
-    console.log(user);
     const { password, newPassword } = changePasswordDto;
 
     if (!(await bcrypt.compare(password, user.password))) {
@@ -163,8 +162,8 @@ export class AuthService {
     return true;
   }
 
-  async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const { newPassword, resetToken } = resetPasswordDto;
+  async resetPassword(resetToken, resetPasswordDto: ResetPasswordDto) {
+    const { newPassword } = resetPasswordDto;
     const user = await this.repository.findOneBy({ resetToken });
 
     if (!user) {

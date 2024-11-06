@@ -71,8 +71,11 @@ export class AuthController {
   @SkipAuth()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'reset-password' })
-  @Post('reset-password')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.service.resetPassword(resetPasswordDto);
+  @Post('reset-password/:resetToken')
+  async resetPassword(
+    @Param('resetToken') resetToken: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ) {
+    return this.service.resetPassword(resetToken, resetPasswordDto);
   }
 }

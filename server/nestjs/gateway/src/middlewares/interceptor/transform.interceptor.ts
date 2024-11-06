@@ -16,7 +16,9 @@ export class TransformInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         try {
-          return instanceToPlain(data);
+          return instanceToPlain(data, {
+            excludeExtraneousValues: true,
+          });
         } catch (e) {
           return data;
         }
