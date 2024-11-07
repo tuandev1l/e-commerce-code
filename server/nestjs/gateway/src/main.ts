@@ -4,7 +4,6 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { SwaggerConfig } from '@config';
 import { AppModule } from '@app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { TransformInterceptor } from '@middlewares/interceptor/transform.interceptor';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
@@ -25,7 +24,6 @@ async function bootstrap() {
 
   const logger = app.get(LoggingService).getLogger('app');
   app.setGlobalPrefix('api/v1');
-  app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

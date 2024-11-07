@@ -194,7 +194,7 @@ export const ProductDetail = ({}: Props) => {
                                     }}
                                     className={`px-4 py-1 rounded-lg solid border-gray-200 border-2 hover:cursor-pointer ${
                                       option[configIdx] === valueIdx &&
-                                      'border-blue-700'
+                                      'border-blue-600'
                                     }`}
                                   >
                                     {value.label}

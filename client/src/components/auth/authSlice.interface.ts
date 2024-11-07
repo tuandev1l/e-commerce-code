@@ -1,3 +1,6 @@
+import { IShopAddress } from '../../interfaces';
+import { IUserAddress } from '../../interfaces/userAddress.interface';
+
 export interface IAuthSlice {
   isLoading: boolean;
   error?: string;
@@ -14,7 +17,7 @@ export interface IAuthSlice {
     email?: string;
     phoneNumber?: string;
     avatarUrl?: string;
-    address?: string;
+    address?: IUserAddress[];
   };
 }
 

@@ -7,7 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 import { GENDER } from '@share/enums';
-import { IUserAddress } from '@share/interfaces';
+import { Type } from 'class-transformer';
 
 export class SignupDto extends LoginDto {
   @IsNotEmpty()
@@ -16,6 +16,7 @@ export class SignupDto extends LoginDto {
 
   @IsOptional()
   @IsDate()
+  @Type(() => Date)
   birthday?: Date;
 
   @IsNotEmpty()
@@ -26,6 +27,6 @@ export class SignupDto extends LoginDto {
   @IsString()
   avatarUrl?: string;
 
-  @IsNotEmpty()
-  address: IUserAddress;
+  // @IsNotEmpty()
+  // address: IUserAddress;
 }

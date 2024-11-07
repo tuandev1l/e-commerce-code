@@ -52,7 +52,7 @@ export class User extends BaseEntity {
   phoneNumber?: string;
 
   @Column({ type: 'jsonb', nullable: true })
-  address: IUserAddress;
+  address: IUserAddress[];
 
   @Column({ nullable: true })
   @Exclude()

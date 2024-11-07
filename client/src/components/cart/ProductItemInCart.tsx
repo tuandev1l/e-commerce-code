@@ -6,6 +6,7 @@ import { changeQuantityOfProductInCartApi } from '../../api/api';
 import { IAxiosError } from '../../config/axiosError.interface';
 import useToast from '../../hook/useToast';
 import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
+import { priceSplit } from '../../common/price/priceSplit';
 
 type Props = {
   productItem: IProductItemMinimal;
@@ -61,31 +62,36 @@ export const ProductItemInCart = ({
             className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mr-4'
             onChange={() => {
               setChecked(!checked);
-              productSelectHandler(productItem, quantity);
+              productSelectHandler(productItem, quantity, !checked);
             }}
           />
         </div>
-        <img
-          src={productItem.thumbnailUrl}
-          alt={productItem.name}
-          className='w-16 h-16 rounded-md mr-4'
-        />
-        <div>
-          <p className='font-semibold line-clamp-3'>{productItem.name}</p>
-          <p className='text-gray-500 text-sm'>
-            {productItem.color}, {productItem.size}
-          </p>
-        </div>
+        <label
+          htmlFor={`product-checkbox-${idx}`}
+          className='flex items-center hover:cursor-pointer'
+        >
+          <img
+            src={productItem.thumbnailUrl}
+            alt={productItem.name}
+            className='w-16 h-16 rounded-md mr-4'
+          />
+          <div>
+            <p className='font-semibold line-clamp-3'>{productItem.name}</p>
+            <p className='text-gray-500 text-sm'>
+              {productItem.color}, {productItem.size}
+            </p>
+          </div>
+        </label>
       </div>
 
       {/* Price Column */}
       <div className='w-1/3 text-center flex gap-2 items-center justify-center'>
         <div className='text-red-500 font-semibold'>
-          {productItem.price.toLocaleString()}₫
+          {priceSplit(productItem.price)}₫
         </div>
         {productItem.discount > 0 && (
           <div className='text-gray-500 line-through text-sm'>
-            {productItem.originalPrice.toLocaleString()}₫
+            {priceSplit(productItem.originalPrice)}₫
           </div>
         )}
       </div>
@@ -137,7 +143,7 @@ export const ProductItemInCart = ({
       {/* Total Price Column */}
       <div className='w-32 text-center'>
         <div className='text-red-500 font-semibold'>
-          {(productItem.price * quantity).toLocaleString()}₫
+          {priceSplit(productItem.price * quantity)}₫
         </div>
       </div>
 

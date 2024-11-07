@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 import { IProductItem } from '../../interfaces';
 import { IProductMinimalWrapper } from '../../interfaces/productMinimalWrapper.interface';
 import { cartInitalState } from './cartSlice.interface';
-import { ICartItemSelect } from './cartItemSelect.interface';
 
 const pickValueOfProduct = (productItem: IProductItem) => ({
   uuid: productItem.uuid,
@@ -28,11 +27,9 @@ const cartSlice = createSlice({
       }: { productItems: IProductItem[]; total: number; userId: number } =
         payload;
       const data: IProductMinimalWrapper[] = [];
-      const cartItemSelect: ICartItemSelect[] = [];
       const sellerObj: { [key: string]: number } = {};
       let discount = 0;
       for (const productItem of productItems) {
-        cartItemSelect.push({ ...productItem, select: false });
         if (productItem.seller?.name) {
           const idx = sellerObj[productItem.seller?.name];
           const product = pickValueOfProduct(productItem);
@@ -49,15 +46,18 @@ const cartSlice = createSlice({
         }
       }
 
-      state.cartItemSelect = cartItemSelect;
       state.products = data;
       state.userId = userId;
       state.discount = discount;
       state.total = total;
     },
+    setProductItemSelected: (state, { payload }) => {
+      state.productSelected = payload;
+    },
   },
   extraReducers: () => {},
 });
 
-export const { getAllProductsInCart } = cartSlice.actions;
+export const { getAllProductsInCart, setProductItemSelected } =
+  cartSlice.actions;
 export default cartSlice;

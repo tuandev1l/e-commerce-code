@@ -1,7 +1,7 @@
 export interface IUserAddress {
-  uuid?: string;
-  detailAddress: string;
+  uuid: string;
   phoneNumber: string;
+  detailAddress: string;
   ward: string;
   district: string;
   province: string;

@@ -38,9 +38,14 @@ const authSlice = createSlice({
       state.accessToken = '';
       localStorage.clear();
     },
+    addNewAddressDispatch: (state, { payload }) => {
+      state.user.address = payload;
+      localStorage.setItem('user', JSON.stringify(state.user));
+    },
   },
   extraReducers: () => {},
 });
 
-export const { loginSuccess, logout } = authSlice.actions;
+export const { loginSuccess, logout, addNewAddressDispatch } =
+  authSlice.actions;
 export default authSlice;

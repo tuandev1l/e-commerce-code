@@ -1,10 +1,9 @@
 import { IProductMinimalWrapper } from '../../interfaces/productMinimalWrapper.interface';
-import { ICartItemSelect } from './cartItemSelect.interface';
 
 export interface ICartSlice {
   isLoading: boolean;
   products: IProductMinimalWrapper[];
-  cartItemSelect: ICartItemSelect[];
+  productSelected: IProductMinimalWrapper[];
   total: number;
   discount: number;
   userId: number;
@@ -14,7 +13,7 @@ export interface ICartSlice {
 export const cartInitalState: ICartSlice = {
   isLoading: false,
   products: [],
-  cartItemSelect: [],
+  productSelected: [],
   error: undefined,
   total: 0,
   discount: 0,

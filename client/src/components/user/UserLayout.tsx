@@ -9,6 +9,8 @@ import {
 import { ReactElement } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Layout } from '../../common/layout/Layout';
+import { useSelector } from 'react-redux';
+import { usernameSelector } from '../../store/selector';
 
 type Props = {
   children: ReactElement;
@@ -48,6 +50,7 @@ const tabs = [
 ];
 
 export const UserLayout = ({ children }: Props) => {
+  const username = useSelector(usernameSelector);
   const location = useLocation();
   const activeTab =
     tabs.findIndex((tab) => tab.link === location.pathname) || 0;
@@ -64,7 +67,7 @@ export const UserLayout = ({ children }: Props) => {
               />
               <div>
                 <h2 className='text-gray-500 font-semibold'>Tài khoản của</h2>
-                <p className='text-gray-700 font-bold'>Trịnh Minh Tuấn BDCCN</p>
+                <p className='text-gray-700 font-bold'>{username}</p>
               </div>
             </div>
             <nav className='mt-6 space-y-4 text-gray-600'>

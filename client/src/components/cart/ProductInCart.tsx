@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { IProductMinimalWrapper } from '../../interfaces/productMinimalWrapper.interface';
 import { ProductItemInCart } from './ProductItemInCart';
 
@@ -16,8 +15,6 @@ export const ProductInCart = ({
   updateQuantityHandler,
   productSelectHandler,
 }: Props) => {
-  const productItemLength = product.productItem.length;
-
   return (
     <div key={productIndex} className='bg-white p-4 pb-2 mb-4 rounded-lg'>
       {/* Seller Row */}

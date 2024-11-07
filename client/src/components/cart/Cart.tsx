@@ -7,7 +7,7 @@ import { priceSplit } from '../../common/price/priceSplit';
 import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
 import { productsInCartSelector, usernameSelector } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
-import { getAllProductsInCart } from './cartSlice';
+import { getAllProductsInCart, setProductItemSelected } from './cartSlice';
 import { ProductInCart } from './ProductInCart';
 type Props = {};
 
@@ -76,6 +76,10 @@ export const Cart = ({}: Props) => {
     }
   };
 
+  const buyProductHandler = () => {
+    dispatch(setProductItemSelected(productSelected));
+  };
+
   return (
     <Layout>
       <div className='flex justify-center p-2 w-11/12'>
@@ -134,10 +138,11 @@ export const Cart = ({}: Props) => {
                     </span>
                   </div>
                   <button
-                    className={`w-full bg-red-500 text-white font-semibold py-2 rounded-md ${
+                    className={`w-full bg-red-500 text-white font-semibold py-2 rounded-md hover:cursor-pointer ${
                       !productSelected.length &&
-                      'disabled hover:cursor-not-allowed bg-red-300'
+                      'disabled hover:cursor-not-allowed bg-red-400'
                     }`}
+                    onClick={buyProductHandler}
                   >
                     Mua Hàng ({productSelected.length})
                   </button>

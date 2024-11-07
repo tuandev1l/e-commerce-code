@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -17,6 +18,8 @@ import { User } from '@user/entities/user.entity';
 import { ChangePasswordDto } from '@auth/dto/changePassword.dto';
 import { ForgotPasswordDto } from '@auth/dto/forgotPassword.dto';
 import { ResetPasswordDto } from '@auth/dto/resetPassword.dto';
+import { AddNewAddressDto } from '@auth/dto/addNewAddress.dto';
+import { SetDefaultAddressDto } from '@auth/dto/setDefaultAddress.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -77,5 +80,35 @@ export class AuthController {
     @Body() resetPasswordDto: ResetPasswordDto,
   ) {
     return this.service.resetPassword(resetToken, resetPasswordDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'add-address' })
+  @Post('add-address')
+  async addNewAddress(
+    @GetUser() user: User,
+    @Body() addNewAddressDto: AddNewAddressDto,
+  ) {
+    return this.service.addNewAddress(user, addNewAddressDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'set-default-address' })
+  @Post('set-default-address')
+  async setDefaultAddress(
+    @GetUser() user: User,
+    @Body() setDefaultAddressDto: SetDefaultAddressDto,
+  ) {
+    return this.service.setDefaultAddress(user, setDefaultAddressDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'set-default-address' })
+  @Delete('delete-address/:addressId')
+  async deleteAddress(
+    @GetUser() user: User,
+    @Param('addressId') addressId: string,
+  ) {
+    return this.service.deleteAddress(user, addressId);
   }
 }

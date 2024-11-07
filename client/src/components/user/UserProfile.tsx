@@ -1,10 +1,41 @@
 import { UserIcon } from '@heroicons/react/24/outline';
 import { Link } from 'react-router-dom';
 import { UserLayout } from './UserLayout';
+import { useEffect, useState } from 'react';
+import {
+  dobSelector,
+  genderSelector,
+  phoneSelector,
+  usernameSelector,
+} from '../../store/selector';
+import { useSelector } from 'react-redux';
+import { Gender } from '../../enum/userGender.enum';
 
 type Props = {};
 
 export const UserProfile = ({}: Props) => {
+  const dob = useSelector(dobSelector);
+  const [fullname, setFullName] = useState<string>(
+    useSelector(usernameSelector) || ''
+  );
+  const [date, setDate] = useState<number>(1);
+  const [month, setMonth] = useState<number>(1);
+  const [year, setYear] = useState<number>(2000);
+
+  const [gender, setGender] = useState<string>(
+    useSelector(genderSelector) || ''
+  );
+  const [phone, setPhone] = useState<string>(useSelector(phoneSelector) || '');
+
+  useEffect(() => {
+    if (dob) {
+      const date = new Date(dob);
+      setDate(date.getDay());
+      setMonth(date.getMonth());
+      setYear(date.getFullYear());
+    }
+  }, [dob]);
+
   return (
     <UserLayout>
       <main className='flex-1 py-2'>
@@ -26,11 +57,12 @@ export const UserProfile = ({}: Props) => {
                     </label>
                     <input
                       type='text'
-                      value='Trịnh Minh Tuấn BDCCN'
+                      value={fullname}
+                      onChange={(e) => setFullName(e.target.value)}
                       className='mt-1 p-2 w-full border border-gray-300 rounded'
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <label className='block text-gray-600 font-medium'>
                       Nickname
                     </label>
@@ -39,7 +71,7 @@ export const UserProfile = ({}: Props) => {
                       placeholder='Thêm nickname'
                       className='mt-1 p-2 w-full border border-gray-300 rounded mb-4'
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -50,19 +82,37 @@ export const UserProfile = ({}: Props) => {
                   Ngày sinh
                 </label>
                 <div className='flex space-x-2 gap-4'>
-                  <select className='py-2 px-6 border border-gray-300 rounded bg-white border-1'>
+                  <select
+                    className='py-2 px-6 border border-gray-300 rounded bg-white border-1'
+                    value={date}
+                    onChange={(e) => {
+                      setDate(+e.target.value);
+                    }}
+                  >
                     <option>Ngày</option>
                     {new Array(31).fill(0).map((_, idx) => (
                       <option value={idx + 1}>{idx + 1}</option>
                     ))}
                   </select>
-                  <select className='py-2 px-6 border border-gray-300 rounded bg-white border-1'>
+                  <select
+                    className='py-2 px-6 border border-gray-300 rounded bg-white border-1'
+                    value={month + 1}
+                    onChange={(e) => {
+                      setMonth(+e.target.value);
+                    }}
+                  >
                     <option>Tháng</option>
                     {new Array(12).fill(0).map((_, idx) => (
                       <option value={idx + 1}>{idx + 1}</option>
                     ))}
                   </select>
-                  <select className='py-2 px-6 border border-gray-300 rounded bg-white border-1'>
+                  <select
+                    className='py-2 px-6 border border-gray-300 rounded bg-white border-1'
+                    value={year}
+                    onChange={(e) => {
+                      setYear(+e.target.value);
+                    }}
+                  >
                     <option>Năm</option>
                     {new Array(125)
                       .fill(1900)
@@ -82,7 +132,8 @@ export const UserProfile = ({}: Props) => {
                     <input
                       id='default-radio-1'
                       type='radio'
-                      value=''
+                      checked={gender === Gender.MALE}
+                      onChange={() => setGender(Gender.MALE)}
                       name='default-radio'
                       className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500'
                     ></input>
@@ -92,7 +143,8 @@ export const UserProfile = ({}: Props) => {
                     <input
                       id='default-radio-1'
                       type='radio'
-                      value=''
+                      checked={gender === Gender.FEMALE}
+                      onChange={() => setGender(Gender.FEMALE)}
                       name='default-radio'
                       className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500'
                     ></input>
@@ -102,7 +154,8 @@ export const UserProfile = ({}: Props) => {
                     <input
                       id='default-radio-1'
                       type='radio'
-                      value=''
+                      onChange={() => setGender(Gender.OTHER)}
+                      checked={gender === Gender.OTHER}
                       name='default-radio'
                       className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500'
                     ></input>
@@ -119,10 +172,11 @@ export const UserProfile = ({}: Props) => {
                 type='text'
                 placeholder='0xxxx'
                 className='mt-1 p-2 w-full border border-gray-300 rounded mb-4'
-                value={'0779245720'}
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
-            <div className='flex items-center'>
+            {/* <div className='flex items-center'>
               <div className='text-gray-600 font-medium w-60'>Email</div>
               <input
                 type='text'
@@ -130,7 +184,7 @@ export const UserProfile = ({}: Props) => {
                 className='mt-1 p-2 w-full border border-gray-300 rounded mb-4'
                 value={'tuanprogrammer001@gmail.com'}
               />
-            </div>
+            </div> */}
             <button className='bg-blue-500 text-white mt-6 py-2 w-full rounded'>
               Lưu thay đổi
             </button>

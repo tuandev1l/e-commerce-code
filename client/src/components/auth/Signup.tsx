@@ -98,9 +98,9 @@ export const Signup = ({}: Props) => {
                     </div>
                   </BoxWrapper>
                 </div>
-                <div className='flex gap-4'>
+                <div className='flex gap-4 items-center'>
                   <div className='flex flex-col flex-1 justify-start gap-5'>
-                    <div>
+                    {/* <div>
                       <label
                         htmlFor='phone'
                         className='block mb-2 text-sm font-medium text-gray-900 '
@@ -114,12 +114,15 @@ export const Signup = ({}: Props) => {
                         className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:focus:border-blue-500'
                         defaultValue='0987654321'
                         required={true}
-                        value={formData.phone}
+                        value={formData.phoneNumber}
                         onChange={(e) =>
-                          setFormData({ ...formData, phone: e.target.value })
+                          setFormData({
+                            ...formData,
+                            phoneNumber: e.target.value,
+                          })
                         }
                       />
-                    </div>
+                    </div> */}
                     <div>
                       <label
                         htmlFor='birthday'
@@ -136,9 +139,13 @@ export const Signup = ({}: Props) => {
                         min={'1900-01-01'}
                         required={true}
                         value={formData.birthday}
-                        onChange={(e) =>
-                          setFormData({ ...formData, birthday: e.target.value })
-                        }
+                        onChange={(e) => {
+                          console.log(e.target.value);
+                          setFormData({
+                            ...formData,
+                            birthday: e.target.value,
+                          });
+                        }}
                       />
                     </div>
                     <div>
@@ -162,15 +169,9 @@ export const Signup = ({}: Props) => {
                       </select>
                     </div>
                   </div>
-                  <div className='w-7/12 flex flex-col justify-center items-center'>
-                    <label
-                      htmlFor='avatar'
-                      className='block mb-2 text-sm font-medium text-gray-900'
-                    >
-                      Avatar
-                    </label>
-                    <div className='h-48 mb-4 w-full flex justify-center items-center'>
-                      <img className='h-48 rounded-lg' src={formData.avatar} />
+                  <div className='w-6/12 flex flex-col justify-center items-center'>
+                    <div className='mb-4 w-full flex justify-center items-center'>
+                      <img className='h-40 rounded-lg' src={formData.avatar} />
                     </div>
                     <input
                       className='block w-8/12 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50'
@@ -178,150 +179,6 @@ export const Signup = ({}: Props) => {
                       type='file'
                     />
                   </div>
-                </div>
-
-                <div className='flex w-full gap-4'>
-                  <BoxWrapper>
-                    <>
-                      <label
-                        htmlFor='country'
-                        className='block mb-2 text-sm font-medium text-gray-900 '
-                      >
-                        Your country
-                      </label>
-                      <input
-                        type='text'
-                        name='country'
-                        id='country'
-                        className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:focus:border-blue-500'
-                        placeholder='name@company.com'
-                        required={true}
-                        value={formData.address.country}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            address: {
-                              ...formData.address,
-                              country: e.target.value,
-                            },
-                          })
-                        }
-                      />
-                    </>
-                  </BoxWrapper>
-                  <BoxWrapper>
-                    <div>
-                      <label
-                        htmlFor='province'
-                        className='block mb-2 text-sm font-medium text-gray-900 '
-                      >
-                        Your province
-                      </label>
-                      <input
-                        type='text'
-                        name='province'
-                        id='province'
-                        className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:focus:border-blue-500'
-                        placeholder='Nguyễn Văn A'
-                        required={true}
-                        value={formData.address.province}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            address: {
-                              ...formData.address,
-                              province: e.target.value,
-                            },
-                          })
-                        }
-                      />
-                    </div>
-                  </BoxWrapper>
-                </div>
-
-                <div className='flex w-full gap-4'>
-                  <BoxWrapper>
-                    <>
-                      <label
-                        htmlFor='district'
-                        className='block mb-2 text-sm font-medium text-gray-900 '
-                      >
-                        Your district
-                      </label>
-                      <input
-                        type='text'
-                        name='district'
-                        id='district'
-                        className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:focus:border-blue-500'
-                        placeholder='name@company.com'
-                        required={true}
-                        value={formData.address.district}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            address: {
-                              ...formData.address,
-                              district: e.target.value,
-                            },
-                          })
-                        }
-                      />
-                    </>
-                  </BoxWrapper>
-                  <BoxWrapper>
-                    <div>
-                      <label
-                        htmlFor='ward'
-                        className='block mb-2 text-sm font-medium text-gray-900 '
-                      >
-                        Your ward
-                      </label>
-                      <input
-                        type='text'
-                        name='ward'
-                        id='ward'
-                        className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:focus:border-blue-500'
-                        placeholder='Nguyễn Văn A'
-                        required={true}
-                        value={formData.address.ward}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            address: {
-                              ...formData.address,
-                              ward: e.target.value,
-                            },
-                          })
-                        }
-                      />
-                    </div>
-                  </BoxWrapper>
-                </div>
-                <div>
-                  <label
-                    htmlFor='detail_address'
-                    className='block mb-2 text-sm font-medium text-gray-900 '
-                  >
-                    Your detail address
-                  </label>
-                  <input
-                    type='text'
-                    name='detail_address'
-                    id='detail_address'
-                    className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:focus:border-blue-500'
-                    placeholder='Nguyễn Văn A'
-                    required={true}
-                    value={formData.address.detailAddress}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        address: {
-                          ...formData.address,
-                          detailAddress: e.target.value,
-                        },
-                      })
-                    }
-                  />
                 </div>
                 <div>
                   <label
@@ -351,7 +208,7 @@ export const Signup = ({}: Props) => {
                     Confirm password
                   </label>
                   <input
-                    type='confirm_password'
+                    type='password'
                     name='confirm_password'
                     id='confirm_password'
                     placeholder='••••••••'

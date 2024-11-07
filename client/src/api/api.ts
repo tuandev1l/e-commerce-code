@@ -5,6 +5,7 @@ import { ICartDto } from '../dto/cart.dto';
 import { IChangeQuantityOfProductInCart } from '../dto/changeQuantityOfProductInCart.dto';
 import { ILogin } from '../interfaces/login.interface';
 import { ISignup } from '../interfaces/signup.interface';
+import { IUserAddress } from '../interfaces/userAddress.interface';
 
 export const requestLoginApi = (userData: ILogin) =>
   instance.post('auth/login', userData);
@@ -31,3 +32,10 @@ export const getCartApi = () => instance.get('cart');
 export const changeQuantityOfProductInCartApi = (
   productDto: IChangeQuantityOfProductInCart
 ) => instance.patch('cart/quantity', productDto);
+
+export const addNewAddressApi = (data: { address: IUserAddress }) =>
+  instance.post('auth/add-address', data);
+export const setDefaultAddressApi = (addressId: string) =>
+  instance.post('auth/set-default-address', { addressId });
+export const deleteAddressApi = (addressId: string) =>
+  instance.delete(`auth/delete-address/${addressId}`);

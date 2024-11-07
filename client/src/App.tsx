@@ -16,6 +16,7 @@ import { UserAddress, UserProfile } from './components/user';
 import { ChangePassword } from './components/user/ChangePassword';
 import { Cart } from './components/cart';
 import { Order } from './components/order';
+import Checkout from './components/order/Checkout';
 
 function App() {
   const isLogin = useSelector(isLoginSelector);
@@ -40,15 +41,34 @@ function App() {
         path='/product/:productId'
         element={isLogin ? <ProductDetail /> : <Navigate to={'/auth/login'} />}
       />
-      <Route path='/shop/:id' element={<Shop />} />
+      <Route
+        path='/shop/:id'
+        element={isLogin ? <Shop /> : <Navigate to={'/auth/login'} />}
+      />
       <Route
         path='/me'
         element={isLogin ? <UserProfile /> : <Navigate to={'/auth/login'} />}
       />
-      <Route path='/me/password' element={<ChangePassword />} />
-      <Route path='/cart' element={<Cart />} />
-      <Route path='/order' element={<Order />} />
-      <Route path='/user-address' element={<UserAddress />} />
+      <Route
+        path='/me/password'
+        element={isLogin ? <ChangePassword /> : <Navigate to={'/auth/login'} />}
+      />
+      <Route
+        path='/cart'
+        element={isLogin ? <Cart /> : <Navigate to={'/auth/login'} />}
+      />
+      <Route
+        path='/order'
+        element={isLogin ? <Order /> : <Navigate to={'/auth/login'} />}
+      />
+      <Route
+        path='/checkout'
+        element={isLogin ? <Checkout /> : <Navigate to={'/auth/login'} />}
+      />
+      <Route
+        path='/user-address'
+        element={isLogin ? <UserAddress /> : <Navigate to={'/auth/login'} />}
+      />
       <Route path='/' element={<Main />} />
       <Route path='*' element={<NotFound />} />
     </Routes>

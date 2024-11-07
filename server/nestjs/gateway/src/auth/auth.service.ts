@@ -20,6 +20,9 @@ import { ResetPasswordDto } from '@auth/dto/resetPassword.dto';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import * as crypto from 'crypto';
+import { AddNewAddressDto } from '@auth/dto/addNewAddress.dto';
+import { SetDefaultAddressDto } from '@auth/dto/setDefaultAddress.dto';
+import { v4 as uuidv4 } from 'uuid';
 
 export class IAuthRes {
   @ApiProperty()
@@ -59,7 +62,7 @@ export class AuthService {
 
     const user = await this.repository.findOneBy({ email });
     if (!user) {
-      throw new NotFoundException('There is no user with this ID');
+      throw new NotFoundException('There is no user with this email');
     }
     if (!(await bcrypt.compare(password, user.password))) {
       throw new BadRequestException('Wrong username or password');
@@ -88,11 +91,13 @@ export class AuthService {
     }
 
     const hashPassword = await this.hashPassword(password);
+    address.isDefault = true;
+    address.uuid = uuidv4();
     const user = this.repository.create({
       accountType: ACCOUNT_TYPE.EMAIL,
       birthday,
       gender,
-      address,
+      address: [address],
       avatarUrl,
       password: hashPassword,
       name,
@@ -176,6 +181,47 @@ export class AuthService {
     void this.repository.save(user);
   }
 
+  async addNewAddress(user: User, addNewAddressDto: AddNewAddressDto) {
+    let isDefault = false;
+    if (addNewAddressDto.address.isDefault) {
+      for (const address of user.address) {
+        address.isDefault = false;
+      }
+      isDefault = true;
+    } else if (!user.address.length) {
+      isDefault = true;
+    }
+
+    user.address.push({
+      ...addNewAddressDto.address,
+      uuid: uuidv4(),
+      isDefault,
+    });
+    await this.repository.save(user);
+    return user.address;
+  }
+
+  async setDefaultAddress(
+    user: User,
+    setDefaultAddressDto: SetDefaultAddressDto,
+  ) {
+    const { address } = user;
+    for (const add of address) {
+      add.isDefault = add.uuid === setDefaultAddressDto.addressId;
+    }
+    await this.repository.save(user);
+    return user.address;
+  }
+
+  async deleteAddress(user: User, addressId: string) {
+    const addressIdx = user.address.findIndex(
+      (address) => address.uuid == addressId,
+    );
+    user.address.splice(addressIdx, 1);
+    await this.repository.save(user);
+    return user.address;
+  }
+
   private validateUsername(username: string) {
     const emailReg = new RegExp(emailRegex, 'gi');
     const phoneReg = new RegExp(phoneRegex, 'gi');
@@ -190,13 +236,6 @@ export class AuthService {
     return [isEmail, isPhoneNumber];
   }
 
-  private async hashPassword(password: string) {
-    return bcrypt.hash(
-      password,
-      this.configService.get('PASSWORD_SALT_LENGTH'),
-    );
-  }
-
   // private async findUserByUsername(username: string, isEmail): Promise<User> {
   //   if (isEmail) {
   //     return this.repository.findOneBy({ email: username });
@@ -204,6 +243,13 @@ export class AuthService {
   //
   //   return this.repository.findOneBy({ phoneNumber: username });
   // }
+
+  private async hashPassword(password: string) {
+    return bcrypt.hash(
+      password,
+      this.configService.get('PASSWORD_SALT_LENGTH'),
+    );
+  }
 
   private async createToken() {
     const randomString = crypto.randomBytes(32).toString('hex');
