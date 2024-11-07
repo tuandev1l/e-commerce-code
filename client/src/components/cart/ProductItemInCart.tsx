@@ -9,24 +9,20 @@ import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interfa
 
 type Props = {
   productItem: IProductItemMinimal;
-  idx: number;
-  quantity: number;
-  productItemQuantityHandler: Function;
   updateQuantityHandler: Function;
-  productItemCheckHandler: Function;
-  checkedValue: boolean;
+  productSelectHandler: Function;
+  idx: number;
 };
 
 export const ProductItemInCart = ({
   productItem,
   idx,
-  quantity,
-  productItemQuantityHandler,
   updateQuantityHandler,
-  productItemCheckHandler,
-  checkedValue,
+  productSelectHandler,
 }: Props) => {
   const toast = useToast();
+  const [checked, setChecked] = useState<boolean>(false);
+  const [quantity, setQuantity] = useState<number>(productItem.quantity);
   const [updateClick, setUpdateClick] = useState<boolean>(false);
   const debounceQuantity = useDebounce(quantity, 1000);
 
@@ -61,10 +57,11 @@ export const ProductItemInCart = ({
           <input
             id={`product-checkbox-${idx}`}
             type='checkbox'
-            checked={checkedValue}
+            checked={checked}
             className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 mr-4'
             onChange={() => {
-              productItemCheckHandler(idx);
+              setChecked(!checked);
+              productSelectHandler(productItem, quantity);
             }}
           />
         </div>
@@ -100,18 +97,17 @@ export const ProductItemInCart = ({
             quantity <= 1 && 'hover:cursor-disabled bg-gray-100'
           }`}
           onClick={() => {
-            productItemQuantityHandler(idx, -1);
-            // if (quantity <= 1) {
-            //   setQuantity(1);
-            // } else {
-            //   setQuantity(quantity - 1);
-            //   if (checkedValue) {
-            //     updateQuantityHandler(
-            //       -productItem.price,
-            //       -productItem.discount
-            //     );
-            //   }
-            // }
+            if (quantity <= 1) {
+              setQuantity(1);
+            } else {
+              setQuantity(quantity - 1);
+              if (checked) {
+                updateQuantityHandler(
+                  -productItem.price,
+                  -productItem.discount
+                );
+              }
+            }
             setUpdateClick(true);
           }}
         >
@@ -123,15 +119,14 @@ export const ProductItemInCart = ({
             quantity >= 100 && 'hover:cursor-disabled bg-gray-100'
           }`}
           onClick={() => {
-            productItemQuantityHandler(idx, 1);
-            // if (quantity >= 100) {
-            //   setQuantity(100);
-            // } else {
-            //   setQuantity(quantity + 1);
-            //   if (checkedValue) {
-            //     updateQuantityHandler(productItem.price, productItem.discount);
-            //   }
-            // }
+            if (quantity >= 100) {
+              setQuantity(100);
+            } else {
+              setQuantity(quantity + 1);
+              if (checked) {
+                updateQuantityHandler(productItem.price, productItem.discount);
+              }
+            }
             setUpdateClick(true);
           }}
         >

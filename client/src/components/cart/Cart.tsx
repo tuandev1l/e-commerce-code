@@ -12,7 +12,6 @@ import { ProductInCart } from './ProductInCart';
 type Props = {};
 
 export const Cart = ({}: Props) => {
-  const [allProductCheck, setAllProductCheck] = useState<boolean>(false);
   const username = useSelector(usernameSelector);
   const dispatch = useAppDispatch();
   const products = useSelector(productsInCartSelector);
@@ -22,9 +21,6 @@ export const Cart = ({}: Props) => {
   const [productSelected, setProductSelected] = useState<IProductItemMinimal[]>(
     []
   );
-  const [productSelectedMapping, setProductSelectedMapping] = useState<{
-    [key: string]: number;
-  }>({});
 
   const { data } = useQuery({
     queryKey: [`listProductInCart/${username}`],
@@ -43,10 +39,6 @@ export const Cart = ({}: Props) => {
     }
   }, [data]);
 
-  useEffect(() => {
-    setAllProductCheck(productCheckStatus.every((el) => !!el));
-  }, [productCheckStatus]);
-
   const productCheckHandler = (idx: number) => {
     productCheckStatus[idx] = !productCheckStatus[idx];
     setProductCheckStatus([...productCheckStatus]);
@@ -57,34 +49,31 @@ export const Cart = ({}: Props) => {
     setDiscount(discount + discountPrice);
   };
 
+  useEffect(() => {
+    console.log(productSelected);
+  }, [productSelected]);
+
   const productSelectHandler = (
     productItem: IProductItemMinimal,
-    quantity: number
-    // isSelected: boolean
+    quantity: number,
+    isSelected: boolean
   ) => {
-    if (productSelectedMapping[productItem.uuid!] !== undefined) {
-      productSelected[productSelectedMapping[productItem.uuid!]].quantity =
-        quantity;
+    if (isSelected) {
+      setTotalPrice(totalPrice + productItem.price * quantity);
+      setDiscount(discount + productItem.discount * quantity);
+      setProductSelected([...productSelected, productItem]);
     } else {
-      productSelectedMapping[productItem.uuid!] = productSelected.length;
-      productSelected.push(productItem);
+      const idx = productSelected.findIndex(
+        (pd) => pd.uuid === productItem.uuid
+      );
+      if (idx !== -1) {
+        setTotalPrice(totalPrice - productItem.price * quantity);
+        setDiscount(discount - productItem.discount * quantity);
+        productSelected.splice(idx, 1);
+        const newProductSelected = [...productSelected];
+        setProductSelected(newProductSelected);
+      }
     }
-    // if (isSelected) {
-    //   setTotalPrice(totalPrice + productItem.price * quantity);
-    //   setDiscount(discount + productItem.discount * quantity);
-    //   setProductSelected([...productSelected, productItem]);
-    // } else {
-    //   const idx = productSelected.findIndex(
-    //     (pd) => pd.uuid === productItem.uuid
-    //   );
-    //   if (idx !== -1) {
-    //     setTotalPrice(totalPrice - productItem.price * quantity);
-    //     setDiscount(discount - productItem.discount * quantity);
-    //     productSelected.splice(idx, 1);
-    //     const newProductSelected = [...productSelected];
-    //     setProductSelected(newProductSelected);
-    //   }
-    // }
   };
 
   return (
@@ -99,16 +88,7 @@ export const Cart = ({}: Props) => {
                   {/* Header Row */}
                   <div className='flex items-center py-2 px-4 bg-white font-semibold mb-4 rounded-lg'>
                     <div className='w-1/2 flex items-center'>
-                      <input
-                        id='select-all-checkbox'
-                        type='checkbox'
-                        className='w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-4'
-                        checked={allProductCheck}
-                        onChange={() => {
-                          setAllProductCheck(!allProductCheck);
-                        }}
-                      />
-                      <span>Tất cả</span>
+                      <span>Sản phẩm</span>
                     </div>
                     <div className='w-1/3 text-center'>Đơn giá</div>
                     <div className='w-32 text-center'>Số lượng</div>
@@ -124,7 +104,6 @@ export const Cart = ({}: Props) => {
                       updateQuantityHandler={updateQuantityHandler}
                       productSelectHandler={productSelectHandler}
                       productCheckHandler={productCheckHandler}
-                      checkedValue={allProductCheck}
                     />
                   ))}
                 </div>
