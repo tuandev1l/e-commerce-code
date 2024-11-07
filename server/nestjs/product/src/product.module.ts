@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Product, ProductSchema } from '@app/entities/product.entity';
-import { Brand, BrandSchema } from '@app/entities/brand.entity';
-import { Category, CategorySchema } from '@app/entities/category.entity';
-import { Shop, ShopSchema } from '@app/entities/shop.entity';
-import { ProductController } from '@app/product.controller';
-import { ProductService } from '@app/product.service';
+import { Product, ProductSchema } from '@lib/product/entities/product.entity';
+import { Brand, BrandSchema } from '@lib/product/entities/brand.entity';
+import {
+  Category,
+  CategorySchema,
+} from '@lib/product/entities/category.entity';
+import { Shop, ShopSchema } from '@lib/product/entities/shop.entity';
+import { ProductController } from '@lib/product/product.controller';
+import { ProductService } from '@lib/product/product.service';
 
 @Module({
   imports: [

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IShopAddress } from '@app/interfaces';
+import { IShopAddress } from '@lib/product/interfaces';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
 
 export type ShopDocument = HydratedDocument<Shop>;

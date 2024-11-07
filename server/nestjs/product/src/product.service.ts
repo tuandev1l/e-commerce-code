@@ -1,12 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ProductDto } from './dto/product.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product, ProductDocument } from '@app/entities/product.entity';
+import { Product, ProductDocument } from '@lib/product/entities/product.entity';
 import { Model } from 'mongoose';
-import { Brand, BrandDocument } from '@app/entities/brand.entity';
-import { Category, CategoryDocument } from '@app/entities/category.entity';
-import { Shop, ShopDocument } from '@app/entities/shop.entity';
+import { Brand, BrandDocument } from '@lib/product/entities/brand.entity';
+import {
+  Category,
+  CategoryDocument,
+} from '@lib/product/entities/category.entity';
+import { Shop, ShopDocument } from '@lib/product/entities/shop.entity';
 import slugify from 'slugify';
+import { ProductDto } from '@lib/product/dto/product.dto';
 
 @Injectable()
 export class ProductService {

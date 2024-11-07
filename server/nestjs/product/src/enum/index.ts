@@ -1,3 +1,3 @@
-import { InventoryStatusEnum } from '@app/enum/InventoryStatus.enum';
+import { InventoryStatusEnum } from '@lib/product/enum/InventoryStatus.enum';
 
 export default InventoryStatusEnum;

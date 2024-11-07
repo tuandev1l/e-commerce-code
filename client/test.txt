@@ -1,0 +1,187 @@
+
+export const products: IProduct[] = [
+  {
+    _id: '',
+    id: '146957711',
+    name: 'Quần Jean Nữ Ống Rộng Lưng Cao Aaa Jeans',
+    shortDescription:
+      'Mô tả sản phẩm: Quần ống rộng với ưu điểm nổi bật nhất là cân bằng vóc dáng và tạo hiệu ứng kéo dài chân, che khuyết điểm rất tốt. Phần lưng cao cũng là một điểm cộng lớn cho chiếc quần này bởi chúng ...',
+    price: 349000,
+    listPrice: 550000,
+    originalPrice: 550000,
+    badges: [
+      {
+        code: 'return_policy',
+        type: 'pdp_icon_badge',
+        index: 3,
+        icon: 'https://salt.tikicdn.com/ts/ta/b1/3f/4e/cc3d0a2dd751a7b06dd97d868d6afa56.png',
+        icon_width: 114,
+        icon_height: 20,
+      },
+      {
+        code: 'is_authentic',
+        type: 'pdp_icon_badge',
+        index: 4,
+        icon: 'https://salt.tikicdn.com/ts/upload/d7/56/04/b93b8c666e13f49971483596ef14800f.png',
+        icon_width: 89,
+        icon_height: 20,
+      },
+    ],
+    discount: 201000,
+    discountRate: 37,
+    ratingAverage: 4.7,
+    reviewCount: 35,
+    favouriteCount: 0,
+    thumbnailUrl:
+      'https://salt.tikicdn.com/cache/280x280/ts/product/41/63/3c/45fc1889b34d853a9bfbcef1dc705a28.jpg',
+    inventoryStatus: InventoryStatusEnum.AVAILABLE,
+    seller: {
+      id: 539,
+      name: 'AAA Jeans',
+      url: 'https://tiki.vn/cua-hang/aaa-jeans',
+      logo: '8d/05/90/e3a5a6a97a3f5cce051cbf7d6c9e325f.png',
+    },
+    allTimeQuantitySold: 119,
+    description: '',
+    images: [
+      {
+        baseUrl:
+          'https://salt.tikicdn.com/ts/product/41/63/3c/45fc1889b34d853a9bfbcef1dc705a28.jpg',
+        isGallery: true,
+        largeUrl:
+          'https://salt.tikicdn.com/cache/w1200/ts/product/41/63/3c/45fc1889b34d853a9bfbcef1dc705a28.jpg',
+        mediumUrl:
+          'https://salt.tikicdn.com/cache/w300/ts/product/41/63/3c/45fc1889b34d853a9bfbcef1dc705a28.jpg',
+        smallUrl:
+          'https://salt.tikicdn.com/cache/200x280/ts/product/41/63/3c/45fc1889b34d853a9bfbcef1dc705a28.jpg',
+        thumbnailUrl:
+          'https://salt.tikicdn.com/cache/200x280/ts/product/41/63/3c/45fc1889b34d853a9bfbcef1dc705a28.jpg',
+      },
+    ],
+    brand: {
+      id: '145615',
+      name: 'AAA JEANS',
+      slug: 'aaa-jeans',
+    },
+    specifications: [
+      {
+        name: 'Content',
+        attributes: [
+          {
+            code: 'brand',
+            name: 'Thương hiệu',
+            value: 'AAA JEANS',
+          },
+          {
+            code: 'brand_country',
+            name: 'Xuất xứ thương hiệu',
+            value: 'Việt Nam',
+          },
+          {
+            code: 'origin',
+            name: 'Xuất xứ (Made in)',
+            value: 'Việt Nam',
+          },
+        ],
+      },
+      {
+        name: 'Operation',
+        attributes: [
+          {
+            code: 'is_warranty_applied',
+            name: 'Sản phẩm có được bảo hành không?',
+            value: 'Không',
+          },
+        ],
+      },
+    ],
+    configurableOptions: [
+      {
+        code: 'option1',
+        name: 'Màu',
+        position: 0,
+        showPreviewImage: true,
+        values: [
+          { label: 'Ice Blue' },
+          { label: 'Indigo' },
+          { label: 'Sapphire Blue' },
+        ],
+      },
+      {
+        code: 'option2',
+        position: 1,
+        name: 'Kích cỡ',
+        showPreviewImage: false,
+        values: [
+          { label: '26' },
+          { label: '27' },
+          { label: '28' },
+          { label: '29' },
+          { label: '30' },
+          { label: '31' },
+          { label: '32' },
+        ],
+      },
+    ],
+    highlight: {
+      items: [
+        'Quần ống rộng cân bằng vóc dáng và che khuyết điểm tốt.',
+        'Lưng cao giúp eo gọn và tạo chiều dài cho đôi chân.',
+        'Phong cách trẻ trung, thời thượng, dễ phối đồ.',
+      ],
+      title: 'Đặc điểm nổi bật',
+    },
+    stockItem: {
+      maxSaleQty: 1000,
+      minSaleQty: 1,
+      qty: 1000,
+    },
+    quantitySold: {
+      text: 'Đã bán 119',
+      value: 119,
+    },
+    categories: {
+      id: '1701',
+      name: 'Quần jean nữ',
+      slug: 'quan-jean-nu',
+    },
+    videoUrl:
+      'https://sand.tikicdn.com/ts/video/9c/4a/86/cc1fd906e0ebff1a210a46459687a8e1.mp4',
+    isSellerInChatWhitelist: true,
+    warrantyInfo: [
+      {
+        name: 'Hướng dẫn bảo hành',
+        value: 'Xem chi tiết',
+        url: 'https://hotro.tiki.vn/s/article/chinh-sach-bao-hanh-tai-tiki-nhu-the-nao',
+      },
+    ],
+    returnAndExchangePolicy: 'Đổi trả trong <br><b>7 ngày</b><br> nếu sp lỗi.',
+    benefits: [
+      {
+        icon: 'https://salt.tikicdn.com/ts/upload/c5/37/ee/76c708d43e377343e82baee8a0340297.png',
+        text: 'Được đồng kiểm khi nhận hàng',
+      },
+      {
+        icon: 'https://salt.tikicdn.com/ts/upload/ea/02/b4/b024e431ec433e6c85d4734aaf35bd65.png',
+        text: '<b>Được hoàn tiền 200%</b> nếu là hàng giả.',
+      },
+      {
+        icon: 'https://salt.tikicdn.com/ts/upload/d8/c7/a5/1cd5bd2f27f9bd74b2c340b8e27c4d82.png',
+        text: 'Đổi trả miễn phí trong 30 ngày. Được đổi ý.',
+      },
+    ],
+    returnPolicy: {
+      body: [
+        {
+          label: '',
+          content: [
+            'Được đổi ý (sản phẩm phải còn nguyên hộp, tem, phụ kiện, chưa kích hoạt bảo hành, không áp dụng đơn hàng trả góp), hoặc',
+            'Sản phẩm không đúng cam kết (lỗi kỹ thuật, giao sai/thiếu, bể vỡ…)',
+          ],
+        },
+      ],
+      title: 'Đổi trả miễn phí trong 30 ngày',
+    },
+    reviewText: '',
+  },
+];

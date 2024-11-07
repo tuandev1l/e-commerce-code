@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.active {
+    font-weight: 800;
+}
+.active.user-nav{
+    font-weight: 500;
+    background-color: #E5E7EB;
+}

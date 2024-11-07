@@ -1,0 +1,15 @@
+curl 'https://api.tiki.vn/product-detail/v2/widgets/seller?seller_id=539&mpid=146957711&spid=252994174&trackity_id=04921f86-8f55-99f4-4fab-e9166040d64c&platform=desktop&version=3' \
+ -H 'accept: application/json, text/plain, _/_' \
+ -H 'accept-language: en-US,en;q=0.9,vi;q=0.8' \
+ -H 'cookie: \_trackity=04921f86-8f55-99f4-4fab-e9166040d64c; G_ENABLED_IDPS=google; TOKENS={%22access_token%22:%22kp8yNSQvKFBn91hxdItUeJ73gOmDo2Rl%22}; \_ga=GA1.1.1567938178.1727837565; delivery_zone=Vk4wMzQwMjQwMTM=; amp_99d374=Jr4CesgGE3fLgT2pwxULOO...1i95i9qhg.1i95i9tbg.4.8.c; tiki_client_id=1567938178.1727837565; \_ga_S9GLR1RQFJ=GS1.1.1727840638.2.0.1727840638.60.0.0' \
+ -H 'origin: https://tiki.vn' \
+ -H 'priority: u=1, i' \
+ -H 'referer: https://tiki.vn/quan-jeans-ong-rong-lung-cao-aaa-jeans-p146957711.html?spid=252994174' \
+ -H 'sec-ch-ua: "Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"' \
+ -H 'sec-ch-ua-mobile: ?0' \
+ -H 'sec-ch-ua-platform: "Linux"' \
+ -H 'sec-fetch-dest: empty' \
+ -H 'sec-fetch-mode: cors' \
+ -H 'sec-fetch-site: same-site' \
+ -H 'user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36' \
+ -H 'x-guest-token: kp8yNSQvKFBn91hxdItUeJ73gOmDo2Rl'

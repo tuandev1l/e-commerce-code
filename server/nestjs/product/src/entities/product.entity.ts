@@ -1,10 +1,10 @@
-import InventoryStatusEnum from '@app/enum';
-import { IProductBadge, IProductImage } from '@app/interfaces';
-import { Brand } from '@app/entities/brand.entity';
-import { Category } from '@app/entities/category.entity';
+import InventoryStatusEnum from '@lib/product/enum';
+import { IProductBadge, IProductImage } from '@lib/product/interfaces';
+import { Brand } from '@lib/product/entities/brand.entity';
+import { Category } from '@lib/product/entities/category.entity';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
-import { Shop } from '@app/entities/shop.entity';
+import { Shop } from '@lib/product/entities/shop.entity';
 
 export type ProductDocument = HydratedDocument<Product>;
 

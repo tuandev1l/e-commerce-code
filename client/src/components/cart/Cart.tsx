@@ -1,0 +1,178 @@
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { getCartApi } from '../../api/api';
+import { Layout } from '../../common/layout/Layout';
+import { priceSplit } from '../../common/price/priceSplit';
+import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
+import { productsInCartSelector, usernameSelector } from '../../store/selector';
+import { useAppDispatch } from '../../store/store';
+import { getAllProductsInCart } from './cartSlice';
+import { ProductInCart } from './ProductInCart';
+type Props = {};
+
+export const Cart = ({}: Props) => {
+  const [allProductCheck, setAllProductCheck] = useState<boolean>(false);
+  const username = useSelector(usernameSelector);
+  const dispatch = useAppDispatch();
+  const products = useSelector(productsInCartSelector);
+  const [productCheckStatus, setProductCheckStatus] = useState<boolean[]>([]);
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [discount, setDiscount] = useState<number>(0);
+  const [productSelected, setProductSelected] = useState<IProductItemMinimal[]>(
+    []
+  );
+  const [productSelectedMapping, setProductSelectedMapping] = useState<{
+    [key: string]: number;
+  }>({});
+
+  const { data } = useQuery({
+    queryKey: [`listProductInCart/${username}`],
+    queryFn: getCartApi,
+  });
+
+  useEffect(() => {
+    if (products) {
+      setProductCheckStatus(new Array(products.length).fill(false));
+    }
+  }, [products]);
+
+  useEffect(() => {
+    if (data) {
+      dispatch(getAllProductsInCart(data));
+    }
+  }, [data]);
+
+  useEffect(() => {
+    setAllProductCheck(productCheckStatus.every((el) => !!el));
+  }, [productCheckStatus]);
+
+  const productCheckHandler = (idx: number) => {
+    productCheckStatus[idx] = !productCheckStatus[idx];
+    setProductCheckStatus([...productCheckStatus]);
+  };
+
+  const updateQuantityHandler = (price: number, discountPrice: number) => {
+    setTotalPrice(totalPrice + price);
+    setDiscount(discount + discountPrice);
+  };
+
+  const productSelectHandler = (
+    productItem: IProductItemMinimal,
+    quantity: number
+    // isSelected: boolean
+  ) => {
+    if (productSelectedMapping[productItem.uuid!] !== undefined) {
+      productSelected[productSelectedMapping[productItem.uuid!]].quantity =
+        quantity;
+    } else {
+      productSelectedMapping[productItem.uuid!] = productSelected.length;
+      productSelected.push(productItem);
+    }
+    // if (isSelected) {
+    //   setTotalPrice(totalPrice + productItem.price * quantity);
+    //   setDiscount(discount + productItem.discount * quantity);
+    //   setProductSelected([...productSelected, productItem]);
+    // } else {
+    //   const idx = productSelected.findIndex(
+    //     (pd) => pd.uuid === productItem.uuid
+    //   );
+    //   if (idx !== -1) {
+    //     setTotalPrice(totalPrice - productItem.price * quantity);
+    //     setDiscount(discount - productItem.discount * quantity);
+    //     productSelected.splice(idx, 1);
+    //     const newProductSelected = [...productSelected];
+    //     setProductSelected(newProductSelected);
+    //   }
+    // }
+  };
+
+  return (
+    <Layout>
+      <div className='flex justify-center p-2 w-11/12'>
+        <div className='w-full'>
+          {products.length > 0 ? (
+            <>
+              <h2 className='text-2xl font-semibold mb-4'>Giỏ Hàng</h2>
+              <div className='flex gap-3'>
+                <div className='flex-1 rounded-lg mr-4'>
+                  {/* Header Row */}
+                  <div className='flex items-center py-2 px-4 bg-white font-semibold mb-4 rounded-lg'>
+                    <div className='w-1/2 flex items-center'>
+                      <input
+                        id='select-all-checkbox'
+                        type='checkbox'
+                        className='w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 mr-4'
+                        checked={allProductCheck}
+                        onChange={() => {
+                          setAllProductCheck(!allProductCheck);
+                        }}
+                      />
+                      <span>Tất cả</span>
+                    </div>
+                    <div className='w-1/3 text-center'>Đơn giá</div>
+                    <div className='w-32 text-center'>Số lượng</div>
+                    <div className='w-32 text-center'>Thành tiền</div>
+                    <div className='w-8 text-center'>Xóa</div>
+                  </div>
+
+                  {products.map((product, productIndex) => (
+                    <ProductInCart
+                      key={productIndex}
+                      product={product}
+                      productIndex={productIndex}
+                      updateQuantityHandler={updateQuantityHandler}
+                      productSelectHandler={productSelectHandler}
+                      productCheckHandler={productCheckHandler}
+                      checkedValue={allProductCheck}
+                    />
+                  ))}
+                </div>
+
+                <div className='sticky top-4 bg-white p-4 rounded-lg h-fit mb-4 w-72'>
+                  <div className='flex justify-between items-center mb-4'>
+                    <h3 className='font-semibold'>Tiki Khuyến Mãi</h3>
+                    <button className='text-blue-500 font-medium'>
+                      Áp Dụng
+                    </button>
+                  </div>
+                  <div className='flex justify-between mb-2'>
+                    <span>Tạm tính</span>
+                    <span>{priceSplit(totalPrice + discount)}</span>
+                  </div>
+                  <div className='flex justify-between text-green-500 font-semibold mb-2'>
+                    <span>Giảm giá từ Deal</span>
+                    <span>-{priceSplit(discount)}₫</span>
+                  </div>
+                  <hr className='my-4' />
+                  <div className='flex justify-between text-red-500 font-bold text-lg'>
+                    <span>Tổng tiền</span>
+                    <span>{priceSplit(totalPrice)}₫</span>
+                  </div>
+                  <div className='text-green-500 text-sm mb-4 mt-2'>
+                    <span>
+                      Tiết kiệm {priceSplit(discount)}₫ (Đã bao gồm VAT nếu có)
+                    </span>
+                  </div>
+                  <button
+                    className={`w-full bg-red-500 text-white font-semibold py-2 rounded-md ${
+                      !productSelected.length &&
+                      'disabled hover:cursor-not-allowed bg-red-300'
+                    }`}
+                  >
+                    Mua Hàng ({productSelected.length})
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className='w-full flex justify-center pt-12'>
+              Bạn chưa có sản phẩm nào trong giỏ hàng, hãy thêm vào giỏ hàng
+              trước khi quay lại đây nhé!
+            </div>
+          )}
+        </div>
+      </div>
+    </Layout>
+  );
+};

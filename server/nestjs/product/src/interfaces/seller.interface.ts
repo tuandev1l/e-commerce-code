@@ -1,4 +1,4 @@
-import { Shop } from '@app/entities/shop.entity';
+import { Shop } from '@lib/product/entities/shop.entity';
 
 export interface ISeller extends Pick<Shop, 'name' | 'logo'> {
   price: number;

@@ -9,11 +9,11 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IProductBadge, IProductImage } from '@app/interfaces';
-import InventoryStatusEnum from '@app/enum';
-import { Shop } from '@app/entities/shop.entity';
-import { Brand } from '@app/entities/brand.entity';
-import { Category } from '@app/entities/category.entity';
+import { IProductBadge, IProductImage } from '@lib/product/interfaces';
+import InventoryStatusEnum from '@lib/product/enum';
+import { Shop } from '@lib/product/entities/shop.entity';
+import { Brand } from '@lib/product/entities/brand.entity';
+import { Category } from '@lib/product/entities/category.entity';
 
 export class ProductDto {
   @IsNotEmpty()
