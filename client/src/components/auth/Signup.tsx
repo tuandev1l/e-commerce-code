@@ -8,6 +8,7 @@ import { Layout } from '../../common/layout/Layout';
 import { IAxiosError } from '../../config/axiosError.interface';
 import useToast from '../../hook/useToast';
 import { ISignup, signupDefault } from '../../interfaces/signup.interface';
+import moment from 'moment';
 
 type Props = {};
 
@@ -25,7 +26,7 @@ export const Signup = ({}: Props) => {
         message: 'Signup successfully, please verify email before login',
       });
       setTimeout(() => {
-        navigate('/');
+        navigate('/auth/login');
       }, 1000);
     },
     onError: (error: IAxiosError) => {
@@ -35,8 +36,20 @@ export const Signup = ({}: Props) => {
 
   const submitHandler = () => {
     const isNotValid = Object.values(formData).some((value) => !value);
-    if (isNotValid) {
-      toast({ type: 'error', message: 'Missing field' });
+    let isValidBirthday: boolean;
+    try {
+      const birthday = moment(formData.birthday);
+      isValidBirthday =
+        birthday.isAfter(moment('1900-01-01')) &&
+        birthday.isBefore(new Date().toISOString().split('T')[0]);
+    } catch (error) {
+      isValidBirthday = false;
+    }
+    if (isNotValid || !isValidBirthday) {
+      toast({
+        type: 'error',
+        message: 'Missing field or birthday is not valid',
+      });
       return;
     }
     mutate(formData);
@@ -135,12 +148,12 @@ export const Signup = ({}: Props) => {
                         name='birthday'
                         id='birthday'
                         className='bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:focus:border-blue-500'
-                        defaultValue='1970-01-01'
-                        min={'1900-01-01'}
+                        defaultValue='2000-01-01'
+                        min='1900-01-01'
+                        max={new Date().toISOString().split('T')[0]}
                         required={true}
                         value={formData.birthday}
                         onChange={(e) => {
-                          console.log(e.target.value);
                           setFormData({
                             ...formData,
                             birthday: e.target.value,

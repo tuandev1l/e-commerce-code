@@ -17,8 +17,35 @@ export class OrderModule implements OnModuleInit {
   constructor(private readonly service: OrderService) {}
 
   onModuleInit(): any {
-    const shippingMethods = ['Giao hàng nhanh', 'Giao hàng tiết kiệm'];
-    const paymentMethod = ['Stripe', 'Momo', 'VnPay'];
+    const shippingMethods = [
+      {
+        name: 'Giao hàng nhanh',
+        imgUrl:
+          'https://cdn.haitrieu.com/wp-content/uploads/2022/05/Logo-GHN-Slogan-En.png',
+      },
+      {
+        name: 'Giao hàng tiết kiệm',
+        imgUrl:
+          'https://cdn.prod.website-files.com/5fb85f26f126ce08d792d2d9/65fddafcf36551945213fe85_After_kime.jpg',
+      },
+    ];
+    const paymentMethod = [
+      {
+        name: 'Stripe',
+        imgUrl:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB1nacBhVfB9L9chvUPk35aYeg0bmYmP-Wag&s',
+      },
+      {
+        name: 'Momo',
+        imgUrl:
+          'https://salt.tikicdn.com/ts/upload/ce/f6/e8/ea880ef285856f744e3ffb5d282d4b2d.jpg',
+      },
+      {
+        name: 'VnPay',
+        imgUrl:
+          'https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg',
+      },
+    ];
     void this.service.createPayment(paymentMethod);
     void this.service.createShippingMethod(shippingMethods);
   }

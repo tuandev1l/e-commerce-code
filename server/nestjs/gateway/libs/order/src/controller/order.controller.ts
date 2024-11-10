@@ -13,6 +13,7 @@ import { User } from '@user/entities/user.entity';
 import { GetOrderDto } from '@libs/order/dto/withUser/getOrder.dto';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
 import { BulkCreateOrderDto } from '@libs/order/dto/withUser/bulkCreateOrder.dto';
+import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
 
 @Controller()
 @UseFilters(ExceptionFilter)
@@ -45,23 +46,8 @@ export class OrderController {
     return this.service.getOrder(getOrderDto);
   }
 
-  @MessagePattern(ORDER_PATTERN.GET_ALL_PAYMENT_METHOD)
-  async getAllPaymentMethod() {
-    return this.service.getAllPaymentMethod();
-  }
-
-  @MessagePattern(ORDER_PATTERN.GET_PAYMENT_METHOD)
-  async getPaymentMethod(@Payload() paymentId: number) {
-    return this.service.getPaymentMethod(paymentId);
-  }
-
-  @MessagePattern(ORDER_PATTERN.GET_ALL_SHIPPING_METHOD)
-  async getAllShippingMethod() {
-    return this.service.getAllShippingMethod();
-  }
-
-  @MessagePattern(ORDER_PATTERN.GET_SHIPPING_METHOD)
-  async getShippingMethod(@Payload() shippingId: number) {
-    return this.service.getShippingMethod(shippingId);
+  @MessagePattern(ORDER_PATTERN.PAY_ORDER)
+  async payOrder(@Payload() payOrderDto: PayOrderDto) {
+    return this.service.payOrder(payOrderDto);
   }
 }

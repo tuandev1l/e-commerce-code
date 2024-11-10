@@ -18,6 +18,7 @@ import { RatingModule } from '@libs/rating/rating.module';
 import { BullModule } from '@nestjs/bullmq';
 import { QueueModule } from '@libs/queue';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { SocketGatewayModule } from '@socket/socket.gateway.module';
 
 @Module({
   controllers: [],
@@ -26,6 +27,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     UserModule,
     LoggingModule,
     // ElasticsearchModule,
+    SocketGatewayModule,
     ConfigModule.forRoot({
       envFilePath: ['.env'],
       isGlobal: true,

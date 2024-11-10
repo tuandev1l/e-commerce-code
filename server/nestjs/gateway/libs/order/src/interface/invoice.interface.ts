@@ -3,9 +3,7 @@ export interface IInvoice {
   productPriceTotal: number;
   total: number;
   discountAmount: number;
-  shippingAmountAfterDiscount: number;
-  shippingDiscountAmount: number;
-  handlingFee: number;
-  otherFee: number;
+  shippingFee: number;
   purchasedAt: string;
+  phoneNumber: string;
 }

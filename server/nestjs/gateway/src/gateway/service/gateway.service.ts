@@ -30,6 +30,7 @@ import { UpdateCategoryDto } from '@libs/product/dto/category/update-category.dt
 import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
 import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
 import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityInCart.dto';
+import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
 
 @Injectable()
 export class GatewayService {
@@ -97,6 +98,10 @@ export class GatewayService {
   }
 
   // ORDER
+  async getPaymentUrl(payOrderDto: PayOrderDto) {
+    return this.producer.sendMessage(ORDER_PATTERN.PAY_ORDER, payOrderDto);
+  }
+
   async createOrder(user: User, orderPayload: BulkCreateOrderDtoWithoutUser) {
     return this.producer.sendMessage(ORDER_PATTERN.CREATE_ORDER, {
       user,

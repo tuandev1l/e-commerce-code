@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Payment } from '@libs/order/entity/payment.entity';
 import { Repository } from 'typeorm';
 import { Shipping } from '@libs/order/entity/shipping.entity';
-import { PaymentEnum } from '@share/enums/payment.enum';
+import { PaymentEnum, PaymentMethodEnum } from '@share/enums/payment.enum';
 import { ShippingEnum } from '@share/enums/shipping.enum';
 import { ORDER_STATUS } from '@libs/order/enum';
 import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
@@ -14,21 +14,41 @@ import { GetOrderDto } from '@libs/order/dto/withUser/getOrder.dto';
 import { RpcBadRequest, RpcNotFound } from '@base/exception/exception.resolver';
 import { BulkCreateOrderDto } from '@libs/order/dto/withUser/bulkCreateOrder.dto';
 import { Role } from '@auth';
+import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
+import { ConfigService } from '@nestjs/config';
+import * as moment from 'moment';
+import * as crypto from 'crypto';
+import * as querystring from 'qs';
+import { v4 as uuidv4 } from 'uuid';
+
+declare const Buffer;
 
 @Injectable()
 export class OrderService {
+  private static readonly vnp_IpAddr = '13.160.92.202';
+  private static readonly vnp_Version = '2.1.0';
+  private static readonly vnp_Command = 'pay';
+  private static readonly vnp_OrderType = 'other';
+  private static readonly vnp_BankCode = 'VNBANK';
+  private static readonly vnp_Locale = 'vn';
+  private static readonly vnp_CurrCode = 'VND';
+
   constructor(
     @InjectRepository(Payment)
     private readonly paymentRepo: Repository<Payment>,
     @InjectRepository(Order) private readonly repository: Repository<Order>,
     @InjectRepository(Shipping)
     private readonly shippingRepo: Repository<Shipping>,
+    private readonly config: ConfigService,
   ) {}
 
   async getAllOrders(user: User) {
     return this.repository.find({
       where: { userId: user.id },
       relations: ['shipping', 'payment'],
+      order: {
+        updatedAt: -1,
+      },
     });
   }
 
@@ -55,23 +75,61 @@ export class OrderService {
   }
 
   async createOrder(orderPayload: BulkCreateOrderDto) {
-    const { user, orders } = orderPayload;
-    const orderEntities = orders.map((order) => {
-      return this.repository.create({
-        status: ORDER_STATUS.PREPARED,
-        invoice: order.invoice,
-        paymentId: order.paymentId,
-        shippingId: order.shippingId,
-        item: order.item,
-        statusHistories: [],
-        userId: user.id,
-      });
+    const {
+      paymentMethod,
+      vnp_TransactionDate,
+      vnp_TxnRef,
+      orderInfo,
+      vnp_TransactionStatus,
+    } = orderPayload;
+
+    const uuid = orderInfo.split(':')[1];
+    let status: ORDER_STATUS;
+
+    const orders = await this.repository.findBy({ uuid });
+    if (!orders.length) {
+      throw new RpcBadRequest('Vnpay wrong credentials');
+    }
+
+    switch (paymentMethod) {
+      case PaymentMethodEnum.VNPAY:
+        // try {
+        //   const requestBody = this.VNPayBodyOrderStatus(
+        //     orderInfo,
+        //     vnp_TransactionDate,
+        //     vnp_TxnRef,
+        //   );
+        //   console.log(requestBody);
+        //   const { data } = await axios.post(
+        //     `https://sandbox.vnpayment.vn/merchant_webapi/api/transaction`,
+        //     requestBody,
+        //   );
+        //   console.log(data);
+        // } catch (e) {
+        //   console.log(JSON.stringify(e));
+        // }
+        if (vnp_TransactionStatus === '00') {
+          status = ORDER_STATUS.PREPARED;
+        } else {
+          status = ORDER_STATUS.UNSUCCESSFUL;
+        }
+
+        break;
+      case PaymentMethodEnum.STRIPE:
+        break;
+      case PaymentMethodEnum.MOMO:
+        break;
+    }
+
+    const newOrders = orders.map((order) => {
+      order.status = status;
+      return order;
     });
 
-    return this.repository.save(orderEntities);
+    return this.repository.save(newOrders);
   }
 
-  async createPayment(payments: string[]) {
+  async createPayment(payments: { name: string; imgUrl: string }[]) {
     const isPaymentExisted = await this.paymentRepo.find();
     if (isPaymentExisted.length > 0) {
       return;
@@ -79,7 +137,8 @@ export class OrderService {
 
     const paymentEntities = payments.map((payment) => {
       return this.paymentRepo.create({
-        method: payment,
+        method: payment.name,
+        imgUrl: payment.imgUrl,
         status: PaymentEnum.AVAILABLE,
         description: `Thanh toán thông qua cổng ${payment}`,
         isPrepaid: true,
@@ -89,7 +148,9 @@ export class OrderService {
     void this.paymentRepo.save(paymentEntities);
   }
 
-  async createShippingMethod(shippingMethods: string[]) {
+  async createShippingMethod(
+    shippingMethods: { name: string; imgUrl: string }[],
+  ) {
     const isShippingMethodExisted = await this.shippingRepo.find();
     if (isShippingMethodExisted.length > 0) {
       return;
@@ -97,7 +158,8 @@ export class OrderService {
 
     const shippingEntities = shippingMethods.map((shipping) => {
       return this.shippingRepo.create({
-        partnerName: shipping,
+        partnerName: shipping.name,
+        imgUrl: shipping.imgUrl,
         status: ShippingEnum.AVAILABLE,
       });
     });
@@ -148,5 +210,151 @@ export class OrderService {
       throw new RpcNotFound('There is no payment with this ID');
     }
     return paymentMethod;
+  }
+
+  async payOrder(payOrderDto: PayOrderDto) {
+    const { orders, user } = payOrderDto;
+
+    let paymentId: number, paymentUrl: string;
+
+    const uuid = uuidv4().toString();
+    switch (payOrderDto.paymentMethod) {
+      case PaymentMethodEnum.VNPAY:
+        paymentId = 3;
+        paymentUrl = await this.vnpayHandler(payOrderDto.amount, uuid);
+        break;
+      case PaymentMethodEnum.MOMO:
+        paymentId = 2;
+        break;
+      case PaymentMethodEnum.STRIPE:
+        paymentId = 1;
+        break;
+      default:
+        throw new RpcBadRequest('This payment method is not supported');
+    }
+
+    const orderEntities = orders.map((order) => {
+      return this.repository.create({
+        status: ORDER_STATUS.PENDING,
+        uuid,
+        invoice: order.invoice,
+        shippingId: order.shippingId,
+        paymentId,
+        item: order.item,
+        statusHistories: [],
+        userId: user.id,
+      });
+    });
+
+    await this.repository.save(orderEntities);
+
+    return {
+      status: 'success',
+      paymentUrl,
+    };
+  }
+
+  private async vnpayHandler(amount: number, uuid: string) {
+    const date = new Date();
+    const createDate = moment(date).format('YYYYMMDDHHmmss');
+
+    const secretKey = this.config.get('vnp_HashSecret');
+    let vnpUrl = this.config.get('vnp_Url');
+    const returnUrl = 'http://localhost:5173/vnpay-payment';
+    const orderId = moment(date).format('DDHHmmss');
+
+    const vnp_Params = {};
+    vnp_Params['vnp_Version'] = OrderService.vnp_Version;
+    vnp_Params['vnp_Command'] = OrderService.vnp_Command;
+    vnp_Params['vnp_TmnCode'] = this.config.get('vnp_TmnCode');
+    vnp_Params['vnp_Locale'] = OrderService.vnp_Locale;
+    vnp_Params['vnp_CurrCode'] = OrderService.vnp_CurrCode;
+    vnp_Params['vnp_TxnRef'] = orderId;
+    vnp_Params['vnp_OrderInfo'] = 'Thanh toan cho ma GD:' + uuid;
+    vnp_Params['vnp_OrderType'] = OrderService.vnp_OrderType;
+    vnp_Params['vnp_Amount'] = amount * 100;
+    vnp_Params['vnp_ReturnUrl'] = returnUrl;
+    vnp_Params['vnp_IpAddr'] = OrderService.vnp_IpAddr;
+    vnp_Params['vnp_CreateDate'] = createDate;
+    vnp_Params['vnp_BankCode'] = OrderService.vnp_BankCode;
+
+    const vnp_ParamsSorted = this.sortObject(vnp_Params);
+    const signData = querystring.stringify(vnp_ParamsSorted, { encode: false });
+    const hmac = crypto.createHmac('sha512', secretKey);
+    vnp_Params['vnp_SecureHash'] = hmac
+      .update(Buffer.from(signData, 'utf-8'))
+      .digest('hex');
+    vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
+
+    return vnpUrl;
+  }
+
+  private sortObject(obj: object) {
+    const sorted = {};
+    const str = [];
+    let key;
+    for (key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        str.push(encodeURIComponent(key));
+      }
+    }
+    str.sort();
+    for (key = 0; key < str.length; key++) {
+      sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, '+');
+    }
+    return sorted;
+  }
+
+  private VNPayBodyOrderStatus(
+    vnp_OrderInfo: string,
+    vnp_TransactionDate: string,
+    vnp_TxnRef: string,
+  ) {
+    const date = new Date();
+    const vnp_RequestId = moment(date).format('HHmmss');
+    const vnp_CreateDate = moment(date).format('YYYYMMDDHHmmss');
+    const vnp_Command = 'querydr';
+
+    const data =
+      vnp_RequestId +
+      '|' +
+      OrderService.vnp_Version +
+      '|' +
+      OrderService.vnp_Command +
+      '|' +
+      this.config.get('vnp_TmnCode') +
+      '|' +
+      vnp_TxnRef +
+      '|' +
+      vnp_TransactionDate +
+      '|' +
+      vnp_CreateDate +
+      '|' +
+      OrderService.vnp_IpAddr +
+      '|' +
+      vnp_OrderInfo;
+
+    console.log(data);
+
+    const secretKey = this.config.get('vnp_HashSecret');
+    const hmac = crypto.createHmac('sha512', secretKey);
+    const vnp_SecureHash = hmac
+      .update(Buffer.from(data, 'utf-8'))
+      .digest('hex');
+
+    const body: { [key: string]: string } = {
+      vnp_RequestId,
+      vnp_Version: OrderService.vnp_Version,
+      vnp_Command,
+      vnp_TmnCode: this.config.get('vnp_TmnCode'),
+      vnp_TxnRef,
+      vnp_OrderInfo: vnp_OrderInfo,
+      vnp_TransactionDate: vnp_TransactionDate,
+      vnp_CreateDate,
+      vnp_IpAddr: OrderService.vnp_IpAddr,
+      vnp_SecureHash,
+    };
+
+    return body;
   }
 }

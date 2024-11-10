@@ -1,4 +1,4 @@
-import { IShopAddress } from './shopAddress.interface';
+import { IUserAddress } from './userAddress.interface';
 
 export interface IShop {
   id: string;
@@ -6,5 +6,5 @@ export interface IShop {
   logo?: string;
   telephone?: string;
   url: string;
-  address?: IShopAddress;
+  address?: IUserAddress;
 }

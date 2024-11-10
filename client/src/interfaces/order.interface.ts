@@ -8,8 +8,9 @@ import { IShipping } from './shipping.interface';
 export interface IOrder {
   status: ORDER_STATUS;
   invoice: IInvoice;
-  items: IProductItem[];
+  item: IProductItem;
   shipping: IShipping;
   payment: IPayment;
   statusHistories: IOrderStatus[];
+  uuid: string;
 }

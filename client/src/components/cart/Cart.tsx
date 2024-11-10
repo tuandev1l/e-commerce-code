@@ -5,16 +5,25 @@ import { getCartApi } from '../../api/api';
 import { Layout } from '../../common/layout/Layout';
 import { priceSplit } from '../../common/price/priceSplit';
 import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
-import { productsInCartSelector, usernameSelector } from '../../store/selector';
+import {
+  addressSelector,
+  productsInCartSelector,
+  usernameSelector,
+} from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { getAllProductsInCart, setProductItemSelected } from './cartSlice';
 import { ProductInCart } from './ProductInCart';
+import useToast from '../../hook/useToast';
+import { useNavigate } from 'react-router-dom';
 type Props = {};
 
 export const Cart = ({}: Props) => {
+  const navigate = useNavigate();
+  const toast = useToast();
   const username = useSelector(usernameSelector);
   const dispatch = useAppDispatch();
   const products = useSelector(productsInCartSelector);
+  const addresses = useSelector(addressSelector);
   const [productCheckStatus, setProductCheckStatus] = useState<boolean[]>([]);
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [discount, setDiscount] = useState<number>(0);
@@ -44,14 +53,20 @@ export const Cart = ({}: Props) => {
     setProductCheckStatus([...productCheckStatus]);
   };
 
-  const updateQuantityHandler = (price: number, discountPrice: number) => {
-    setTotalPrice(totalPrice + price);
-    setDiscount(discount + discountPrice);
+  const updateQuantityHandler = (
+    productId: string,
+    amount: number,
+    price: number,
+    discountPrice: number
+  ) => {
+    setTotalPrice(totalPrice + amount * price);
+    setDiscount(discount + amount * discountPrice);
+    const idx = productSelected.findIndex((pd) => pd.uuid === productId);
+    if (idx !== -1) {
+      productSelected[idx].quantity += amount;
+      setProductSelected([...productSelected]);
+    }
   };
-
-  useEffect(() => {
-    console.log(productSelected);
-  }, [productSelected]);
 
   const productSelectHandler = (
     productItem: IProductItemMinimal,
@@ -61,7 +76,8 @@ export const Cart = ({}: Props) => {
     if (isSelected) {
       setTotalPrice(totalPrice + productItem.price * quantity);
       setDiscount(discount + productItem.discount * quantity);
-      setProductSelected([...productSelected, productItem]);
+      const productItemSelected = { ...productItem, quantity };
+      setProductSelected([...productSelected, productItemSelected]);
     } else {
       const idx = productSelected.findIndex(
         (pd) => pd.uuid === productItem.uuid
@@ -76,8 +92,25 @@ export const Cart = ({}: Props) => {
     }
   };
 
+  // useEffect(() => {
+  //   console.log(productSelected);
+  // }, [productSelected]);
+
   const buyProductHandler = () => {
-    dispatch(setProductItemSelected(productSelected));
+    if (addresses?.length) {
+      dispatch(setProductItemSelected(productSelected));
+      setTimeout(() => {
+        navigate('/checkout');
+      }, 500);
+    } else {
+      toast({
+        type: 'error',
+        message: 'You have to add address and phone before ordering products',
+      });
+      setTimeout(() => {
+        navigate('/user-address');
+      }, 500);
+    }
   };
 
   return (

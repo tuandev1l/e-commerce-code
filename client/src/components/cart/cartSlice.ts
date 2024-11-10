@@ -32,20 +32,21 @@ const cartSlice = createSlice({
       for (const productItem of productItems) {
         if (productItem.seller?.name) {
           const idx = sellerObj[productItem.seller?.name];
-          const product = pickValueOfProduct(productItem);
-          discount += product.discount * product.quantity;
+          discount += productItem.discount * productItem.quantity;
           if (idx === undefined) {
             sellerObj[productItem.seller.name] = data.length;
             data.push({
               seller: productItem.seller,
-              productItem: [product],
+              productItem: [productItem],
             });
           } else {
-            data[idx]['productItem'].push(product);
+            data[idx]['productItem'].push(productItem);
           }
         }
       }
 
+      state.numberOfProducts = productItems.length;
+      localStorage.setItem('numberOfProducts', productItems.length.toString());
       state.products = data;
       state.userId = userId;
       state.discount = discount;

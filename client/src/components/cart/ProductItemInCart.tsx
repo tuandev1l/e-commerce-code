@@ -109,8 +109,10 @@ export const ProductItemInCart = ({
               setQuantity(quantity - 1);
               if (checked) {
                 updateQuantityHandler(
-                  -productItem.price,
-                  -productItem.discount
+                  productItem.uuid,
+                  -1,
+                  productItem.price,
+                  productItem.discount
                 );
               }
             }
@@ -130,7 +132,12 @@ export const ProductItemInCart = ({
             } else {
               setQuantity(quantity + 1);
               if (checked) {
-                updateQuantityHandler(productItem.price, productItem.discount);
+                updateQuantityHandler(
+                  productItem.uuid,
+                  1,
+                  productItem.price,
+                  productItem.discount
+                );
               }
             }
             setUpdateClick(true);

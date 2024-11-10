@@ -1,18 +1,14 @@
-import { useState } from 'react';
-import { AddressModal } from './AddressModal';
-import { UserLayout } from './UserLayout';
-import { useSelector } from 'react-redux';
-import {
-  addressSelector,
-  phoneSelector,
-  usernameSelector,
-} from '../../store/selector';
 import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { deleteAddressApi, setDefaultAddressApi } from '../../api/api';
-import useToast from '../../hook/useToast';
 import { IAxiosError } from '../../config/axiosError.interface';
+import useToast from '../../hook/useToast';
+import { addressSelector, usernameSelector } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { addNewAddressDispatch } from '../auth';
+import { AddressModal } from './AddressModal';
+import { UserLayout } from './UserLayout';
 
 type Props = {};
 
@@ -21,7 +17,6 @@ export const UserAddress = ({}: Props) => {
   const dispatch = useAppDispatch();
   const addresses = useSelector(addressSelector);
   const username = useSelector(usernameSelector);
-  const phone = useSelector(phoneSelector);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -80,7 +75,10 @@ export const UserAddress = ({}: Props) => {
               <div className='flex justify-between items-center'>
                 <div>
                   <p className='font-semibold'>
-                    {username} <span className='text-gray-500'>| {phone}</span>
+                    {username}{' '}
+                    <span className='text-gray-500'>
+                      | {address.phoneNumber}
+                    </span>
                   </p>
                   <p className='text-gray-600 mt-2'>{`${address.detailAddress}, ${address.ward}, ${address.district}, ${address.province}, ${address.country}`}</p>
                   {address.isDefault && (

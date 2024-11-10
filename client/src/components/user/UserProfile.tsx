@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import {
   dobSelector,
   genderSelector,
-  phoneSelector,
   usernameSelector,
 } from '../../store/selector';
 import { useSelector } from 'react-redux';
@@ -25,7 +24,6 @@ export const UserProfile = ({}: Props) => {
   const [gender, setGender] = useState<string>(
     useSelector(genderSelector) || ''
   );
-  const [phone, setPhone] = useState<string>(useSelector(phoneSelector) || '');
 
   useEffect(() => {
     if (dob) {
@@ -164,7 +162,7 @@ export const UserProfile = ({}: Props) => {
                 </div>
               </div>
             </div>
-            <div className='flex items-center mt-4 '>
+            {/* <div className='flex items-center mt-4 '>
               <label className='block text-gray-600 font-medium w-60'>
                 Số điện thoại
               </label>
@@ -175,7 +173,7 @@ export const UserProfile = ({}: Props) => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
               />
-            </div>
+            </div> */}
             {/* <div className='flex items-center'>
               <div className='text-gray-600 font-medium w-60'>Email</div>
               <input

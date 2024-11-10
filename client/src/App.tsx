@@ -17,6 +17,7 @@ import { ChangePassword } from './components/user/ChangePassword';
 import { Cart } from './components/cart';
 import { Order } from './components/order';
 import Checkout from './components/order/Checkout';
+import { VNPayPayment } from './components/order/VNPayPayment';
 
 function App() {
   const isLogin = useSelector(isLoginSelector);
@@ -42,7 +43,7 @@ function App() {
         element={isLogin ? <ProductDetail /> : <Navigate to={'/auth/login'} />}
       />
       <Route
-        path='/shop/:id'
+        path='/shop/:slug'
         element={isLogin ? <Shop /> : <Navigate to={'/auth/login'} />}
       />
       <Route
@@ -68,6 +69,10 @@ function App() {
       <Route
         path='/user-address'
         element={isLogin ? <UserAddress /> : <Navigate to={'/auth/login'} />}
+      />
+      <Route
+        path='/vnpay-payment'
+        element={isLogin ? <VNPayPayment /> : <Navigate to={'/auth/login'} />}
       />
       <Route path='/' element={<Main />} />
       <Route path='*' element={<NotFound />} />

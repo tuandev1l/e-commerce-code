@@ -1,9 +1,13 @@
+import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
 import { IProductMinimalWrapper } from '../../interfaces/productMinimalWrapper.interface';
+import { IUserAddress } from '../../interfaces/userAddress.interface';
 
 export interface ICartSlice {
   isLoading: boolean;
   products: IProductMinimalWrapper[];
-  productSelected: IProductMinimalWrapper[];
+  productSelected: IProductItemMinimal[];
+  numberOfProducts: number;
+  selectedAddress?: IUserAddress;
   total: number;
   discount: number;
   userId: number;
@@ -13,7 +17,11 @@ export interface ICartSlice {
 export const cartInitalState: ICartSlice = {
   isLoading: false,
   products: [],
+  selectedAddress: undefined,
   productSelected: [],
+  numberOfProducts: localStorage.getItem('numberOfProducts')
+    ? +localStorage.getItem('numberOfProducts')!
+    : 0,
   error: undefined,
   total: 0,
   discount: 0,

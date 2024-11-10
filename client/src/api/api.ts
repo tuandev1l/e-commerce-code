@@ -3,6 +3,8 @@ import { IChangePassword } from '../components/user/ChangePassword';
 import { instance } from '../config/axiosConfig';
 import { ICartDto } from '../dto/cart.dto';
 import { IChangeQuantityOfProductInCart } from '../dto/changeQuantityOfProductInCart.dto';
+import { ICreateCheckout } from '../dto/createCheckout.dto';
+import { ICreateOrder } from '../dto/createOrder.dto';
 import { ILogin } from '../interfaces/login.interface';
 import { ISignup } from '../interfaces/signup.interface';
 import { IUserAddress } from '../interfaces/userAddress.interface';
@@ -39,3 +41,15 @@ export const setDefaultAddressApi = (addressId: string) =>
   instance.post('auth/set-default-address', { addressId });
 export const deleteAddressApi = (addressId: string) =>
   instance.delete(`auth/delete-address/${addressId}`);
+
+export const getShopInfoApi = (shopName: string) =>
+  instance.get(`shop/${shopName}`);
+export const getAllPaymentsApi = () => instance.get('payment');
+export const getAllShippingMethodsApi = () => instance.get('shipping');
+
+export const createOrderApi = (orderDto: ICreateOrder) =>
+  instance.post('order', orderDto);
+export const createCheckoutApi = (checkoutDto: ICreateCheckout) =>
+  instance.post('order/get-payment-url', checkoutDto);
+
+export const getAllOrdersApi = () => instance.get('order');

@@ -185,3 +185,17 @@ export const products: IProduct[] = [
     reviewText: '',
   },
 ];
+
+
+
+// const product = pickValueOfProduct(productItem);
+          // discount += product.discount * product.quantity;
+          // if (idx === undefined) {
+          //   sellerObj[productItem.seller.name] = data.length;
+          //   data.push({
+          //     seller: productItem.seller,
+          //     productItem: [product],
+          //   });
+          // } else {
+          //   data[idx]['productItem'].push(product);
+          // }

@@ -1,12 +1,9 @@
 export interface IInvoice {
-  itemsCount: number;
   itemsQuantity: number;
+  productPriceTotal: number;
   total: number;
-  collectibleAmount: number;
   discountAmount: number;
-  shippingAmountAfterDiscount: number;
-  shippingDiscountAmount: number;
-  handlingFee: number;
-  otherFee: number;
+  shippingFee: number;
   purchasedAt: string;
+  phoneNumber: string;
 }

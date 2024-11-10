@@ -11,6 +11,9 @@ export class Shipping extends BaseEntity {
   @Column({ type: 'enum', enum: ShippingEnum, default: ShippingEnum.AVAILABLE })
   status: ShippingEnum;
 
+  @Column({ name: 'img_url' })
+  imgUrl: string;
+
   @OneToMany(() => Order, (order) => order.shipping)
   order: Order;
 }

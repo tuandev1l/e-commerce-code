@@ -32,9 +32,7 @@ const user = JSON.parse(localStorage.getItem('user')) || {
   isVerifyEmail: '',
   isVerifyPhone: '',
   email: '',
-  phoneNumber: '',
   avatarUrl: '',
-  address: '',
 };
 
 export const authSliceInitialState: IAuthSlice = {

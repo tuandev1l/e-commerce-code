@@ -78,8 +78,7 @@ export class AuthService {
   }
 
   async signup(signupDto: SignupDto) {
-    const { email, password, name, birthday, address, gender, avatarUrl } =
-      signupDto;
+    const { email, password, name, birthday, gender, avatarUrl } = signupDto;
 
     const resetToken = await this.createToken();
 
@@ -91,13 +90,13 @@ export class AuthService {
     }
 
     const hashPassword = await this.hashPassword(password);
-    address.isDefault = true;
-    address.uuid = uuidv4();
+    // address.isDefault = true;
+    // address.uuid = uuidv4();
     const user = this.repository.create({
       accountType: ACCOUNT_TYPE.EMAIL,
       birthday,
       gender,
-      address: [address],
+      // address: [address],
       avatarUrl,
       password: hashPassword,
       name,
@@ -163,7 +162,7 @@ export class AuthService {
     user.isEmailVerified = true;
     user.resetToken = undefined;
     user.resetTokenExpired = undefined;
-    void this.repository.save(user);
+    await this.repository.save(user);
     return true;
   }
 

@@ -3,12 +3,16 @@ import authSlice from '../components/auth/authSlice';
 import productSlice from '../components/product/productSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import cartSlice from '../components/cart/cartSlice';
+import shopSlice from '../components/shop/shopSlice';
+import orderSlice from '../components/order/orderSlice';
 
 const store = configureStore({
   reducer: {
     auth: authSlice.reducer,
     product: productSlice.reducer,
     cart: cartSlice.reducer,
+    shop: shopSlice.reducer,
+    order: orderSlice.reducer,
   },
 });
 

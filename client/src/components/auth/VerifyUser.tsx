@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { verifyUserApi } from '../../api/api';
 import { IAxiosError } from '../../config/axiosError.interface';
 import useToast from '../../hook/useToast';
+import { Layout } from '../../common/layout/Layout';
 
 type Props = {};
 
@@ -20,7 +21,7 @@ export const VerifyUser = ({}: Props) => {
       setMessage('Verify user successfully!');
       setTimeout(() => {
         navigate('/auth/login');
-      }, 1000);
+      }, 2000);
     },
     onError: (error: IAxiosError) => {
       setMessage(error.message.toString());
@@ -35,5 +36,9 @@ export const VerifyUser = ({}: Props) => {
     mutate(resetToken);
   }, []);
 
-  return <div>{message}</div>;
+  return (
+    <Layout>
+      <div className='pt-8'>{message}</div>
+    </Layout>
+  );
 };

@@ -1,9 +1,50 @@
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { getShopInfoApi } from '../../api/api';
 import { Layout } from '../../common/layout/Layout';
-import { ProductItem } from '../product/ProductItem';
+import { useAppDispatch } from '../../store/store';
+import { getShopInfo, setProductsOfShop } from './shopSlice';
+import { useSelector } from 'react-redux';
+import { productsOfShopSelector, shopSelector } from '../../store/selector';
 
 type Props = {};
 
 export const Shop = ({}: Props) => {
+  const dispatch = useAppDispatch();
+  const shop = useSelector(shopSelector);
+  const products = useSelector(productsOfShopSelector);
+  const shopName = useParams()['slug'];
+
+  const { data } = useQuery({
+    queryKey: [`shop`],
+    queryFn: () => getShopInfoApi(`${shopName}`),
+    enabled: !!shopName,
+    gcTime: 10 * 60 * 1000,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const { data: productsOfShop } = useQuery({
+    queryKey: [`products/shop/${shopName}`],
+    queryFn: () => {},
+    enabled: !!shop.name,
+    gcTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  useEffect(() => {
+    if (productsOfShop) {
+      dispatch(setProductsOfShop(productsOfShop));
+    }
+  }, []);
+
+  useEffect(() => {
+    if (data) {
+      console.log(data);
+      dispatch(getShopInfo(data));
+    }
+  }, [data]);
+
   return (
     <Layout>
       <>
@@ -82,22 +123,21 @@ export const Shop = ({}: Props) => {
               />
             </div>
           </div>
-
-          <div className='flex w-full mt-6 space-x-4 overflow-hidden'>
-            <div className='flex-none'>
-              <img
-                src='https://salt.tikicdn.com/cache/w700/ts/tmp/bf/0f/a8/efb8470f067e4e82b98cba27390170fd.jpg.webp'
-                alt='Banner 1'
-                className='w-full h-auto rounded-lg object-cover'
-              />
-            </div>
-            <div className='flex-none'>
-              <img
-                src='https://salt.tikicdn.com/cache/w700/ts/tmp/bf/0f/a8/efb8470f067e4e82b98cba27390170fd.jpg.webp' // Replace with your banner image source
-                alt='Banner 2'
-                className='w-full h-auto rounded-lg object-cover'
-              />
-            </div>
+        </div>
+        <div className='flex w-11/12 mt-6 space-x-4 overflow-hidden'>
+          <div className='flex-none'>
+            <img
+              src='https://salt.tikicdn.com/cache/w700/ts/tmp/bf/0f/a8/efb8470f067e4e82b98cba27390170fd.jpg.webp'
+              alt='Banner 1'
+              className='w-full h-auto rounded-lg object-cover'
+            />
+          </div>
+          <div className='flex-none'>
+            <img
+              src='https://salt.tikicdn.com/cache/w700/ts/tmp/bf/0f/a8/efb8470f067e4e82b98cba27390170fd.jpg.webp'
+              alt='Banner 1'
+              className='w-full h-auto rounded-lg object-cover'
+            />
           </div>
         </div>
         <div className='w-11/12 bg-white rounded-md mt-8'>

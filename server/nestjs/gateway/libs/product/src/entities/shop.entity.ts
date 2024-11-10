@@ -9,6 +9,9 @@ export class Shop {
   @Prop({ required: true })
   name: string;
 
+  @Prop({ required: true })
+  slug: string;
+
   @Prop()
   logo: string;
 

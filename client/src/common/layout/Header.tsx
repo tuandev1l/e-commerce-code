@@ -7,18 +7,40 @@ import {
   MapPinIcon,
   ShoppingCartIcon,
 } from '@heroicons/react/24/outline';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { logo } from '../../assets/images/image';
 import { logout } from '../../components/auth';
-import { isLoginSelector, usernameSelector } from '../../store/selector';
+import {
+  addressSelector,
+  isLoginSelector,
+  numberOfProductSelector,
+  usernameSelector,
+} from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
+import { useSocket } from '../../hook/useSocket';
 
 type Props = {};
 
 export const Header = ({}: Props) => {
   const isLogin = useSelector(isLoginSelector);
   const username = useSelector(usernameSelector) || 'Tài khoản';
+  const addresses = useSelector(addressSelector);
+  const [address, setAddress] = useState<string>(
+    'P.Hàng Trống, Q.Hoàn Kiếm, Hà Nội'
+  );
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (addresses?.length && addresses?.length > 0) {
+      const addressDefault = addresses.find((add) => add.isDefault);
+      if (addressDefault) {
+        setAddress(
+          `${addressDefault.ward}, ${addressDefault.district}, ${addressDefault.province}`
+        );
+      }
+    }
+  }, [addresses]);
 
   const logoutHandler = () => {
     dispatch(logout());
@@ -73,9 +95,9 @@ export const Header = ({}: Props) => {
         </div>
         <div className='flex right-0 justify-end mt-4 items-center'>
           <MapPinIcon className='w-5 mr-1' />
-          <p>Giao đến:</p>
+          <p>Giao đến: {address}</p>
           <Link to='/' className='flex text-black underline-offset-1'>
-            <p className='ml-2'>Q.Hoàn Kiếm, P.Hàng Trống, Hà Nội</p>
+            <p className='ml-2'></p>
           </Link>
         </div>
       </div>

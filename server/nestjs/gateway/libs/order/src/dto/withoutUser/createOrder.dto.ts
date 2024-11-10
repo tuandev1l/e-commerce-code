@@ -12,8 +12,4 @@ export class CreateOrderDtoWithoutUser {
   @IsNotEmpty()
   @IsNumber()
   shippingId: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  paymentId: number;
 }

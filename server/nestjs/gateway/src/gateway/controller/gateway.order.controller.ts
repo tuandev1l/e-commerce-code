@@ -7,6 +7,9 @@ import { GetUser } from '@auth/decorator/get-user.decorator';
 import { ORDER_PREFIX } from '@constants/requestPrefix';
 import { BulkCreateOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/bulkCreateOrder.dto';
 import { UpdateOrderStatusDtoWithoutUser } from '@libs/order/dto/withoutUser/updateOrderStatus.dto';
+import { Auth } from '@auth/decorator/auth.decorator';
+import { Role } from '@auth';
+import { PayOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/payOrder.dto';
 
 @ApiTags('Gateway')
 @Controller(ORDER_PREFIX)
@@ -29,7 +32,7 @@ export class GatewayOrderController {
     return this.service.cancelOrder(user, orderPayload);
   }
 
-  // @Auth(Role.ADMIN, Role.SHOP)
+  @Auth(Role.ADMIN, Role.SHOP)
   @Patch()
   async updateOrderStatus(
     @GetUser() user: User,
@@ -46,5 +49,13 @@ export class GatewayOrderController {
   @Get(':id')
   async getOrder(@GetUser() user: User, @Param('id') id: string) {
     return this.service.getOrder(user, { orderId: +id });
+  }
+
+  @Post('get-payment-url')
+  async getPaymentUrl(
+    @GetUser() user: User,
+    @Body() payOrderDto: PayOrderDtoWithoutUser,
+  ) {
+    return this.service.getPaymentUrl({ user, ...payOrderDto });
   }
 }

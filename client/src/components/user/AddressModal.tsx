@@ -66,6 +66,9 @@ export const AddressModal = ({ isModalOpen, closeModal }: Props) => {
     ) {
       toast({ type: 'error', message: 'Missing fields' });
       return;
+    } else if (!/\d+/.test(phoneNumber) || phoneNumber.trim().length !== 10) {
+      toast({ type: 'error', message: 'Invalid phone number' });
+      return;
     }
     mutate({
       address: {

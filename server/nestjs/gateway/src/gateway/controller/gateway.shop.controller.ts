@@ -7,23 +7,23 @@ import { UpdateShopDtoWithoutId } from '@libs/product/dto/shop/update-shop-wid.d
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
 
-@Auth(Role.ADMIN)
 @ApiTags('Gateway')
 @Controller(SHOP_PREFIX)
 export class GatewayShopController {
   constructor(private readonly service: GatewayService) {}
 
+  @Auth(Role.ADMIN)
   @Post()
   async createShop(@Body() createShop: CreateShopDto) {
     return this.service.createShop(createShop);
   }
 
-  @Get(':id')
-  async getShop(@Param('id') shopId: string) {
-    return this.service.getShop(shopId);
-  }
+  // @Get(':id')
+  // async getShop(@Param('id') shopId: string) {
+  //   return this.service.getShop(shopId);
+  // }
 
-  @Get('shop/:name')
+  @Get(':name')
   async getShopByName(@Param('name') shopName: string) {
     return this.service.getShopByName(shopName);
   }
@@ -33,6 +33,7 @@ export class GatewayShopController {
     return this.service.getAllShops();
   }
 
+  @Auth(Role.ADMIN, Role.SHOP)
   @Patch(':id')
   async updateShop(
     @Param('id') shopId: string,

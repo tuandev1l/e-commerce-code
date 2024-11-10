@@ -19,6 +19,9 @@ export class Order extends BaseEntity {
   @Column({ type: 'jsonb', nullable: true })
   item: IProductItem;
 
+  @Column({ nullable: true })
+  uuid: string;
+
   @Exclude()
   @Column({ name: 'shipping_id' })
   shippingId: number;

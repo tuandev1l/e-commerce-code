@@ -14,6 +14,9 @@ export class Payment extends BaseEntity {
   @Column({ type: 'enum', enum: PaymentEnum, default: PaymentEnum.AVAILABLE })
   status: PaymentEnum;
 
+  @Column({ name: 'img_url' })
+  imgUrl: string;
+
   @Column()
   description: string;
 

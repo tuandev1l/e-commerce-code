@@ -7,12 +7,12 @@ import { UpdateCategoryDtoWithoutId } from '@libs/product/dto/category/update-ca
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
 
-@Auth(Role.ADMIN)
 @ApiTags('Gateway')
 @Controller(CATEGORY_PREFIX)
 export class GatewayCategoryController {
   constructor(private readonly service: GatewayService) {}
 
+  @Auth(Role.ADMIN)
   @Post()
   async createCategory(@Body() createCategory: CreateCategoryDto) {
     return this.service.createCategory(createCategory);
