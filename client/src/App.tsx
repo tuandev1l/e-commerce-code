@@ -41,6 +41,7 @@ function App() {
       <Route
         path='/product/:productId'
         element={isLogin ? <ProductDetail /> : <Navigate to={'/auth/login'} />}
+        // element={<ProductDetail />}
       />
       <Route
         path='/shop/:slug'

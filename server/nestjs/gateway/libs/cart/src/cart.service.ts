@@ -28,11 +28,9 @@ export class CartService {
         pd.size === cartPayload.size,
     );
 
-    let addingPrice;
     if (!productItem) {
       const product = await this.productService.findOne(cartPayload.productId);
 
-      addingPrice = cartPayload.quantity * product.price;
       const productItem: IProductItem = {
         _id: product._id,
         uuid: uuidv4(),
@@ -44,17 +42,13 @@ export class CartService {
         price: product.price,
         seller: product.seller,
         quantity: cartPayload.quantity,
-        subTotal: addingPrice,
         color: cartPayload.color,
         size: cartPayload.size,
       };
       cart.productItems.push(productItem);
     } else {
       productItem.quantity += cartPayload.quantity;
-      addingPrice = cartPayload.quantity * productItem.price;
-      productItem.subTotal += addingPrice;
     }
-    cart.total += addingPrice;
 
     await this.repository.save(cart);
     return this.getCart(cartPayload.user);
@@ -71,24 +65,13 @@ export class CartService {
 
   async deleteFromCart(cartPayload: DelItemDto) {
     const cart = await this.getCart(cartPayload.user);
-    const { quantity, productId } = cartPayload;
+    const { productId } = cartPayload;
 
     const productItemIdx = cart.productItems.findIndex(
-      (product) => product._id.toString() === productId,
+      (product) => product.uuid === productId,
     );
 
-    const productItem = cart.productItems[productItemIdx];
-
-    if (productItem.quantity - quantity < 0) {
-      throw new RpcBadRequest('Quantity of product is not enough');
-    } else if (productItem.quantity - quantity == 0) {
-      cart.productItems.splice(productItemIdx, 1);
-    } else {
-      productItem.quantity -= quantity;
-    }
-
-    const removePrice = productItem.price * quantity;
-    cart.total -= removePrice;
+    cart.productItems.splice(productItemIdx, 1);
 
     return this.repository.save(cart);
   }

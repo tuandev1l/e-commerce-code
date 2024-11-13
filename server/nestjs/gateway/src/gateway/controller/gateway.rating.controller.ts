@@ -26,6 +26,16 @@ import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
 export class GatewayRatingController {
   constructor(private readonly service: GatewayService) {}
 
+  @Get('product-rating/:productId')
+  async getProductRating(@Param('productId') productId: string) {
+    return this.service.getProductRating(productId);
+  }
+
+  @Get('product/:id')
+  async getAllRatingOfProduct(@Param('id') productId: string) {
+    return this.service.getAllRatingsOfProduct(productId);
+  }
+
   @Patch(':id')
   async updateRating(
     @Param('id') id: string,
@@ -55,11 +65,6 @@ export class GatewayRatingController {
   @Delete(':id')
   async deleteRating(@GetUser() user: User, @Param('id') id: string) {
     return this.service.deleteRating({ ratingId: +id, user });
-  }
-
-  @Get('product/:id')
-  async getAllRatingOfProduct(@Param('id') productId: string) {
-    return this.service.getAllRatingsOfProduct(productId);
   }
 
   @Get(':id')

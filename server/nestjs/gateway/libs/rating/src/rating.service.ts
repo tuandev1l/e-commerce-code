@@ -9,6 +9,7 @@ import { GetAndDeleteRatingDto } from '@libs/rating/dto/withUser/getAndDeleteRat
 import { Order } from '@libs/order/entity/order.entity';
 import { ORDER_STATUS } from '@libs/order/enum';
 import { RpcBadRequest, RpcNotFound } from '@base/exception/exception.resolver';
+import { ProductRating } from '@libs/rating/entity/productRating.entity';
 
 @Injectable()
 export class RatingService {
@@ -16,10 +17,18 @@ export class RatingService {
     @InjectRepository(Rating) private readonly repository: Repository<Rating>,
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
+    @InjectRepository(ProductRating)
+    private readonly productRatingRepo: Repository<ProductRating>,
   ) {}
 
   async getAllRatingsOfProduct(productId: string) {
-    return this.repository.findBy({ productId });
+    return this.repository.find({
+      where: { productId },
+      relations: ['user'],
+      order: {
+        updatedAt: -1,
+      },
+    });
   }
 
   async getAllRatingOfUser(user: User) {
@@ -70,7 +79,6 @@ export class RatingService {
     const rating = await this.getRating({ user, ratingId });
 
     rating.rating = updateRatingDto.rating;
-    rating.deliveryRating = updateRatingDto.deliveryRating;
     rating.content = updateRatingDto.content;
     rating.images = updateRatingDto.images;
     rating.title = updateRatingDto.title;
@@ -82,5 +90,9 @@ export class RatingService {
     const rating = await this.getRating(getAndDeleteRatingDto);
     void this.repository.delete(rating.id);
     return null;
+  }
+
+  async getProductRating(productId: string) {
+    return this.productRatingRepo.findOneBy({ productId });
   }
 }

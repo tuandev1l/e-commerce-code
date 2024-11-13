@@ -16,5 +16,4 @@ export interface IProductItem
   color?: string;
   size?: string;
   quantity: number;
-  subTotal: number;
 }

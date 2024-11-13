@@ -1,9 +1,16 @@
-import { Body, Controller, Delete, Get, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { GatewayService } from '@gateway/service/gateway.service';
 import { CART_PREFIX } from '@constants/requestPrefix';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from '@user/entities/user.entity';
-import { DelItemWithoutUserDto } from '@libs/cart/dto/withoutUser/delItemWithoutUser.dto';
 import { GetUser } from '@auth/decorator/get-user.decorator';
 import { AddItemWithoutUserDto } from '@libs/cart/dto/withoutUser/addItemWithoutUser.dto';
 import { ChangeQuantityWithoutUserDto } from '@libs/cart/dto/withoutUser/changeQuantityWithoutUser.dto';
@@ -29,12 +36,12 @@ export class GatewayCartController {
     return this.service.changeQuantity({ ...changeQuantityDto, user });
   }
 
-  @Delete('delete-from-cart')
+  @Delete(':productId')
   async deleteFromCart(
     @GetUser() user: User,
-    @Body() cartPayload: DelItemWithoutUserDto,
+    @Param('productId') productId: string,
   ) {
-    return this.service.deleteFromCart(user, cartPayload);
+    return this.service.deleteFromCart({ user, productId });
   }
 
   @Post()

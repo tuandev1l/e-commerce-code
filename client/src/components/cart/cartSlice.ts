@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, current } from '@reduxjs/toolkit';
 import { IProductItem } from '../../interfaces';
 import { IProductMinimalWrapper } from '../../interfaces/productMinimalWrapper.interface';
 import { cartInitalState } from './cartSlice.interface';
@@ -55,10 +55,17 @@ const cartSlice = createSlice({
     setProductItemSelected: (state, { payload }) => {
       state.productSelected = payload;
     },
+    removeItemInCartDispatch: (state, { payload }) => {
+      const seller = state.products[payload.productIndex];
+      seller.productItem.splice(payload.productIdx, 1);
+    },
   },
   extraReducers: () => {},
 });
 
-export const { getAllProductsInCart, setProductItemSelected } =
-  cartSlice.actions;
+export const {
+  getAllProductsInCart,
+  setProductItemSelected,
+  removeItemInCartDispatch,
+} = cartSlice.actions;
 export default cartSlice;

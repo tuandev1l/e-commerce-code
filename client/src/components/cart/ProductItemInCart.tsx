@@ -1,26 +1,40 @@
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { useMutation } from '@tanstack/react-query';
 import { useDebounce } from '@uidotdev/usehooks';
-import { useEffect, useState } from 'react';
-import { changeQuantityOfProductInCartApi } from '../../api/api';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import {
+  changeQuantityOfProductInCartApi,
+  removeItemInCartApi,
+} from '../../api/api';
+import { priceSplit } from '../../common/price/priceSplit';
 import { IAxiosError } from '../../config/axiosError.interface';
 import useToast from '../../hook/useToast';
 import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
-import { priceSplit } from '../../common/price/priceSplit';
+import { usernameSelector } from '../../store/selector';
+import { useAppDispatch } from '../../store/store';
+import { removeItemInCartDispatch } from './cartSlice';
+import { IProductItem } from '../../interfaces';
 
 type Props = {
-  productItem: IProductItemMinimal;
+  productItem: IProductItem;
+  removeItemHandler: Function;
   updateQuantityHandler: Function;
   productSelectHandler: Function;
   idx: number;
+  productIndex: number;
 };
 
 export const ProductItemInCart = ({
   productItem,
   idx,
+  removeItemHandler: updateTotalPriceAndDiscountHandler,
   updateQuantityHandler,
   productSelectHandler,
+  productIndex,
 }: Props) => {
+  const username = useSelector(usernameSelector);
+  const dispatch = useAppDispatch();
   const toast = useToast();
   const [checked, setChecked] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(productItem.quantity);
@@ -40,6 +54,35 @@ export const ProductItemInCart = ({
       toast({ type: 'error', message: error.message });
     },
   });
+
+  const { mutate: removeItemMutate } = useMutation({
+    mutationKey: [`removeItem/${username}`],
+    mutationFn: removeItemInCartApi,
+    onSuccess: () => {
+      toast({ type: 'success', message: 'Remove item successfully' });
+      dispatch(
+        removeItemInCartDispatch({
+          productIndex,
+          productIdx: idx,
+          productId: productItem.uuid,
+        })
+      );
+      updateTotalPriceAndDiscountHandler(
+        productItem.price * quantity,
+        productItem.discount,
+        productItem.uuid
+      );
+    },
+    onError: (error: IAxiosError) => {
+      toast({ type: 'error', message: error.message });
+    },
+  });
+
+  const removeItemHandler = () => {
+    if (productItem.uuid) {
+      removeItemMutate(productItem.uuid);
+    }
+  };
 
   // useEffect(() => {
   //   if (updateClick && quantity >= 1 && productItem.uuid) {
@@ -154,7 +197,10 @@ export const ProductItemInCart = ({
         </div>
       </div>
 
-      <div className='w-8 text-center flex justify-center items-center'>
+      <div
+        className='w-8 text-center flex justify-center items-center'
+        onClick={removeItemHandler}
+      >
         <TrashIcon
           width={24}
           className='text-gray-500 hover:text-red-500 cursor-pointer'

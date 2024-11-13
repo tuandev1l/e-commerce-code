@@ -1,3 +1,4 @@
+import { IProductItem } from '../../interfaces';
 import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
 import { IProductMinimalWrapper } from '../../interfaces/productMinimalWrapper.interface';
 import { IUserAddress } from '../../interfaces/userAddress.interface';
@@ -5,7 +6,7 @@ import { IUserAddress } from '../../interfaces/userAddress.interface';
 export interface ICartSlice {
   isLoading: boolean;
   products: IProductMinimalWrapper[];
-  productSelected: IProductItemMinimal[];
+  productSelected: IProductItem[];
   numberOfProducts: number;
   selectedAddress?: IUserAddress;
   total: number;

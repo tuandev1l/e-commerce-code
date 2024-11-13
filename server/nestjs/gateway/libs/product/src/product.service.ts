@@ -20,6 +20,13 @@ import { UpdateCategoryDto } from '@libs/product/dto/category/update-category.dt
 import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
 import { readFile } from 'fs/promises';
 import InventoryStatusEnum from '@libs/product/enum';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductRating } from '@libs/rating/entity/productRating.entity';
+import { Repository } from 'typeorm';
+import { Rating } from '@libs/rating/entity/rating.entity';
+import { User } from '@user/entities/user.entity';
+import { AuthService } from '@auth/auth.service';
+import { ACCOUNT_TYPE, GENDER } from '@share/enums';
 
 @Injectable()
 export class ProductService {
@@ -28,11 +35,16 @@ export class ProductService {
     @InjectModel(Brand.name) private brandModel: Model<BrandDocument>,
     @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
     @InjectModel(Shop.name) private shopModel: Model<ShopDocument>,
+    @InjectRepository(ProductRating)
+    private readonly productRatingRepo: Repository<ProductRating>,
+    @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    private readonly authService: AuthService,
   ) {}
 
   async insertData() {
     const rawData = await readFile(
-      '/home/tuantm/schooling/ending_project_code/crawl/formatted_data_camelCase.json',
+      '/home/tuantm/schooling/ending_project/crawl/resolved_products.json',
       'utf-8',
     );
     const data = JSON.parse(rawData) as ProductDocument[];
@@ -41,11 +53,13 @@ export class ProductService {
 
     for (const product of data) {
       try {
-        product.badges = product['badgesV3'];
+        // product.badges = product['badgesV3'];
         product.inventoryStatus = InventoryStatusEnum.AVAILABLE;
 
-        const { brand, categories } = product;
-        const seller = product['currentSeller'];
+        // @ts-ignore
+        const { brand, categories, seller, reviews } = product;
+
+        // const seller = product['currentSeller'];
 
         const brandSlug = this.getSlugName(brand.name);
         const brandEntity = await this.brandModel
@@ -81,14 +95,10 @@ export class ProductService {
           newShop.name = seller.name;
           newShop.url = seller['link'];
           newShop.logo = seller.logo;
-          newShop.telephone = '';
-          newShop.address = {
-            streetAddress: '',
-            addressLocality: '',
-            postalCode: '',
-            addressRegion: '',
-            addressCountry: '',
-          };
+          // @ts-ignore
+          newShop.telephone = product.telephone;
+          newShop.address = seller.address;
+          newShop.slug = this.getSlugName(seller.name);
 
           product.seller = await this.shopModel.create(newShop);
         } else {
@@ -96,11 +106,78 @@ export class ProductService {
         }
 
         const savedProduct = await this.model.create(product);
-        savedData.push(savedProduct);
+
+        const productRating = this.productRatingRepo.create();
+        productRating.stars = reviews['stars'];
+        productRating.ratingAverage = reviews['ratingAverage'];
+        productRating.reviewsCount = reviews['reviewsCount'];
+        productRating.reviewPhoto = reviews['reviewPhoto'];
+
+        // @ts-ignore
+        productRating.productId = savedProduct._id.toString();
+
+        void this.productRatingRepo.save(productRating);
+        const ratingData: Rating[] = [];
+
+        for (const rating of reviews.data) {
+          const newRating = this.ratingRepo.create();
+          newRating.title = rating.title;
+          newRating.content = rating.content;
+          newRating.thankCount = rating.thankCount;
+          newRating.commentCount = rating.commentCount;
+          newRating.rating = rating.rating;
+          newRating.images = rating.images;
+          newRating.productAttributes = rating.productAttributes;
+          newRating.hadPhoto = rating.isPhoto;
+          // @ts-ignore
+          newRating.productId = savedProduct._id.toString();
+          newRating.timeline = rating.timeline;
+
+          const user = rating.createdBy;
+
+          const email =
+            slugify(user.name, {
+              replacement: '',
+              locale: 'vi',
+              trim: true,
+              lower: true,
+            }) + '@gmail.com';
+
+          const existedUser = await this.userRepo.findOneBy({ email });
+          if (existedUser) {
+            newRating.userId = existedUser.id;
+          } else {
+            const newUser = this.userRepo.create();
+            newUser.name = user.fullName;
+            newUser.isEmailVerified = true;
+            newUser.password = await this.authService.hashPassword('123456789');
+            newUser.email = email;
+
+            newUser.gender = GENDER.MALE;
+            newUser.birthday = new Date('2000-01-01');
+            newUser.accountType = ACCOUNT_TYPE.EMAIL;
+            newUser.hasPassword = true;
+            newUser.avatarUrl = `https://avatar.iran.liara.run/public/boy?username=${user.fullName}`;
+            newUser.joinedTime = user.joinedTime;
+            newUser.totalReview = user.totalReview;
+            newUser.totalThank = user.totalThank;
+
+            const savedUser = await this.userRepo.save(newUser);
+            newRating.userId = savedUser.id;
+          }
+          ratingData.push(newRating);
+        }
+
+        if (ratingData.length > 0) {
+          void this.ratingRepo.save(ratingData);
+        }
+
+        // savedData.push(savedProduct);
       } catch (e) {
         console.error(`Error at productId: ${product.id}`);
         console.log(e);
       }
+      // break;
     }
 
     return savedData;

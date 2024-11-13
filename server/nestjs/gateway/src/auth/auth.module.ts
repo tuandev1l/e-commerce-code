@@ -29,5 +29,6 @@ import { BullModule } from '@nestjs/bullmq';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  exports: [AuthModule],
 })
 export class AuthModule {}

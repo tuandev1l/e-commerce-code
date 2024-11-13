@@ -46,7 +46,7 @@ export const ProductItem = ({ product }: Props) => {
               {product.ratingAverage}
             </p>
             <p className='text-sm font-medium text-gray-500 '>
-              {`Đã bán ${product.quantitySold.value}`}
+              {`Đã bán ${product.quantitySold?.value}`}
             </p>
           </div>
         </div>

@@ -11,7 +11,6 @@ import {
 } from '@constants/pattern';
 import { ISearch } from '@libs/searching/search.interface';
 import { User } from '@user/entities/user.entity';
-import { DelItemWithoutUserDto } from '@libs/cart/dto/withoutUser/delItemWithoutUser.dto';
 import { ProducerService } from '@gateway/service/producer.service';
 import { AddItemWithoutUserDto } from '@libs/cart/dto/withoutUser/addItemWithoutUser.dto';
 import { CancelOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/cancelOrder.dto';
@@ -31,6 +30,7 @@ import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
 import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
 import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityInCart.dto';
 import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
+import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
 
 @Injectable()
 export class GatewayService {
@@ -82,11 +82,11 @@ export class GatewayService {
     );
   }
 
-  async deleteFromCart(user: User, cartPayload: DelItemWithoutUserDto) {
-    return this.producer.sendMessage(CART_PATTERN.DELETE_FROM_CART, {
-      user,
-      ...cartPayload,
-    });
+  async deleteFromCart(cartPayload: DelItemDto) {
+    return this.producer.sendMessage(
+      CART_PATTERN.DELETE_FROM_CART,
+      cartPayload,
+    );
   }
 
   async createCart(user: User) {
@@ -175,6 +175,13 @@ export class GatewayService {
   async getAllRatingsOfProduct(productId: string) {
     return this.producer.sendMessage(
       RATING_PATTERN.GET_ALL_RATING_OF_PRODUCT,
+      productId,
+    );
+  }
+
+  async getProductRating(productId: string) {
+    return this.producer.sendMessage(
+      RATING_PATTERN.GET_PRODUCT_RATING,
       productId,
     );
   }

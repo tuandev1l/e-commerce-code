@@ -8,9 +8,6 @@ export class Cart extends BaseEntity {
   @Column({ type: 'int', name: 'user_id' })
   userId: number;
 
-  @Column({ type: 'int', name: 'total', default: 0 })
-  total: number;
-
   @Column({ type: 'jsonb', name: 'product_items', default: [] })
   productItems: IProductItem[];
 

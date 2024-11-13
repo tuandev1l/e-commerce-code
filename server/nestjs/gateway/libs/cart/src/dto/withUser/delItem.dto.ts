@@ -1,9 +1,12 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
 import { User } from '@user/entities/user.entity';
-import { DelItemWithoutUserDto } from '@libs/cart/dto/withoutUser/delItemWithoutUser.dto';
 
-export class DelItemDto extends DelItemWithoutUserDto {
+export class DelItemDto {
+  @IsNotEmpty()
+  @IsUUID()
+  productId: string;
+
   @IsNotEmpty()
   @Type(() => User)
   user: User;

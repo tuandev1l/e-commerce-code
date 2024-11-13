@@ -31,6 +31,10 @@ export const Cart = ({}: Props) => {
     []
   );
 
+  useEffect(() => {
+    console.log(productSelected);
+  }, [productSelected]);
+
   const { data } = useQuery({
     queryKey: [`listProductInCart/${username}`],
     queryFn: getCartApi,
@@ -64,6 +68,22 @@ export const Cart = ({}: Props) => {
     const idx = productSelected.findIndex((pd) => pd.uuid === productId);
     if (idx !== -1) {
       productSelected[idx].quantity += amount;
+      setProductSelected([...productSelected]);
+    }
+  };
+
+  const removeItemHandler = (
+    price: number,
+    discountPrice: number,
+    productId: string
+  ) => {
+    setTotalPrice(totalPrice - price);
+    setDiscount(discount - discountPrice);
+    const selectedIdx = productSelected.findIndex(
+      (pd) => pd.uuid === productId
+    );
+    if (selectedIdx !== -1) {
+      productSelected.splice(selectedIdx, 1);
       setProductSelected([...productSelected]);
     }
   };
@@ -135,6 +155,7 @@ export const Cart = ({}: Props) => {
 
                   {products.map((product, productIndex) => (
                     <ProductInCart
+                      removeItemHandler={removeItemHandler}
                       key={productIndex}
                       product={product}
                       productIndex={productIndex}

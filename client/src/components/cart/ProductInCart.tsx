@@ -4,6 +4,7 @@ import { ProductItemInCart } from './ProductItemInCart';
 type Props = {
   product: IProductMinimalWrapper;
   productIndex: number;
+  removeItemHandler: Function;
   updateQuantityHandler: Function;
   productSelectHandler: Function;
   productCheckHandler: Function;
@@ -14,6 +15,7 @@ export const ProductInCart = ({
   productIndex,
   updateQuantityHandler,
   productSelectHandler,
+  removeItemHandler,
 }: Props) => {
   return (
     <div key={productIndex} className='bg-white p-4 pb-2 mb-4 rounded-lg'>
@@ -24,7 +26,9 @@ export const ProductInCart = ({
 
       {product.productItem.map((productItem, idx) => (
         <ProductItemInCart
+          removeItemHandler={removeItemHandler}
           key={productItem.uuid}
+          productIndex={productIndex}
           productItem={productItem}
           idx={idx}
           productSelectHandler={productSelectHandler}

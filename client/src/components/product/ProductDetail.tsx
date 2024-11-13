@@ -7,10 +7,17 @@ import { priceSplit } from '../../common/price/priceSplit';
 import { productSelector, usernameSelector } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { addToCartApi, getDetailProductApi } from '../../api/api';
+import {
+  addToCartApi,
+  getAllRatingsOfProductApi,
+  getDetailProductApi,
+  getProductRatingApi,
+} from '../../api/api';
 import { getDetailProduct } from './productSlice';
 import useToast from '../../hook/useToast';
 import { IAxiosError } from '../../config/axiosError.interface';
+import { IRatingProduct } from '../../interfaces/ratingProduct.interface';
+import { IRating } from '../../interfaces/rating.interface';
 
 type Props = {};
 
@@ -34,6 +41,8 @@ export const ProductDetail = ({}: Props) => {
   const [option, setOption] = useState<number[]>([]);
   const [quantity, setQuantity] = useState<number>(1);
   const username = useSelector(usernameSelector);
+  const [ratingProduct, setRatingProduct] = useState<IRatingProduct>();
+  const [ratings, setRatings] = useState<IRating[]>([]);
 
   const { data } = useQuery({
     queryKey: [`product/getAllProducts/${productId}`],
@@ -41,6 +50,38 @@ export const ProductDetail = ({}: Props) => {
     gcTime: 60 * 1000 * 10,
     staleTime: 60 * 1000 * 10,
   });
+
+  const { data: ratingProductData } = useQuery({
+    queryKey: [`product/ratingProduct/${productId}`],
+    queryFn: () => getProductRatingApi(productId),
+    enabled: !!productId,
+    gcTime: 60 * 1000 * 3,
+    staleTime: 60 * 1000 * 3,
+  });
+
+  useEffect(() => {
+    if (ratingProductData) {
+      console.log(`ratingProductData: ${JSON.stringify(ratingProductData)}`);
+      // @ts-ignore
+      setRatingProduct(ratingProductData);
+    }
+  }, [ratingProductData]);
+
+  const { data: ratingData } = useQuery({
+    queryKey: [`product/ratingsOfProduct/${productId}`],
+    queryFn: () => getAllRatingsOfProductApi(productId),
+    enabled: !!productId,
+    gcTime: 60 * 1000 * 3,
+    staleTime: 60 * 1000 * 3,
+  });
+
+  useEffect(() => {
+    if (ratingData) {
+      console.log(`ratingData: ${JSON.stringify(ratingData)}`);
+      // @ts-ignore
+      setRatings(ratingData);
+    }
+  }, [ratingData]);
 
   useEffect(() => {
     if (data) {
@@ -327,99 +368,30 @@ export const ProductDetail = ({}: Props) => {
                 <div className='text-gray-500'>{`(${product.reviewCount} đánh giá)`}</div>
                 <div className='mt-4'>
                   {/* 5 stars */}
-                  <div className='flex gap-3 w-1/5 items-center'>
-                    <Rating
-                      size={16}
-                      readonly
-                      transition
-                      allowFraction
-                      initialValue={5}
-                      SVGclassName={'inline-block'}
-                    />
-                    <div className='w-full bg-gray-200 rounded-full h-1.5'>
-                      <div
-                        className='bg-blue-600 h-1.5 rounded-full'
-                        style={{ width: '85%' }}
-                      ></div>
-                    </div>
-                    <div className='text-sm text-gray-500'>29</div>
-                  </div>
-
-                  {/* 4 stars */}
-                  <div className='flex gap-3 w-1/5 items-center'>
-                    <Rating
-                      size={16}
-                      readonly
-                      transition
-                      allowFraction
-                      initialValue={4}
-                      SVGclassName={'inline-block'}
-                    />
-                    <div className='w-full bg-gray-200 rounded-full h-1.5'>
-                      <div
-                        className='bg-blue-600 h-1.5 rounded-full'
-                        style={{ width: '65%' }}
-                      ></div>
-                    </div>
-                    <div className='text-sm text-gray-500'>5</div>
-                  </div>
-
-                  {/* 3 stars */}
-                  <div className='flex gap-3 w-1/5 items-center'>
-                    <Rating
-                      size={16}
-                      readonly
-                      transition
-                      allowFraction
-                      initialValue={3}
-                      SVGclassName={'inline-block'}
-                    />
-                    <div className='w-full bg-gray-200 rounded-full h-1.5'>
-                      <div
-                        className='bg-blue-600 h-1.5 rounded-full'
-                        style={{ width: '0%' }}
-                      ></div>
-                    </div>
-                    <div className='text-sm text-gray-500'>0</div>
-                  </div>
-
-                  {/* 2 stars */}
-                  <div className='flex gap-3 w-1/5 items-center'>
-                    <Rating
-                      size={16}
-                      readonly
-                      transition
-                      allowFraction
-                      initialValue={2}
-                      SVGclassName={'inline-block'}
-                    />
-                    <div className='w-full bg-gray-200 rounded-full h-1.5'>
-                      <div
-                        className='bg-blue-600 h-1.5 rounded-full'
-                        style={{ width: '0%' }}
-                      ></div>
-                    </div>
-                    <div className='text-sm text-gray-500'>0</div>
-                  </div>
-
-                  {/* 1 stars */}
-                  <div className='flex gap-3 w-1/5 items-center'>
-                    <Rating
-                      size={16}
-                      readonly
-                      transition
-                      allowFraction
-                      initialValue={1}
-                      SVGclassName={'inline-block'}
-                    />
-                    <div className='w-full bg-gray-200 rounded-full h-1.5'>
-                      <div
-                        className='bg-blue-600 h-1.5 rounded-full'
-                        style={{ width: '0%' }}
-                      ></div>
-                    </div>
-                    <div className='text-sm text-gray-500'>0</div>
-                  </div>
+                  {ratingProduct?.stars &&
+                    Object.values(ratingProduct?.stars)
+                      .map((star, idx) => (
+                        <div className='flex gap-3 w-1/5 items-center'>
+                          <Rating
+                            size={16}
+                            readonly
+                            transition
+                            allowFraction
+                            initialValue={idx + 1}
+                            SVGclassName={'inline-block'}
+                          />
+                          <div className='w-full bg-gray-200 rounded-full h-1.5'>
+                            <div
+                              className='bg-blue-600 h-1.5 rounded-full'
+                              style={{ width: star.percent }}
+                            ></div>
+                          </div>
+                          <div className='text-sm text-gray-500'>
+                            {star.count}
+                          </div>
+                        </div>
+                      ))
+                      .reverse()}
                 </div>
                 <div className='mt-4'>
                   <div>Tất cả hình ảnh</div>
@@ -440,75 +412,86 @@ export const ProductDetail = ({}: Props) => {
                 </div>
                 {/* Rating element */}
                 <div className='mt-8'>
-                  <div className='flex gap-8 items-start'>
-                    <div className='w-3/12'>
-                      <div className='flex items-center mt-4'>
-                        {/* Avatar */}
-                        <div className='w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xl font-semibold'>
-                          L
+                  {ratings.map((rating) => (
+                    <div
+                      key={rating.id}
+                      className='flex gap-8 items-start mb-8'
+                    >
+                      <div className='w-3/12'>
+                        <div className='flex items-center mt-4'>
+                          {/* Avatar */}
+                          <div className='rounded-full flex items-center justify-center text-gray-600 text-xl font-semibold'>
+                            <img
+                              src={rating.user?.avatarUrl}
+                              className='w-12 h-12'
+                            />
+                          </div>
+                          <div className='ml-4'>
+                            <p className='font-semibold'>{rating.user?.name}</p>
+                            <p className='text-sm text-gray-500'>
+                              {rating.user?.joinedTime}
+                            </p>
+                          </div>
                         </div>
-                        <div className='ml-4'>
-                          <p className='font-semibold'>Lien</p>
-                          <p className='text-sm text-gray-500'>
-                            Đã tham gia 8 năm
-                          </p>
+                        <div className='flex justify-between mt-4 text-sm items-end'>
+                          <div className='flex gap-4 items-end'>
+                            <img
+                              src='https://salt.tikicdn.com/ts/upload/c6/67/f1/444fc9e1869b5d4398cdec3682af7f14.png'
+                              width={24}
+                            />
+                            <div className='text-gray-500'>Đã viết</div>
+                          </div>
+                          <div>{rating.user?.totalReview} Đánh giá</div>
+                        </div>
+                        <div className='flex justify-between mt-4 text-sm items-end'>
+                          <div className='flex gap-4 items-end'>
+                            <img
+                              src='https://salt.tikicdn.com/ts/upload/cc/86/cd/1d5ac6d4e00abbf6aa4e4636489c9d80.png'
+                              width={24}
+                            />
+                            <div className='text-gray-500'>Đã nhận</div>
+                          </div>
+                          <div>{rating.user?.totalThank} Lượt cảm ơn</div>
                         </div>
                       </div>
-                      <div className='flex justify-between mt-4 text-sm items-end'>
-                        <div className='flex gap-4 items-end'>
-                          <img
-                            src='https://salt.tikicdn.com/ts/upload/c6/67/f1/444fc9e1869b5d4398cdec3682af7f14.png'
-                            width={24}
+                      <div className='flex-1'>
+                        <div className='flex items-center gap-3'>
+                          <Rating
+                            size={16}
+                            readonly
+                            transition
+                            allowFraction
+                            initialValue={rating.rating}
+                            SVGclassName={'inline-block'}
                           />
-                          <div className='text-gray-500'>Đã viết</div>
+                          <div className='font-semibold text-lg'>
+                            {rating.title}
+                          </div>
                         </div>
-                        <div>136 Đánh giá</div>
-                      </div>
-                      <div className='flex justify-between mt-4 text-sm items-end'>
-                        <div className='flex gap-4 items-end'>
+                        <p className='mt-4'>{rating.content}</p>
+                        {rating.images.length > 0 && (
+                          <div className='mt-4 w-36 rounded-lg flex gap-2'>
+                            {rating.images.map((img) => (
+                              <img src={img.fullPath} />
+                            ))}
+                          </div>
+                        )}
+
+                        <div className='mt-4 text-gray-500'>
+                          {rating.productAttributes.map((attr) => (
+                            <p>{attr}</p>
+                          ))}
+                        </div>
+                        <button className='flex items-center text-blue-500 gap-2 mt-4'>
                           <img
-                            src='https://salt.tikicdn.com/ts/upload/cc/86/cd/1d5ac6d4e00abbf6aa4e4636489c9d80.png'
-                            width={24}
+                            src='https://salt.tikicdn.com/ts/upload/10/9f/8b/54e5f6b084fb9e3445036b4646bc48b5.png'
+                            width={20}
                           />
-                          <div className='text-gray-500'>Đã nhận</div>
-                        </div>
-                        <div>24 Lượt cảm ơn</div>
+                          <span>Hữu ích</span>
+                        </button>
                       </div>
                     </div>
-                    <div className=''>
-                      <div className='flex items-center gap-3'>
-                        <Rating
-                          size={24}
-                          readonly
-                          transition
-                          allowFraction
-                          initialValue={5}
-                          SVGclassName={'inline-block'}
-                        />
-                        <div className='font-semibold text-lg'>
-                          Cực kì hài lòng
-                        </div>
-                      </div>
-                      <p className='mt-4'>
-                        Quần rất đẹp nha. Mình mua lúc giảm giá còn hơn 200k.
-                        Rất đáng tiền
-                      </p>
-                      <div className='mt-4 w-36 rounded-lg overflow-hidden'>
-                        <img src='https://salt.tikicdn.com/cache/750x750/ts/review/ee/c7/66/1fa7eb61d5c32c9c88229ab3672c9704.jpg.webp' />
-                      </div>
-                      <div className='mt-4 text-gray-500'>
-                        <p>Màu: Baby Blue • Kích cỡ: 26</p>
-                        <p>Đánh giá vào 2 năm trước • Đã dùng 1 ngày</p>
-                      </div>
-                      <button className='flex items-center text-blue-500 gap-2 mt-4'>
-                        <img
-                          src='https://salt.tikicdn.com/ts/upload/10/9f/8b/54e5f6b084fb9e3445036b4646bc48b5.png'
-                          width={20}
-                        />
-                        <span>Hữu ích</span>
-                      </button>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -518,7 +501,9 @@ export const ProductDetail = ({}: Props) => {
                 <img
                   src={
                     product.seller?.logo
-                      ? `https://salt.tikicdn.com/cache/w220/ts/seller/${product.seller.logo}`
+                      ? product.seller.logo.startsWith('http')
+                        ? product.seller.logo
+                        : `https://salt.tikicdn.com/cache/w220/ts/seller/${product.seller.logo}`
                       : 'https://vcdn.tikicdn.com/cache/w100/ts/seller/8d/05/90/e3a5a6a97a3f5cce051cbf7d6c9e325f.png.webp'
                   }
                   width={60}

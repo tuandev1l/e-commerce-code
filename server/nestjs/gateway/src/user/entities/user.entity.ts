@@ -62,6 +62,15 @@ export class User extends BaseEntity {
   @Exclude()
   resetTokenExpired?: Date;
 
+  @Column({ nullable: true })
+  joinedTime: string;
+
+  @Column({ default: 0 })
+  totalReview: number;
+
+  @Column({ default: 0 })
+  totalThank: number;
+
   @Exclude()
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];

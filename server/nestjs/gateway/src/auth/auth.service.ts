@@ -160,8 +160,8 @@ export class AuthService {
     }
 
     user.isEmailVerified = true;
-    user.resetToken = undefined;
-    user.resetTokenExpired = undefined;
+    user.resetToken = null;
+    user.resetTokenExpired = null;
     await this.repository.save(user);
     return true;
   }
@@ -221,6 +221,21 @@ export class AuthService {
     return user.address;
   }
 
+  async hashPassword(password: string) {
+    return bcrypt.hash(
+      password,
+      this.configService.get('PASSWORD_SALT_LENGTH'),
+    );
+  }
+
+  // private async findUserByUsername(username: string, isEmail): Promise<User> {
+  //   if (isEmail) {
+  //     return this.repository.findOneBy({ email: username });
+  //   }
+  //
+  //   return this.repository.findOneBy({ phoneNumber: username });
+  // }
+
   private validateUsername(username: string) {
     const emailReg = new RegExp(emailRegex, 'gi');
     const phoneReg = new RegExp(phoneRegex, 'gi');
@@ -233,21 +248,6 @@ export class AuthService {
     }
 
     return [isEmail, isPhoneNumber];
-  }
-
-  // private async findUserByUsername(username: string, isEmail): Promise<User> {
-  //   if (isEmail) {
-  //     return this.repository.findOneBy({ email: username });
-  //   }
-  //
-  //   return this.repository.findOneBy({ phoneNumber: username });
-  // }
-
-  private async hashPassword(password: string) {
-    return bcrypt.hash(
-      password,
-      this.configService.get('PASSWORD_SALT_LENGTH'),
-    );
   }
 
   private async createToken() {

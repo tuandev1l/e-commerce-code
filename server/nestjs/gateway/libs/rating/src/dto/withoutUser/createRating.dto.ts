@@ -1,4 +1,5 @@
 import { IsArray, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IRatingImage } from '@libs/rating/interface/ratingImage.interface';
 
 export class CreateRatingDtoWithoutUser {
   @IsNotEmpty()
@@ -19,7 +20,7 @@ export class CreateRatingDtoWithoutUser {
 
   @IsNotEmpty()
   @IsArray()
-  images?: string[];
+  images?: IRatingImage[];
 
   @IsNotEmpty()
   @IsArray()

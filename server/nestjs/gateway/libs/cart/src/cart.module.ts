@@ -6,14 +6,23 @@ import { CartController } from '@libs/cart/cart.controller';
 import { ProductService } from '@libs/product/product.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { mongooseConfig, productConfig } from '@libs/product/mongoose.config';
+import { ProductRating } from '@libs/rating/entity/productRating.entity';
+import { Rating } from '@libs/rating/entity/rating.entity';
+import { User } from '@user/entities/user.entity';
+import { AuthService } from '@auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Cart]),
+    TypeOrmModule.forFeature([Cart, ProductRating, Rating, User]),
     MongooseModule.forFeatureAsync(productConfig),
     MongooseModule.forFeature(mongooseConfig),
+    BullModule.registerQueue({
+      name: 'mail-queue',
+    }),
   ],
   controllers: [CartController],
-  providers: [CartService, ProductService],
+  providers: [CartService, ProductService, AuthService, JwtService],
 })
 export class CartModule {}

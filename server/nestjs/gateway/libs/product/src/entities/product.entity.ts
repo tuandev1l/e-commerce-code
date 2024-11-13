@@ -12,52 +12,52 @@ export type ProductDocument = HydratedDocument<Product>;
 export class Product {
   _id: MongooseSchema.Types.ObjectId;
 
-  @Prop({ required: true })
+  @Prop()
   name: string;
 
-  @Prop({ required: true })
+  @Prop()
   shortDescription: string;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   price: number;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   listPrice: number;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   originalPrice: number;
 
-  @Prop({ required: true })
+  @Prop()
   badges: IProductBadge[];
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   discount: number;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   discountRate: number;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   ratingAverage: number;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   reviewCount: number;
 
-  @Prop({ required: true })
+  @Prop()
   reviewText: string;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   favouriteCount: number;
 
-  @Prop({ required: true })
+  @Prop()
   thumbnailUrl: string;
 
-  @Prop({ required: true, type: String, enum: InventoryStatusEnum })
+  @Prop({ type: String, enum: InventoryStatusEnum })
   inventoryStatus: InventoryStatusEnum;
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Shop' })
   seller: Shop;
 
-  @Prop({ required: true })
+  @Prop({ default: 0 })
   allTimeQuantitySold: number;
 
   @Prop()
@@ -69,16 +69,16 @@ export class Product {
   @Prop()
   metaKeywords: string;
 
-  @Prop({ required: true })
+  @Prop()
   description: string;
 
-  @Prop({ required: true })
+  @Prop()
   images: IProductImage[];
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Brand' })
   brand: Brand;
 
-  @Prop({ required: true, type: MongooseSchema.Types.Array })
+  @Prop({ type: MongooseSchema.Types.Array })
   specifications: [
     {
       name: 'Content';
@@ -112,7 +112,7 @@ export class Product {
     },
   ];
 
-  @Prop({ required: true })
+  @Prop()
   configurableOptions: [
     {
       code: 'option1';
@@ -152,7 +152,7 @@ export class Product {
     qty: number;
   };
 
-  @Prop({ required: true, type: MongooseSchema.Types.Map })
+  @Prop({ type: MongooseSchema.Types.Map })
   quantitySold: {
     text: string;
     value: number;
@@ -167,7 +167,7 @@ export class Product {
   @Prop()
   isSellerInChatWhitelist: boolean = true;
 
-  @Prop({ required: true, type: MongooseSchema.Types.Array })
+  @Prop({ type: MongooseSchema.Types.Array })
   warrantyInfo: [
     {
       name: 'Hướng dẫn bảo hành';
@@ -176,7 +176,7 @@ export class Product {
     },
   ];
 
-  @Prop({ required: true })
+  @Prop()
   returnAndExchangePolicy: string;
 
   @Prop({ type: MongooseSchema.Types.Array })

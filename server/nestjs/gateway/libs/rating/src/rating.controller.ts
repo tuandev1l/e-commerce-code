@@ -19,6 +19,11 @@ import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
 export class RatingController {
   constructor(private readonly service: RatingService) {}
 
+  @MessagePattern(RATING_PATTERN.GET_PRODUCT_RATING)
+  async getProductRating(@Payload() productId: string) {
+    return this.service.getProductRating(productId);
+  }
+
   @MessagePattern(RATING_PATTERN.CREATE_RATING)
   async createRating(@Payload() createRatingDto: CreateRatingDto) {
     return this.service.createRating(createRatingDto);

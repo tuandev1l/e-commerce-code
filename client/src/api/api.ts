@@ -34,6 +34,8 @@ export const getCartApi = () => instance.get('cart');
 export const changeQuantityOfProductInCartApi = (
   productDto: IChangeQuantityOfProductInCart
 ) => instance.patch('cart/quantity', productDto);
+export const removeItemInCartApi = (productId: string) =>
+  instance.delete(`cart/${productId}`);
 
 export const addNewAddressApi = (data: { address: IUserAddress }) =>
   instance.post('auth/add-address', data);
@@ -53,3 +55,8 @@ export const createCheckoutApi = (checkoutDto: ICreateCheckout) =>
   instance.post('order/get-payment-url', checkoutDto);
 
 export const getAllOrdersApi = () => instance.get('order');
+export const getProductRatingApi = (productId: string) =>
+  instance.get(`rating/product-rating/${productId}`);
+
+export const getAllRatingsOfProductApi = (productId: string) =>
+  instance.get(`rating/product/${productId}`);
