@@ -17,8 +17,4 @@ export class UpdateRatingDtoWithoutUser {
   @IsNotEmpty()
   @IsArray()
   images?: IRatingImage[];
-
-  @IsNotEmpty()
-  @IsNumber()
-  deliveryRating: number;
 }

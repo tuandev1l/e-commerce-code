@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { BaseEntity } from '@base/base.entity';
 import { ORDER_STATUS } from '@libs/order/enum';
 import { IInvoice, IOrderStatus } from '@libs/order/interface';
@@ -7,6 +7,7 @@ import { Shipping } from '@libs/order/entity/shipping.entity';
 import { Payment } from '@libs/order/entity/payment.entity';
 import { User } from '@user/entities/user.entity';
 import { Exclude } from 'class-transformer';
+import { Rating } from '@libs/rating/entity/rating.entity';
 
 @Entity()
 export class Order extends BaseEntity {
@@ -21,6 +22,13 @@ export class Order extends BaseEntity {
 
   @Column({ nullable: true })
   uuid: string;
+
+  @Column({ nullable: true, name: 'rating_id' })
+  ratingId: number;
+
+  @OneToOne(() => Rating, (order) => order.rating)
+  @JoinColumn({ name: 'rating_id' })
+  rating: Rating;
 
   @Exclude()
   @Column({ name: 'shipping_id' })

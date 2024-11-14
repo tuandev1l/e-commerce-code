@@ -6,6 +6,7 @@ import { CreateCategoryDto } from '@libs/product/dto/category/create-category.dt
 import { UpdateCategoryDtoWithoutId } from '@libs/product/dto/category/update-category-wid.dto';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
+import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
 
 @ApiTags('Gateway')
 @Controller(CATEGORY_PREFIX)
@@ -23,11 +24,13 @@ export class GatewayCategoryController {
     return this.service.getCategory(categoryId);
   }
 
+  @SkipAuth()
   @Get()
   async getAllCategories() {
     return this.service.getAllCategories();
   }
 
+  @Auth(Role.ADMIN)
   @Patch(':id')
   async updateCategory(
     @Param('id') categoryId: string,

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
 import { GatewayService } from '@gateway/service/gateway.service';
@@ -32,8 +33,8 @@ export class GatewayProductController {
 
   @SkipAuth()
   @Get()
-  async findAllProducts() {
-    return this.service.findAllProduct();
+  async findAllProducts(@Query('page') page: number) {
+    return this.service.findAllProduct(page);
   }
 
   @SkipAuth()

@@ -6,13 +6,14 @@ import { ApiTags } from '@nestjs/swagger';
 import { UpdateBrandWithoutId } from '@libs/product/dto/brand/update-brand-wid.dto';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
+import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
 
-@Auth(Role.ADMIN)
 @ApiTags('Gateway')
 @Controller(BRAND_PREFIX)
 export class GatewayBrandController {
   constructor(private readonly service: GatewayService) {}
 
+  @Auth(Role.ADMIN)
   @Post()
   async createBrand(@Body() createBrand: CreateBrandDto) {
     return this.service.createBrand(createBrand);
@@ -28,11 +29,13 @@ export class GatewayBrandController {
     return this.service.getBrandByName(brandName);
   }
 
+  @SkipAuth()
   @Get()
   async getAllBrands() {
     return this.service.getAllBrands();
   }
 
+  @Auth(Role.ADMIN, Role.SHOP)
   @Patch(':id')
   async updateBrand(
     @Param('id') brandId: string,

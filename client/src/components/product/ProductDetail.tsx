@@ -18,6 +18,8 @@ import useToast from '../../hook/useToast';
 import { IAxiosError } from '../../config/axiosError.interface';
 import { IRatingProduct } from '../../interfaces/ratingProduct.interface';
 import { IRating } from '../../interfaces/rating.interface';
+import moment from 'moment';
+import 'moment/dist/locale/vi';
 
 type Props = {};
 
@@ -33,6 +35,7 @@ const fitlerBy = [
 ];
 
 export const ProductDetail = ({}: Props) => {
+  moment.locale('vi');
   const toast = useToast();
   const dispatch = useAppDispatch();
   const productId = useParams()['productId'] || '';
@@ -61,7 +64,6 @@ export const ProductDetail = ({}: Props) => {
 
   useEffect(() => {
     if (ratingProductData) {
-      console.log(`ratingProductData: ${JSON.stringify(ratingProductData)}`);
       // @ts-ignore
       setRatingProduct(ratingProductData);
     }
@@ -77,7 +79,6 @@ export const ProductDetail = ({}: Props) => {
 
   useEffect(() => {
     if (ratingData) {
-      console.log(`ratingData: ${JSON.stringify(ratingData)}`);
       // @ts-ignore
       setRatings(ratingData);
     }
@@ -354,18 +355,18 @@ export const ProductDetail = ({}: Props) => {
                 <div className='font-bold mt-4'>Tổng quan</div>
                 <div className='flex items-center my-2 gap-4'>
                   <div className='font-bold text-3xl'>
-                    {product.ratingAverage}
+                    {ratingProduct?.ratingAverage}
                   </div>
                   <Rating
                     size={20}
                     readonly
                     transition
                     allowFraction
-                    initialValue={product.ratingAverage}
+                    initialValue={ratingProduct?.ratingAverage}
                     SVGclassName={'inline-block'}
                   />
                 </div>
-                <div className='text-gray-500'>{`(${product.reviewCount} đánh giá)`}</div>
+                <div className='text-gray-500'>{`(${ratingProduct?.reviewsCount} đánh giá)`}</div>
                 <div className='mt-4'>
                   {/* 5 stars */}
                   {ratingProduct?.stars &&
@@ -429,7 +430,9 @@ export const ProductDetail = ({}: Props) => {
                           <div className='ml-4'>
                             <p className='font-semibold'>{rating.user?.name}</p>
                             <p className='text-sm text-gray-500'>
-                              {rating.user?.joinedTime}
+                              Đã tham gia{' '}
+                              {rating.user?.joinedTime ||
+                                moment(rating.user?.createdAt).fromNow()}
                             </p>
                           </div>
                         </div>

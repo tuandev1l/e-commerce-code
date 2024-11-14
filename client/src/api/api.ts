@@ -5,6 +5,8 @@ import { ICartDto } from '../dto/cart.dto';
 import { IChangeQuantityOfProductInCart } from '../dto/changeQuantityOfProductInCart.dto';
 import { ICreateCheckout } from '../dto/createCheckout.dto';
 import { ICreateOrder } from '../dto/createOrder.dto';
+import { ICreateRatingDto } from '../dto/createRating.dto';
+import { IUpdateRatingDto } from '../dto/updateRating.dto';
 import { ILogin } from '../interfaces/login.interface';
 import { ISignup } from '../interfaces/signup.interface';
 import { IUserAddress } from '../interfaces/userAddress.interface';
@@ -24,7 +26,10 @@ export const resetPasswordApi = (
 export const changePasswordApi = (data: IChangePassword) =>
   instance.post('auth/change-password', data);
 
-export const getAllProductsApi = () => instance.get('product');
+export const getAllCategoriesApi = () => instance.get('category');
+export const getAllBrandsApi = () => instance.get('brand');
+export const getAllProductsApi = (page: number) =>
+  instance.get(`product/?page=${page}`);
 export const getDetailProductApi = (productId: string) =>
   instance.get(`product/${productId}`);
 
@@ -60,3 +65,9 @@ export const getProductRatingApi = (productId: string) =>
 
 export const getAllRatingsOfProductApi = (productId: string) =>
   instance.get(`rating/product/${productId}`);
+export const createRatingApi = (ratingDto: ICreateRatingDto) =>
+  instance.post('rating', ratingDto);
+export const updateRatingApi = (updateRatingDto: IUpdateRatingDto) =>
+  instance.patch(`rating/${updateRatingDto.ratingId}`, updateRatingDto);
+export const deleteRatingApi = (ratingId: number) =>
+  instance.delete(`rating/${ratingId}`);

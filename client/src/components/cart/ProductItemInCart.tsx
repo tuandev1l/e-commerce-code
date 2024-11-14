@@ -121,7 +121,9 @@ export const ProductItemInCart = ({
           <div>
             <p className='font-semibold line-clamp-3'>{productItem.name}</p>
             <p className='text-gray-500 text-sm'>
-              {productItem.color}, {productItem.size}
+              {[productItem.color, productItem.size]
+                .filter((el) => !!el)
+                .join(',')}
             </p>
           </div>
         </label>

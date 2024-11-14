@@ -30,6 +30,8 @@ import { ACCOUNT_TYPE, GENDER } from '@share/enums';
 
 @Injectable()
 export class ProductService {
+  private static readonly LIMIT = 15;
+
   constructor(
     @InjectModel(Product.name) private readonly model: Model<ProductDocument>,
     @InjectModel(Brand.name) private brandModel: Model<BrandDocument>,
@@ -187,8 +189,25 @@ export class ProductService {
     return this.model.create(productDto);
   }
 
-  async findAll() {
-    return this.model.find().exec();
+  async findAll(page: number) {
+    if (page < 1) {
+      page = 1;
+    }
+    const data = await this.model
+      .find()
+      .sort({
+        createdAt: -1,
+      })
+      .skip((page - 1) * ProductService.LIMIT)
+      .limit(ProductService.LIMIT)
+      .exec();
+    const length = await this.model.countDocuments().exec();
+
+    return {
+      totalPage: Math.ceil(length / ProductService.LIMIT),
+      currentPage: +page,
+      data,
+    };
   }
 
   async findOne(id: string) {
@@ -235,6 +254,7 @@ export class ProductService {
   }
 
   async getAllBrands() {
+    // return this.brandModel.find().limit(10).exec();
     return this.brandModel.find().exec();
   }
 
@@ -276,6 +296,7 @@ export class ProductService {
   }
 
   async getAllCategories() {
+    // return this.categoryModel.find().limit(10).exec();
     return this.categoryModel.find().exec();
   }
 

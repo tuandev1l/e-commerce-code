@@ -10,7 +10,7 @@ type Props = {
 
 export const ProductItem = ({ product }: Props) => {
   return (
-    <div className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm '>
+    <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm '>
       <Link to={`/product/${product._id}`}>
         <div className='h-56 w-full'>
           <img
@@ -19,8 +19,8 @@ export const ProductItem = ({ product }: Props) => {
             alt=''
           />
         </div>
-        <div className='pt-6'>
-          <div className='mb-4 flex items-center justify-between gap-4'></div>
+        <div className='pt-2'>
+          <div className='mb-2 flex items-center justify-between gap-4'></div>
           <p className='text-xl font-bold leading-tight text-gray-900 mb-2 flex items-center'>
             {`${priceSplit(product.price)} đ`}
             {product.discountRate !== 0 && (
@@ -31,7 +31,7 @@ export const ProductItem = ({ product }: Props) => {
             {product.name}
           </div>
 
-          <div className='mt-2 flex items-center gap-2 items-center'>
+          <div className='flex items-center gap-2 items-center'>
             <div>
               <Rating
                 size={16}
@@ -46,7 +46,7 @@ export const ProductItem = ({ product }: Props) => {
               {product.ratingAverage}
             </p>
             <p className='text-sm font-medium text-gray-500 '>
-              {`Đã bán ${product.quantitySold?.value}`}
+              {`Đã bán ${product.quantitySold?.value ?? 0}`}
             </p>
           </div>
         </div>

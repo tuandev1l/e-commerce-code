@@ -22,8 +22,8 @@ export class ProductController {
   }
 
   @MessagePattern(PRODUCT_PATTERN.FIND_ALL_PRODUCT)
-  async findAll() {
-    return this.productService.findAll();
+  async findAll(@Payload() page: number) {
+    return this.productService.findAll(page);
   }
 
   @MessagePattern(PRODUCT_PATTERN.FIND_ONE_PRODUCT)

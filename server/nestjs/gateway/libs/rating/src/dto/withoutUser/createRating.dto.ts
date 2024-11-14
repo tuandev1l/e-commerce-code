@@ -29,8 +29,4 @@ export class CreateRatingDtoWithoutUser {
   @IsNotEmpty()
   @IsString()
   productId: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  deliveryRating: number;
 }

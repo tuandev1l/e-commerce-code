@@ -26,6 +26,9 @@ export class Rating extends BaseEntity {
   @Column({ default: 0, name: 'comment_count' })
   commentCount: number;
 
+  @Column({ name: 'order_id', nullable: true })
+  orderId: number;
+
   @Column({ default: 0 })
   rating: number;
 

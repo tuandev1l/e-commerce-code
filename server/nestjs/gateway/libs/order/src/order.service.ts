@@ -45,7 +45,7 @@ export class OrderService {
   async getAllOrders(user: User) {
     return this.repository.find({
       where: { userId: user.id },
-      relations: ['shipping', 'payment'],
+      relations: ['shipping', 'payment', 'rating'],
       order: {
         updatedAt: -1,
       },

@@ -10,4 +10,6 @@ export interface IUser {
   joinedTime: string;
   totalReview: number;
   totalThank: number;
+  createdAt: Date;
+  updatedAt: Date;
 }

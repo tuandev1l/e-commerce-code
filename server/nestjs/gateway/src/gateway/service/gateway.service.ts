@@ -44,8 +44,8 @@ export class GatewayService {
     );
   }
 
-  async findAllProduct() {
-    return this.producer.sendMessage(PRODUCT_PATTERN.FIND_ALL_PRODUCT);
+  async findAllProduct(page: number) {
+    return this.producer.sendMessage(PRODUCT_PATTERN.FIND_ALL_PRODUCT, page);
   }
 
   async findOneProduct(id: string) {

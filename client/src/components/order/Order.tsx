@@ -1,4 +1,3 @@
-import { TrashIcon } from '@heroicons/react/24/outline';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -9,7 +8,7 @@ import { ordersSelector } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { UserLayout } from '../user/UserLayout';
 import { getAllOrderDispatch } from './orderSlice';
-import { Link } from 'react-router-dom';
+import { SelectedOrder } from './SelectedOrder';
 
 type Props = {};
 const btns = [
@@ -26,22 +25,6 @@ const btns = [
   { name: 'Đã giao', status: [ORDER_STATUS.COMPLETE] },
   { name: 'Đã hủy', status: [ORDER_STATUS.CANCEL] },
 ];
-
-const convertOrderStatus = (orderStatus: ORDER_STATUS) => {
-  switch (orderStatus) {
-    case ORDER_STATUS.PENDING:
-    case ORDER_STATUS.UNSUCCESSFUL:
-      return 'Đơn hàng đang chờ thanh toán';
-    case ORDER_STATUS.PREPARED:
-      return 'Đơn hàng đang được người bán chuẩn bị';
-    case ORDER_STATUS.SHIPPING:
-      return 'Đơn hàng đang được vận chuyển đến cho bạn';
-    case ORDER_STATUS.COMPLETE:
-      return 'Đơn hàng đã được giao thành công';
-    case ORDER_STATUS.CANCEL:
-      return 'Đơn hàng đã bị hủy';
-  }
-};
 
 export const Order = ({}: Props) => {
   const dispatch = useAppDispatch();
@@ -103,6 +86,7 @@ export const Order = ({}: Props) => {
           <div className='flex border-b mb-4 bg-white'>
             {btns.map((btn, idx) => (
               <button
+                key={idx}
                 className={` ${
                   idx === btnActive
                     ? 'flex-1 px-4 py-2 border-b-2 border-blue-500 text-blue-500 font-semibold'
@@ -134,97 +118,7 @@ export const Order = ({}: Props) => {
 
           {selectedOrders.length ? (
             selectedOrders.map((order) => (
-              <div
-                key={order.item?.seller?.id}
-                className='bg-white p-4 pb-2 mb-4 rounded-lg'
-              >
-                {/* Order Status */}
-                <div className='flex justify-between items-center border-b pb-2 mb-2'>
-                  <h3 className='font-semibold text-lg'>
-                    {order.item.seller?.name}
-                  </h3>
-                  <div className='text-green-500 flex items-center gap-2'>
-                    <span className='text-md'>
-                      {convertOrderStatus(order.status)}
-                    </span>{' '}
-                    {/* |<span className='text-md text-red-500'></span> */}
-                  </div>
-                </div>
-
-                <div className='flex justify-between items-center py-1 mb-4'>
-                  {/* Image and Product Info */}
-                  <div className='flex items-center w-1/2'>
-                    <img
-                      src={order.item.thumbnailUrl}
-                      alt={order.item.name}
-                      className='w-16 h-16 rounded-md mr-4'
-                    />
-                    <div>
-                      <p className='font-semibold'>{order.item.name}</p>
-                      <p className='text-gray-500 text-sm'>
-                        {order.item.color}, {order.item.size}
-                      </p>
-                      <span className='text-sm text-gray-500'>
-                        x{order.item.quantity}
-                      </span>
-                      <div className='mt-1'>
-                        <button className='text-green-500 border border-green-500 text-xs px-2 py-0.5 rounded'>
-                          Trả hàng miễn phí 15 ngày
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Price Column */}
-                  <div className='w-1/3 text-center flex gap-2 items-center justify-center'>
-                    <div className='text-red-500 font-semibold'>
-                      {order.item.price.toLocaleString()}₫
-                    </div>
-                    <div className='text-gray-500 line-through text-sm'>
-                      {order.item.originalPrice.toLocaleString()}₫
-                    </div>
-                  </div>
-
-                  {/* Total Price Column */}
-                  <div className='w-32 text-center'>
-                    <div className='text-red-500 font-semibold'>
-                      {(
-                        order.item.price * order.item.quantity
-                      ).toLocaleString()}
-                      ₫
-                    </div>
-                  </div>
-
-                  {/* Delete Column */}
-                  <div className='w-8 text-center flex justify-center items-center'>
-                    <TrashIcon
-                      width={24}
-                      className='text-gray-500 hover:text-red-500 cursor-pointer'
-                    />
-                  </div>
-                </div>
-
-                {/* Total and Action Buttons */}
-                <div className='flex justify-between items-center mt-4 border-t pt-4 pb-2'>
-                  <div className='flex gap-4 justify-end w-full'>
-                    <div className='flex gap-3'>
-                      {order.status === ORDER_STATUS.COMPLETE && (
-                        <button className='bg-red-500 text-white px-4 py-2 rounded'>
-                          Đánh giá
-                        </button>
-                      )}
-                      <Link to={`/product/${order.item._id}`}>
-                        <button className='bg-red-500 text-white px-4 py-2 rounded'>
-                          Mua Lại
-                        </button>
-                      </Link>
-                      <button className='border border-gray-300 text-gray-700 px-4 py-2 rounded'>
-                        Liên Hệ Người Bán
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <SelectedOrder key={order.id} order={order} />
             ))
           ) : (
             <div className='flex flex-col items-center justify-center py-12'>

@@ -8,9 +8,16 @@ const orderSlice = createSlice({
     getAllOrderDispatch: (state, { payload }) => {
       state.orders = payload;
     },
+    removeOrderRating: (state, { payload }) => {
+      const order = state.orders.find((ord) => ord.id === payload);
+      if (order) {
+        order.ratingId = null;
+        order.rating = null;
+      }
+    },
   },
 });
 
-export const { getAllOrderDispatch } = orderSlice.actions;
+export const { getAllOrderDispatch, removeOrderRating } = orderSlice.actions;
 
 export default orderSlice;

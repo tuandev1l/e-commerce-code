@@ -6,14 +6,18 @@ const productSlice = createSlice({
   initialState: productInitialState,
   reducers: {
     getAllProducts: (state, { payload }) => {
-      state.products = payload;
+      state.products.push(...payload);
     },
     getDetailProduct: (state, { payload }) => {
       state.product = payload;
+    },
+    resetProduct: (state) => {
+      state.products = [];
     },
   },
   extraReducers: () => {},
 });
 
-export const { getAllProducts, getDetailProduct } = productSlice.actions;
+export const { getAllProducts, getDetailProduct, resetProduct } =
+  productSlice.actions;
 export default productSlice;
