@@ -6,6 +6,7 @@ import { IChangeQuantityOfProductInCart } from '../dto/changeQuantityOfProductIn
 import { ICreateCheckout } from '../dto/createCheckout.dto';
 import { ICreateOrder } from '../dto/createOrder.dto';
 import { ICreateRatingDto } from '../dto/createRating.dto';
+import { IProductFilter } from '../dto/productFilter.dto';
 import { IUpdateRatingDto } from '../dto/updateRating.dto';
 import { ILogin } from '../interfaces/login.interface';
 import { ISignup } from '../interfaces/signup.interface';
@@ -28,8 +29,17 @@ export const changePasswordApi = (data: IChangePassword) =>
 
 export const getAllCategoriesApi = () => instance.get('category');
 export const getAllBrandsApi = () => instance.get('brand');
-export const getAllProductsApi = (page: number) =>
-  instance.get(`product/?page=${page}`);
+export const getAllProductsApi = (dto: IProductFilter) => {
+  console.log(dto);
+  return instance.get(
+    `product?page=${dto.page}&keyword=${
+      dto.keyword
+    }&brands=${dto?.brands?.toString()}&categories=${dto?.categories?.toString()}&fromNumber=${
+      dto.fromNumber
+    }&toNumber=${dto.toNumber}&usingKnn=${dto.usingKnn}&type=${dto.type}`
+  );
+};
+
 export const getDetailProductApi = (productId: string) =>
   instance.get(`product/${productId}`);
 

@@ -73,3 +73,49 @@
   //
   //   return savedData;
   // }
+
+
+  // if (page < 1) {
+      //   page = 1;
+      // }
+      //
+      // const data = await this.model
+      //   .find()
+      //   .sort({
+      //     createdAt: -1,
+      //   })
+      //   .skip((page - 1) * ProductService.LIMIT)
+      //   .limit(ProductService.LIMIT)
+      //   .exec();
+      // const length = await this.model.countDocuments().exec();
+      //
+      // return {
+      //   totalPage: Math.ceil(length / ProductService.LIMIT),
+      //   currentPage: +page,
+      //   data,
+      // };
+
+      // async findAllTest() {
+        //   const data = await this.model.aggregate([
+        //     {
+        //       $match: {
+        //         brand: {
+        //           $in: [
+        //             new mongoose.Types.ObjectId('67320fd50b146ac694f1d3f9'),
+        //             new mongoose.Types.ObjectId('67320fd60b146ac694f1d404'),
+        //           ],
+        //         },
+        //         price: {
+        //           $gte: 100000,
+        //           $lte: 1000000,
+        //         },
+        //       },
+        //     },
+        //     {
+        //       $project: {
+        //         _id: 1,
+        //         price: 1,
+        //       },
+        //     },
+        //   ]);
+        // }

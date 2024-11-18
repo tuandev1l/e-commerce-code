@@ -18,7 +18,7 @@ import { UpdateProductDto } from '@libs/product/dto/product/withUser/update-prod
 import { UpdateBrandDto } from '@libs/product/dto/brand/update-brand.dto';
 import { UpdateCategoryDto } from '@libs/product/dto/category/update-category.dto';
 import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import InventoryStatusEnum from '@libs/product/enum';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductRating } from '@libs/rating/entity/productRating.entity';
@@ -27,10 +27,14 @@ import { Rating } from '@libs/rating/entity/rating.entity';
 import { User } from '@user/entities/user.entity';
 import { AuthService } from '@auth/auth.service';
 import { ACCOUNT_TYPE, GENDER } from '@share/enums';
+import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
+import { ConfigService } from '@nestjs/config';
+import { ProducerService } from '@gateway/service/producer.service';
+import { SEARCHING_PATTERN } from '@constants';
 
 @Injectable()
 export class ProductService {
-  private static readonly LIMIT = 15;
+  private static LIMIT = 0;
 
   constructor(
     @InjectModel(Product.name) private readonly model: Model<ProductDocument>,
@@ -42,24 +46,61 @@ export class ProductService {
     @InjectRepository(Rating) private readonly ratingRepo: Repository<Rating>,
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     private readonly authService: AuthService,
-  ) {}
+    private readonly configService: ConfigService,
+    private readonly producerService: ProducerService,
+  ) {
+    ProductService.LIMIT = this.configService.get('LIMIT_SEARCH');
+  }
 
   async insertData() {
+    const blacklist = [
+      'mông',
+      'biển',
+      'ngực',
+      'đồ ngủ',
+      'khỏa thân',
+      'đồ bơi',
+      'sau sinh',
+      'độn',
+    ];
+
     const rawData = await readFile(
-      '/home/tuantm/schooling/ending_project/crawl/resolved_products.json',
+      '/home/tuantm/schooling/ending_project/crawl/final_resolved_products.json',
       'utf-8',
     );
-    const data = JSON.parse(rawData) as ProductDocument[];
+    const data = JSON.parse(rawData);
 
-    const savedData: ProductDocument[] = [];
+    const savedProducts = [];
 
     for (const product of data) {
       try {
+        if (blacklist.some((el) => product.name.includes(el))) {
+          continue;
+        }
+
+        const existedProduct = await this.model
+          .findOne({
+            name: product.name,
+          })
+          .exec();
+        if (existedProduct) {
+          continue;
+        }
+
         // product.badges = product['badgesV3'];
         product.inventoryStatus = InventoryStatusEnum.AVAILABLE;
 
         // @ts-ignore
         const { brand, categories, seller, reviews } = product;
+        delete product['sku'];
+        delete product['badgesNew'];
+        delete product['trackingInfo'];
+        delete product['breadcrumbs'];
+
+        const minimalProduct = { ...product };
+        delete minimalProduct['reviews'];
+        delete minimalProduct['descriptionVector'];
+        delete minimalProduct['imgVector'];
 
         // const seller = product['currentSeller'];
 
@@ -76,6 +117,8 @@ export class ProductService {
           product.brand = brandEntity;
         }
 
+        minimalProduct.brand = product.brand;
+
         const categorySlug = this.getSlugName(categories.name);
         const categoryEntity = await this.categoryModel
           .findOne({ slug: categorySlug })
@@ -89,6 +132,8 @@ export class ProductService {
           product.categories = categoryEntity;
         }
 
+        minimalProduct.categories = product.categories;
+
         const shopEntity = await this.shopModel
           .findOne({ name: seller.name })
           .exec();
@@ -99,7 +144,14 @@ export class ProductService {
           newShop.logo = seller.logo;
           // @ts-ignore
           newShop.telephone = product.telephone;
-          newShop.address = seller.address;
+          newShop.address = {
+            phoneNumber: seller.telephone,
+            country: seller.country,
+            province: seller.province,
+            district: seller.district,
+            ward: seller.ward,
+            detailAddress: seller.detailAddress,
+          };
           newShop.slug = this.getSlugName(seller.name);
 
           product.seller = await this.shopModel.create(newShop);
@@ -107,7 +159,9 @@ export class ProductService {
           product.seller = shopEntity;
         }
 
-        const savedProduct = await this.model.create(product);
+        minimalProduct.seller = product.seller;
+
+        const savedProduct = await this.model.create(minimalProduct);
 
         const productRating = this.productRatingRepo.create();
         productRating.stars = reviews['stars'];
@@ -160,9 +214,9 @@ export class ProductService {
             newUser.accountType = ACCOUNT_TYPE.EMAIL;
             newUser.hasPassword = true;
             newUser.avatarUrl = `https://avatar.iran.liara.run/public/boy?username=${user.fullName}`;
-            newUser.joinedTime = user.joinedTime;
-            newUser.totalReview = user.totalReview;
-            newUser.totalThank = user.totalThank;
+            newUser.joinedTime = user.contributeInfo.summary.joinedTime;
+            newUser.totalReview = user.contributeInfo.summary.totalReview;
+            newUser.totalThank = user.contributeInfo.summary.totalThank;
 
             const savedUser = await this.userRepo.save(newUser);
             newRating.userId = savedUser.id;
@@ -174,40 +228,64 @@ export class ProductService {
           void this.ratingRepo.save(ratingData);
         }
 
-        // savedData.push(savedProduct);
+        delete product['reviews'];
+        // @ts-ignore
+        const newProduct = { ...savedProduct._doc, id: savedProduct._id };
+        delete newProduct._id;
+
+        newProduct.seller = {
+          ...newProduct.seller._doc,
+          id: newProduct.seller._id,
+        };
+        delete newProduct.seller._id;
+
+        newProduct.categories = {
+          ...newProduct.categories._doc,
+          id: newProduct.categories._id,
+        };
+        delete newProduct.categories['_id'];
+
+        newProduct.brand = {
+          ...newProduct.brand._doc,
+          id: newProduct.brand._id,
+        };
+        delete newProduct.brand['_id'];
+
+        newProduct['descriptionVector'] = product['descriptionVector'];
+        newProduct['imgVector'] = product['imgVector'];
+
+        savedProducts.push(newProduct);
       } catch (e) {
         console.error(`Error at productId: ${product.id}`);
         console.log(e);
       }
-      // break;
     }
 
-    return savedData;
+    await writeFile('./vector.json', JSON.stringify(savedProducts), {
+      encoding: 'utf-8',
+    });
   }
 
   async create(productDto: CreateProductDto) {
     return this.model.create(productDto);
   }
 
-  async findAll(page: number) {
-    if (page < 1) {
-      page = 1;
+  async findAll(productFilterDto: ProductFilterDto) {
+    const isElasticEnable = !!this.configService.get('ES_ENABLE');
+    console.log(productFilterDto);
+    if (isElasticEnable) {
+      if (productFilterDto.usingKnn) {
+        return this.producerService.sendMessage(
+          SEARCHING_PATTERN.SEARCH_PRODUCTS_USING_KNN,
+          productFilterDto,
+        );
+      }
+      return this.producerService.sendMessage(
+        SEARCHING_PATTERN.SEARCH_PRODUCTS,
+        productFilterDto,
+      );
     }
-    const data = await this.model
-      .find()
-      .sort({
-        createdAt: -1,
-      })
-      .skip((page - 1) * ProductService.LIMIT)
-      .limit(ProductService.LIMIT)
-      .exec();
-    const length = await this.model.countDocuments().exec();
-
-    return {
-      totalPage: Math.ceil(length / ProductService.LIMIT),
-      currentPage: +page,
-      data,
-    };
+    return [];
   }
 
   async findOne(id: string) {

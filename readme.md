@@ -6,3 +6,6 @@ Các service trong dự án:
 - Rating: NestJS - Postgresql
 - Virtual Tryons: PYTHON
 - Searching: Sử dụng ElasticSearch để full-text search, một số technique để improve searching đối với tiếng việt cũng như hình ảnh, hình ảnh tương tự
+- image searching improvement?:
+  - segmentation cloth
+  - images must have same size

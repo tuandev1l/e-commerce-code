@@ -31,6 +31,7 @@ import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
 import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityInCart.dto';
 import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
 import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
+import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 
 @Injectable()
 export class GatewayService {
@@ -44,8 +45,11 @@ export class GatewayService {
     );
   }
 
-  async findAllProduct(page: number) {
-    return this.producer.sendMessage(PRODUCT_PATTERN.FIND_ALL_PRODUCT, page);
+  async findAllProduct(productFilterDto: ProductFilterDto) {
+    return this.producer.sendMessage(
+      PRODUCT_PATTERN.FIND_ALL_PRODUCT,
+      productFilterDto,
+    );
   }
 
   async findOneProduct(id: string) {
@@ -64,7 +68,10 @@ export class GatewayService {
   }
 
   async searchProductByElasticsearch(search: ISearch) {
-    return this.producer.sendMessage(SEARCHING_PATTERN.SEARCH_PRODUCTS, search);
+    return this.producer.sendMessage(
+      SEARCHING_PATTERN.SEARCH_PRODUCTS_USING_KNN,
+      search,
+    );
   }
 
   // CART
@@ -269,5 +276,9 @@ export class GatewayService {
 
   async updateShop(updateShopDto: UpdateShopDto) {
     return this.producer.sendMessage(SHOP_PATTERN.UPDATE_SHOP, updateShopDto);
+  }
+
+  async findAllProductTest() {
+    return this.producer.sendMessage(PRODUCT_PATTERN.TEST);
   }
 }

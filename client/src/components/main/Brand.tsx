@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { IResponseData } from './Main';
+import { useAppDispatch } from '../../store/store';
+import { setCheckedBrand } from '../product/searchingSlice';
 
 type Props = {
   brand: IResponseData;
-  setCheckedBrand: Function;
 };
 
-export const Brand = ({ brand, setCheckedBrand }: Props) => {
+export const Brand = ({ brand }: Props) => {
+  const dispatch = useAppDispatch();
   const [checked, setChecked] = useState<boolean>(false);
+
   return (
     <div>
       <input
@@ -16,7 +19,7 @@ export const Brand = ({ brand, setCheckedBrand }: Props) => {
         checked={checked}
         onClick={() => {
           setChecked(!checked);
-          setCheckedBrand(brand._id);
+          dispatch(setCheckedBrand(brand._id));
         }}
         className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500'
       />

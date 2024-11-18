@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IShopAddress } from '@libs/product/interfaces';
 import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { IUserAddress } from '@share/interfaces';
 
 export type ShopDocument = HydratedDocument<Shop>;
 
@@ -22,7 +22,7 @@ export class Shop {
   url: string;
 
   @Prop({ type: MongooseSchema.Types.Map })
-  address: IShopAddress;
+  address: IUserAddress;
 
   @Prop({ select: false })
   __v: number;

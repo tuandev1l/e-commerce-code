@@ -7,6 +7,7 @@ import { IShop } from './shop.interface';
 
 export interface IProduct {
   _id: string;
+  id?: string;
   name: string;
   shortDescription: string;
   price: number;

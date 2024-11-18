@@ -10,7 +10,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ProductModule } from '@libs/product/product.module';
 import { GatewayModule } from '@gateway/gateway.module';
 import { MongooseModule } from '@nestjs/mongoose';
-// import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
 import { CartModule } from '@libs/cart/cart.module';
 import { OrderModule } from '@libs/order/order.module';
 import { RoleGuard } from '@guard/role.guard';
@@ -19,6 +18,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { QueueModule } from '@libs/queue';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { SocketGatewayModule } from '@socket/socket.gateway.module';
+import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
 
 @Module({
   controllers: [],
@@ -26,7 +26,7 @@ import { SocketGatewayModule } from '@socket/socket.gateway.module';
     AuthModule,
     UserModule,
     LoggingModule,
-    // ElasticsearchModule,
+    ElasticsearchModule,
     SocketGatewayModule,
     ConfigModule.forRoot({
       envFilePath: ['.env'],

@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import cartSlice from '../components/cart/cartSlice';
 import shopSlice from '../components/shop/shopSlice';
 import orderSlice from '../components/order/orderSlice';
+import searchingSlice from '../components/product/searchingSlice';
 
 const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ const store = configureStore({
     cart: cartSlice.reducer,
     shop: shopSlice.reducer,
     order: orderSlice.reducer,
+    searching: searchingSlice.reducer,
   },
 });
 

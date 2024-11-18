@@ -16,6 +16,19 @@ export const discountInCartSelector = (state: RootState) => state.cart.discount;
 export const numberOfProductSelector = (state: RootState) =>
   state.cart.numberOfProducts;
 
+export const keywordSelector = (state: RootState) => state.searching.keyword;
+export const brandSelectedSelector = (state: RootState) =>
+  state.searching.brands;
+export const categorySelectedSelector = (state: RootState) =>
+  state.searching.categories;
+export const fromNumberSelector = (state: RootState) =>
+  state.searching.fromNumber;
+export const toNumberSelector = (state: RootState) => state.searching.toNumber;
+export const pageSelector = (state: RootState) => state.searching.page;
+export const usingKnnSelector = (state: RootState) => state.searching.usingKnn;
+export const searchingTypeSelector = (state: RootState) => state.searching.type;
+export const totalPageSelector = (state: RootState) => state.product.totalPage;
+
 export const shopSelector = (state: RootState) => state.shop.shop;
 export const productsOfShopSelector = (state: RootState) => state.shop.products;
 export const selectedAddressSelector = (state: RootState) =>

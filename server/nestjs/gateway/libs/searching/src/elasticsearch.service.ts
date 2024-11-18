@@ -3,19 +3,23 @@ import { ConfigService } from '@nestjs/config';
 import { Client } from '@elastic/elasticsearch';
 import * as path from 'path';
 import * as process from 'process';
-import { readFile } from 'fs/promises';
 import axios from 'axios';
-import { ISearch } from '@libs/searching/search.interface';
 import { SearchType } from '@libs/searching/searchType.enum';
+import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
+import { QueryDslQueryContainer } from '@elastic/elasticsearch/lib/api/types';
+
+import { readFile } from 'fs/promises';
 
 @Injectable()
 export class ElasticsearchService {
+  private static LIMIT = 0;
   private readonly client: Client;
   private readonly embeddedHost: string;
   private readonly embeddedPort: string;
   private readonly elasticIndex: string;
 
   constructor(private readonly config: ConfigService) {
+    ElasticsearchService.LIMIT = this.config.get('LIMIT_SEARCH');
     this.embeddedHost = config.get('EMBEDDING_HOST');
     this.embeddedPort = config.get('EMBEDDING_PORT');
     this.elasticIndex = config.get('ELASTIC_INDEX');
@@ -44,11 +48,11 @@ export class ElasticsearchService {
           index: this.elasticIndex,
           mappings: {
             properties: {
-              description_vector: {
+              descriptionVector: {
                 type: 'dense_vector',
                 dims: 768,
               },
-              image_vector: {
+              imgVector: {
                 type: 'dense_vector',
                 dims: 768,
               },
@@ -68,7 +72,6 @@ export class ElasticsearchService {
         // console.log(data);
         const jsonData = JSON.parse(data);
         for (const record of jsonData) {
-          delete record['images_vector'];
           void this.client.index({
             index: this.elasticIndex,
             body: record,
@@ -78,27 +81,155 @@ export class ElasticsearchService {
     })();
   }
 
-  async searchProduct(search: ISearch) {
-    const textEmbedding = await axios.post(
-      `http://${this.embeddedHost}:${this.embeddedPort}/convert/${search.type == SearchType.TEXT ? 'text' : 'img'}`,
-      { data: search.data },
-    );
+  async searchProductNormal(productFilterDto: ProductFilterDto) {
+    const { page } = productFilterDto;
+    const query = this.createQueryBuilder(productFilterDto);
+
+    const filterPage = page ? page : 1;
 
     const records = await this.getClient().search({
       index: this.elasticIndex,
-      knn: {
-        query_vector: textEmbedding.data.data,
-        k: 10,
-        num_candidates: 10,
-        field: 'description_vector',
-      },
-      _source_excludes: ['description_vector', 'image_vector'],
+      from: (filterPage - 1) * ElasticsearchService.LIMIT,
+      size: ElasticsearchService.LIMIT,
+      query,
+      _source_includes: [
+        'id',
+        'name',
+        'description',
+        'thumbnailUrl',
+        'discountRate',
+        'price',
+        'ratingAverage',
+        'quantitySold.value',
+      ],
     });
 
-    return records.hits.hits;
+    return this.returnData(records, filterPage);
+  }
+
+  async searchProductUsingKnn(productFilterDto: ProductFilterDto) {
+    const textEmbedding = await axios.post(
+      `http://${this.embeddedHost}:${this.embeddedPort}/convert/${productFilterDto.type === SearchType.TEXT ? 'text' : 'img'}`,
+      { data: productFilterDto.keyword },
+    );
+
+    const { page } = productFilterDto;
+    const query = this.createQueryBuilder(productFilterDto);
+
+    const filterPage = page ? page : 1;
+
+    const records = await this.getClient().search({
+      index: this.elasticIndex,
+      // query,
+      knn: {
+        query_vector: textEmbedding.data.data,
+        k: 20,
+        num_candidates: 20,
+        field: SearchType.TEXT ? 'descriptionVector' : 'imgVector',
+      },
+      from: (filterPage - 1) * ElasticsearchService.LIMIT,
+      size: ElasticsearchService.LIMIT,
+      _source_includes: [
+        'id',
+        'name',
+        'description',
+        'thumbnailUrl',
+        'discountRate',
+        'price',
+        'ratingAverage',
+        'quantitySold.value',
+      ],
+    });
+
+    return this.returnData(records, filterPage);
   }
 
   getClient(): Client {
     return this.client;
+  }
+
+  private returnData(records: any, filterPage: number) {
+    const count =
+      typeof records.hits.total === 'object'
+        ? records.hits.total.value
+        : (records.hits.total ?? 0);
+
+    return {
+      totalPage: Math.ceil(count / ElasticsearchService.LIMIT),
+      currentPage: filterPage,
+      data: records.hits.hits.map((pd) => pd._source),
+    };
+  }
+
+  private createQueryBuilder(productFilterDto: ProductFilterDto) {
+    const {
+      categories,
+      fromNumber,
+      toNumber,
+      brands,
+      keyword,
+      usingKnn,
+      type,
+    } = productFilterDto;
+
+    const mustQuery: QueryDslQueryContainer[] = [];
+
+    if (keyword && keyword !== '') {
+      mustQuery.push({
+        bool: {
+          should: [
+            {
+              match: {
+                name: keyword,
+              },
+            },
+          ],
+        },
+      });
+
+      if (usingKnn && type === SearchType.TEXT) {
+        // @ts-ignore
+        mustQuery[0].bool.should.push({
+          match: {
+            description: keyword,
+          },
+        });
+      }
+    }
+
+    if (categories?.length && categories?.length > 0) {
+      mustQuery.push({
+        terms: {
+          'categories.id': categories,
+        },
+      });
+    }
+
+    if (brands?.length && brands?.length > 0) {
+      mustQuery.push({
+        terms: {
+          'brand.id': brands,
+        },
+      });
+    }
+
+    if (fromNumber && toNumber) {
+      mustQuery.push({
+        range: {
+          price: {
+            gte: fromNumber,
+            lte: toNumber,
+          },
+        },
+      });
+    }
+
+    const query: QueryDslQueryContainer = {
+      bool: {
+        must: mustQuery,
+      },
+    };
+
+    return query;
   }
 }

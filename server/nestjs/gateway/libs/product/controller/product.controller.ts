@@ -5,6 +5,7 @@ import { PRODUCT_PATTERN } from '@constants/pattern';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
 import { CreateProductDto } from '@libs/product/dto/product/withUser/create-product.dto';
 import { UpdateProductDto } from '@libs/product/dto/product/withUser/update-product.dto';
+import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 
 @Controller()
 @UseFilters(new ExceptionFilter())
@@ -22,8 +23,8 @@ export class ProductController {
   }
 
   @MessagePattern(PRODUCT_PATTERN.FIND_ALL_PRODUCT)
-  async findAll(@Payload() page: number) {
-    return this.productService.findAll(page);
+  async findAll(@Payload() productFilterDto: ProductFilterDto) {
+    return this.productService.findAll(productFilterDto);
   }
 
   @MessagePattern(PRODUCT_PATTERN.FIND_ONE_PRODUCT)

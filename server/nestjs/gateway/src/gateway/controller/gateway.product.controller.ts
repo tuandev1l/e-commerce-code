@@ -19,6 +19,7 @@ import { CreateProductDtoWithoutUser } from '@libs/product/dto/product/withoutUs
 import { UpdateProductDtoWithoutUser } from '@libs/product/dto/product/withoutUser/update-product.dto';
 import { GetUser } from '@auth/decorator/get-user.decorator';
 import { User } from '@user/entities/user.entity';
+import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 
 @ApiTags('Gateway')
 @Controller(PRODUCT_PREFIX)
@@ -33,8 +34,8 @@ export class GatewayProductController {
 
   @SkipAuth()
   @Get()
-  async findAllProducts(@Query('page') page: number) {
-    return this.service.findAllProduct(page);
+  async findAllProducts(@Query() productFilterDto: ProductFilterDto) {
+    return this.service.findAllProduct(productFilterDto);
   }
 
   @SkipAuth()

@@ -10,7 +10,7 @@ import { Rating } from '@libs/rating/entity/rating.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity {
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @Exclude()

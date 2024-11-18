@@ -11,13 +11,9 @@ type Props = {
 export const ProductItem = ({ product }: Props) => {
   return (
     <div className='rounded-lg border border-gray-200 bg-white p-4 shadow-sm '>
-      <Link to={`/product/${product._id}`}>
+      <Link to={`/product/${product._id ?? product.id}`}>
         <div className='h-56 w-full'>
-          <img
-            className='mx-auto h-full '
-            src={product.images[0].baseUrl}
-            alt=''
-          />
+          <img className='mx-auto h-full ' src={product.thumbnailUrl} alt='' />
         </div>
         <div className='pt-2'>
           <div className='mb-2 flex items-center justify-between gap-4'></div>
