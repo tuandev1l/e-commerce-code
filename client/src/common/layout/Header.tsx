@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 // import logo from '../../assets/images/logo.png'
 import {
   FaceSmileIcon,
@@ -44,7 +44,6 @@ import { uploadFile } from '../uploadFile';
 type Props = {};
 
 export const Header = ({}: Props) => {
-  const navigate = useNavigate();
   const toast = useToast();
   const isLogin = useSelector(isLoginSelector);
   const username = useSelector(usernameSelector) || 'Tài khoản';
@@ -173,7 +172,7 @@ export const Header = ({}: Props) => {
             </div>
             <div>
               <div>
-                <div className='mt-2 absolute top-12 flex w-full justify-between pr-1'>
+                <div className='mt-2 absolute top-12 flex w-11/12 justify-between pr-1'>
                   <div className='flex items-center'>
                     <input
                       id='default-checkbox'
@@ -202,14 +201,6 @@ export const Header = ({}: Props) => {
                       type='file'
                       onChange={(e) => imgUploadHandler(e)}
                     />
-                  </div>
-                  <div>
-                    <button
-                      type='button'
-                      className='text-white bg-gray-400 hover:bg-gray-300 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-0.5'
-                    >
-                      Clear search
-                    </button>
                   </div>
                 </div>
               </div>

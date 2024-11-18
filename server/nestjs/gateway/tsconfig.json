@@ -41,6 +41,12 @@
       ],
       "@libs/queue/*": [
         "libs/queue/src/*"
+      ],
+      "@libs/cache": [
+        "libs/cache/src"
+      ],
+      "@libs/cache/*": [
+        "libs/cache/src/*"
       ]
     }
   }

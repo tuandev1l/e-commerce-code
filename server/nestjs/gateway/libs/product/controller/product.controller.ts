@@ -29,7 +29,8 @@ export class ProductController {
 
   @MessagePattern(PRODUCT_PATTERN.FIND_ONE_PRODUCT)
   async findOne(@Payload() id: string) {
-    return this.productService.findOne(id);
+    // return this.productService.findOne(id);
+    return this.productService.findOneWithES(id);
   }
 
   @MessagePattern(PRODUCT_PATTERN.UPDATE_PRODUCT)

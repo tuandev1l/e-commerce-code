@@ -144,6 +144,45 @@ export class ElasticsearchService {
     return this.returnData(records, filterPage);
   }
 
+  async getProduct(id: string) {
+    const data = await this.client.search({
+      index: this.elasticIndex,
+      query: {
+        match: {
+          id,
+        },
+      },
+      _source_excludes: ['descriptionVector', 'imgVector'],
+    });
+
+    if (data) {
+      return data.hits.hits[0]._source;
+    }
+
+    return null;
+  }
+
+  async createProduct<E>(product: E) {
+    void this.client.index({
+      index: this.elasticIndex,
+      document: product,
+    });
+  }
+
+  async updateProduct<E>(productId: string, product: E) {
+    await this.deleteProduct(productId);
+    void this.createProduct(product);
+  }
+
+  async deleteProduct(id: string) {
+    void this.client.deleteByQuery({
+      index: this.elasticIndex,
+      query: {
+        match: id,
+      },
+    });
+  }
+
   getClient(): Client {
     return this.client;
   }

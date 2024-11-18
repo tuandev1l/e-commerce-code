@@ -22,6 +22,8 @@
     "@lib/order/(.*)": "<rootDir>/../libs/order/src/$1",
     "@lib/order": "<rootDir>/../libs/order/src",
     "@queue/queue/(.*)": "<rootDir>/../libs/queue/src/$1",
-    "@queue/queue": "<rootDir>/../libs/queue/src"
+    "@queue/queue": "<rootDir>/../libs/queue/src",
+    "@app/cache/(.*)": "<rootDir>/../libs/cache/src/$1",
+    "@app/cache": "<rootDir>/../libs/cache/src"
   }
 }

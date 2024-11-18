@@ -31,6 +31,9 @@ import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productF
 import { ConfigService } from '@nestjs/config';
 import { ProducerService } from '@gateway/service/producer.service';
 import { SEARCHING_PATTERN } from '@constants';
+import { CacheService } from '@libs/cache';
+import { plainToInstance } from 'class-transformer';
+import { ElasticsearchService } from '@libs/searching/elasticsearch.service';
 
 @Injectable()
 export class ProductService {
@@ -48,6 +51,8 @@ export class ProductService {
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
     private readonly producerService: ProducerService,
+    private readonly cacheService: CacheService,
+    private readonly elasticsearchService: ElasticsearchService,
   ) {
     ProductService.LIMIT = this.configService.get('LIMIT_SEARCH');
   }
@@ -285,7 +290,64 @@ export class ProductService {
         productFilterDto,
       );
     }
-    return [];
+
+    let { page } = productFilterDto;
+    if (page < 1) {
+      page = 1;
+    }
+
+    const data = await this.model
+      .find()
+      .sort({
+        createdAt: -1,
+      })
+      .skip((page - 1) * ProductService.LIMIT)
+      .limit(ProductService.LIMIT)
+      .exec();
+    const length = await this.model.countDocuments().exec();
+
+    return {
+      totalPage: Math.ceil(length / ProductService.LIMIT),
+      currentPage: +page,
+      data,
+    };
+  }
+
+  async findOneWithES(id: string) {
+    let existedInRedis = false,
+      existedInES = false;
+
+    // find redis first
+    const redisProduct = await this.cacheService.getKey(`product:${id}`);
+    if (redisProduct) {
+      existedInRedis = true;
+      return plainToInstance(Product, redisProduct);
+    }
+
+    // find ES next
+    const ESProduct = await this.elasticsearchService.getProduct(id);
+    if (ESProduct) {
+      existedInES = true;
+
+      if (!existedInRedis) {
+        void this.saveToRedis(`product:${id}`, ESProduct);
+      }
+
+      return ESProduct;
+    }
+
+    // find in DB last
+    const product = await this.findOne(id);
+
+    if (!existedInRedis) {
+      void this.saveToRedis(`product:${id}`, ESProduct);
+    }
+
+    if (!existedInES) {
+      void this.elasticsearchService.createProduct(product);
+    }
+
+    return product;
   }
 
   async findOne(id: string) {
@@ -298,11 +360,26 @@ export class ProductService {
 
   async update(productDto: UpdateProductDto) {
     const product = await this.findOne(productDto.productId);
-    return this.model.create({ _id: product._id, ...productDto });
+    const savedProduct = await this.model.create({
+      _id: product._id,
+      ...productDto,
+    });
+
+    void this.deleleKeyFromRedis(`product:${productDto.productId}`);
+    void this.saveToRedis(`product:${productDto.productId}`, savedProduct);
+
+    void this.elasticsearchService.updateProduct(
+      productDto.productId,
+      savedProduct,
+    );
   }
 
   async remove(id: string) {
-    return this.model.deleteOne({ id }).exec();
+    void this.model.deleteOne({ id }).exec();
+
+    void this.deleleKeyFromRedis(id);
+    void this.elasticsearchService.deleteProduct(id);
+    return null;
   }
 
   // BRAND
@@ -433,5 +510,13 @@ export class ProductService {
       lower: true,
       trim: true,
     });
+  }
+
+  private saveToRedis<E>(key: string, document: E) {
+    void this.cacheService.setKey(key, document);
+  }
+
+  private deleleKeyFromRedis(key: string) {
+    void this.cacheService.delKey(key);
   }
 }

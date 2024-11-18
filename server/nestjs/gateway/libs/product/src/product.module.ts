@@ -13,6 +13,8 @@ import { User } from '@user/entities/user.entity';
 import { AuthService } from '@auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { BullModule } from '@nestjs/bullmq';
+import { ElasticsearchService } from '@libs/searching/elasticsearch.service';
+import { CacheService } from '@libs/cache';
 
 @Module({
   imports: [
@@ -29,7 +31,13 @@ import { BullModule } from '@nestjs/bullmq';
     ShopController,
     CategoryController,
   ],
-  providers: [ProductService, AuthService, JwtService],
+  providers: [
+    ProductService,
+    AuthService,
+    JwtService,
+    ElasticsearchService,
+    CacheService,
+  ],
 })
 export class ProductModule {}
 
