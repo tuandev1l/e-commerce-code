@@ -120,13 +120,13 @@ export class ElasticsearchService {
 
     const records = await this.getClient().search({
       index: this.elasticIndex,
-      // query,
       knn: {
         query_vector: textEmbedding.data.data,
         k: 20,
         num_candidates: 20,
         field: SearchType.TEXT ? 'descriptionVector' : 'imgVector',
       },
+      query,
       from: (filterPage - 1) * ElasticsearchService.LIMIT,
       size: ElasticsearchService.LIMIT,
       _source_includes: [
