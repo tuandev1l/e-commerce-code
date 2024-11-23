@@ -6,10 +6,10 @@ import { CancelOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/cancelOrd
 import { GetUser } from '@auth/decorator/get-user.decorator';
 import { ORDER_PREFIX } from '@constants/requestPrefix';
 import { BulkCreateOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/bulkCreateOrder.dto';
-import { UpdateOrderStatusDtoWithoutUser } from '@libs/order/dto/withoutUser/updateOrderStatus.dto';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
 import { PayOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/payOrder.dto';
+import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
 
 @ApiTags('Gateway')
 @Controller(ORDER_PREFIX)
@@ -36,7 +36,7 @@ export class GatewayOrderController {
   @Patch()
   async updateOrderStatus(
     @GetUser() user: User,
-    @Body() orderPayload: UpdateOrderStatusDtoWithoutUser,
+    @Body() orderPayload: UpdateOrderStatusDto,
   ) {
     return this.service.updateOrderStatus({ user, ...orderPayload });
   }
@@ -44,6 +44,24 @@ export class GatewayOrderController {
   @Get()
   async getAllOrders(@GetUser() user: User) {
     return this.service.getAllOrders(user);
+  }
+
+  @Auth(Role.ADMIN)
+  @Get('order-for-admin')
+  async getAllOrdersForAdmin() {
+    return this.service.getAllOrdersForAdmin();
+  }
+
+  @Auth(Role.SHOP)
+  @Get('order-for-shop/:id')
+  async getAllOrdersForShop(@Param('id') shopId: string) {
+    return this.service.getAllOrdersForShop(shopId);
+  }
+
+  @Auth(Role.SHOP)
+  @Get('order-prepared-for-shop/:id')
+  async getAllOrdersPreparedForShop(@Param('id') shopId: string) {
+    return this.service.getAllOrdersPreparedForShop(shopId);
   }
 
   @Get(':id')

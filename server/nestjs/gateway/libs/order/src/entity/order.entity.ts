@@ -23,6 +23,9 @@ export class Order extends BaseEntity {
   @Column({ nullable: true })
   uuid: string;
 
+  @Column({ nullable: true, name: 'shop_id' })
+  shopId: string;
+
   @Column({ nullable: true, name: 'rating_id' })
   ratingId: number;
 

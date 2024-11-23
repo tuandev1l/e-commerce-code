@@ -6,6 +6,7 @@ import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
 import { CreateProductDto } from '@libs/product/dto/product/withUser/create-product.dto';
 import { UpdateProductDto } from '@libs/product/dto/product/withUser/update-product.dto';
 import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
+import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
 
 @Controller()
 @UseFilters(new ExceptionFilter())
@@ -27,6 +28,11 @@ export class ProductController {
     return this.productService.findAll(productFilterDto);
   }
 
+  @MessagePattern(PRODUCT_PATTERN.FIND_ALL_PRODUCT_OF_SHOP)
+  async findAllProductsOfShop(@Payload() shopId: string) {
+    return this.productService.findAllProductsOfShop(shopId);
+  }
+
   @MessagePattern(PRODUCT_PATTERN.FIND_ONE_PRODUCT)
   async findOne(@Payload() id: string) {
     // return this.productService.findOne(id);
@@ -39,7 +45,7 @@ export class ProductController {
   }
 
   @MessagePattern(PRODUCT_PATTERN.REMOVE_PRODUCT)
-  async remove(@Payload() id: string) {
-    return this.productService.remove(id);
+  async remove(@Payload() deleteProductDto: DeleteProductDto) {
+    return this.productService.remove(deleteProductDto);
   }
 }

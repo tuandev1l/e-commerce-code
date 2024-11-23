@@ -1,7 +1,7 @@
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { useMutation } from '@tanstack/react-query';
 import { useDebounce } from '@uidotdev/usehooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import {
   changeQuantityOfProductInCartApi,
@@ -84,11 +84,11 @@ export const ProductItemInCart = ({
     }
   };
 
-  // useEffect(() => {
-  //   if (updateClick && quantity >= 1 && productItem.uuid) {
-  //     mutate({ productId: productItem.uuid, quantity });
-  //   }
-  // }, [debounceQuantity]);
+  useEffect(() => {
+    if (updateClick && quantity >= 1 && productItem.uuid) {
+      mutate({ productId: productItem.uuid, quantity });
+    }
+  }, [debounceQuantity]);
 
   return (
     <div

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductController } from '../controller/product.controller';
 import { ProductService } from '@libs/product/product.service';
@@ -16,6 +16,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { ElasticsearchService } from '@libs/searching/elasticsearch.service';
 import { CacheService } from '@libs/cache';
 
+@Global()
 @Module({
   imports: [
     MongooseModule.forFeatureAsync(productConfig),

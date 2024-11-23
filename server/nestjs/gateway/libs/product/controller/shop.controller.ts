@@ -5,11 +5,22 @@ import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { SHOP_PATTERN } from '@constants';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
+import { ApproveShopDto } from '@libs/product/dto/shop/approveShop.dto';
 
 @Controller()
 @UseFilters(ExceptionFilter)
 export class ShopController {
   constructor(private readonly service: ProductService) {}
+
+  @MessagePattern(SHOP_PATTERN.GET_SHOPS_NOT_APPROVED)
+  async getAllShopsNotApproved() {
+    return this.service.getAllShopsNotApproved();
+  }
+
+  @MessagePattern(SHOP_PATTERN.APPROVE_SHOP)
+  async approveShop(@Payload() approveShopDto: ApproveShopDto) {
+    return this.service.approveShop(approveShopDto);
+  }
 
   @MessagePattern(SHOP_PATTERN.CREATE_SHOP)
   async createShop(@Payload() createShop: CreateShopDto) {

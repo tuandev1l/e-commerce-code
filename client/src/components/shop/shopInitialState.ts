@@ -11,7 +11,7 @@ export const shopInitialState: IShopSlice = {
   isLoading: false,
   products: [],
   shop: {
-    id: '0',
+    _id: '0',
     name: '',
     url: '',
     address: {

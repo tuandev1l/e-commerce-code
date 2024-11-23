@@ -54,6 +54,7 @@ export class AuthService {
         expiresIn: this.configService.get('JWT_EXPIRE'),
       },
     );
+    user.password = undefined;
     return new IAuthRes(accessToken, user);
   }
 
@@ -97,7 +98,9 @@ export class AuthService {
       birthday,
       gender,
       // address: [address],
-      avatarUrl,
+      avatarUrl: avatarUrl
+        ? avatarUrl
+        : `https://avatar.iran.liara.run/public/boy?username=${name}`,
       password: hashPassword,
       name,
       email,

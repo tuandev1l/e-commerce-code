@@ -8,6 +8,7 @@ import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interfa
 import {
   addressSelector,
   productsInCartSelector,
+  roleSelector,
   usernameSelector,
 } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
@@ -15,9 +16,11 @@ import { getAllProductsInCart, setProductItemSelected } from './cartSlice';
 import { ProductInCart } from './ProductInCart';
 import useToast from '../../hook/useToast';
 import { useNavigate } from 'react-router-dom';
+import { Role } from '../../enum/role.user.enum';
 type Props = {};
 
 export const Cart = ({}: Props) => {
+  const userRole = useSelector(roleSelector);
   const navigate = useNavigate();
   const toast = useToast();
   const username = useSelector(usernameSelector);
@@ -117,6 +120,13 @@ export const Cart = ({}: Props) => {
   // }, [productSelected]);
 
   const buyProductHandler = () => {
+    if (userRole !== Role.USER) {
+      toast({
+        type: 'error',
+        message: 'Bạn không thể mua hàng với tài khoản này',
+      });
+      return;
+    }
     if (addresses?.length) {
       dispatch(setProductItemSelected(productSelected));
       setTimeout(() => {

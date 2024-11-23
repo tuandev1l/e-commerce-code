@@ -65,7 +65,13 @@ export class GatewayProductController {
 
   @Auth(Role.ADMIN, Role.SHOP)
   @Delete(':id')
-  async removeProduct(@Param('id') id: string) {
-    return this.service.removeProduct(id);
+  async removeProduct(@GetUser() user: User, @Param('id') id: string) {
+    return this.service.removeProduct({ user, id });
+  }
+
+  // @Auth(Role.ADMIN, Role.SHOP)
+  @Get('shop/:id')
+  async getAllProductOfShop(@Param('id') id: string) {
+    return this.service.getAllProductsOfShop(id);
   }
 }

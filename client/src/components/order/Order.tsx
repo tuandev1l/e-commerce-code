@@ -53,29 +53,15 @@ export const Order = ({}: Props) => {
   const orderStatusBtnHandler = (idx: number) => {
     setBtnActive(idx);
     const status = btns[idx].status;
-    if (idx === 0) {
-      setSelectedOrders(orders);
-      return;
-    }
     const lowerSearch = search.toLowerCase();
-    const filterOrders = orders.filter(
-      (order) =>
-        status.includes(order.status) &&
-        (order.item.seller?.name.toLowerCase().includes(lowerSearch) ||
-          order.item.name.toLocaleLowerCase().includes(lowerSearch))
+    const filterOrders = orders.filter((order) =>
+      idx === 0
+        ? true
+        : status.includes(order.status) &&
+          (order.item.seller?.name.toLowerCase().includes(lowerSearch) ||
+            order.item.name.toLocaleLowerCase().includes(lowerSearch))
     );
     setSelectedOrders(filterOrders);
-  };
-
-  const searchOrderHandler = () => {
-    const lowerSearch = search.toLowerCase();
-    setSelectedOrders(
-      selectedOrders.filter(
-        (order) =>
-          order.item.seller?.name.toLowerCase().includes(lowerSearch) ||
-          order.item.name.toLocaleLowerCase().includes(lowerSearch)
-      )
-    );
   };
 
   return (
@@ -100,17 +86,17 @@ export const Order = ({}: Props) => {
           </div>
 
           {/* Search Bar */}
-          <div className='relative mb-4'>
+          <div className='relative mb-4 hover:cursor-pointer'>
             <input
               type='text'
-              placeholder='Tìm đơn hàng theo Mã đơn hàng, Nhà bán hoặc Tên sản phẩm'
+              placeholder='Tìm đơn hàng theo Nhà bán hoặc Tên sản phẩm'
               className='w-full px-4 py-2 border rounded-lg focus:outline-none'
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
             <button
               className='absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500 font-medium'
-              onClick={searchOrderHandler}
+              onClick={() => orderStatusBtnHandler(btnActive)}
             >
               Tìm đơn hàng
             </button>

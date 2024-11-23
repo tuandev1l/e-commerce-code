@@ -16,13 +16,16 @@ export class Shop {
   logo: string;
 
   @Prop()
-  telephone: string;
+  description: string;
 
   @Prop({ required: true })
   url: string;
 
   @Prop({ type: MongooseSchema.Types.Map })
   address: IUserAddress;
+
+  @Prop({ default: false })
+  approved: boolean = false;
 
   @Prop({ select: false })
   __v: number;

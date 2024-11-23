@@ -1,10 +1,11 @@
 import { IUserAddress } from './userAddress.interface';
 
 export interface IShop {
-  id: string;
+  _id: string;
   name: string;
   logo?: string;
   telephone?: string;
+  description?: string;
   url: string;
-  address?: IUserAddress;
+  address: IUserAddress;
 }

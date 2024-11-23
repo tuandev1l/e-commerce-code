@@ -17,4 +17,6 @@ export interface IOrder {
   uuid: string;
   ratingId: number | null;
   rating: IRating | null;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

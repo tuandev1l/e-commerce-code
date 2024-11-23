@@ -32,6 +32,8 @@ import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityI
 import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
 import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
 import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
+import { ApproveShopDto } from '@libs/product/dto/shop/approveShop.dto';
+import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
 
 @Injectable()
 export class GatewayService {
@@ -63,8 +65,11 @@ export class GatewayService {
     );
   }
 
-  async removeProduct(id: string) {
-    return this.producer.sendMessage(PRODUCT_PATTERN.REMOVE_PRODUCT, id);
+  async removeProduct(deleteProductDto: DeleteProductDto) {
+    return this.producer.sendMessage(
+      PRODUCT_PATTERN.REMOVE_PRODUCT,
+      deleteProductDto,
+    );
   }
 
   async searchProductByElasticsearch(search: ISearch) {
@@ -258,6 +263,10 @@ export class GatewayService {
   }
 
   // SHOP
+  async getAllShopsNotApproved() {
+    return this.producer.sendMessage(SHOP_PATTERN.GET_SHOPS_NOT_APPROVED);
+  }
+
   async createShop(createShop: CreateShopDto) {
     return this.producer.sendMessage(SHOP_PATTERN.CREATE_SHOP, createShop);
   }
@@ -280,5 +289,34 @@ export class GatewayService {
 
   async findAllProductTest() {
     return this.producer.sendMessage(PRODUCT_PATTERN.TEST);
+  }
+
+  async approveShop(approveShopDto: ApproveShopDto) {
+    return this.producer.sendMessage(SHOP_PATTERN.APPROVE_SHOP, approveShopDto);
+  }
+
+  async getAllProductsOfShop(id: string) {
+    return this.producer.sendMessage(
+      PRODUCT_PATTERN.FIND_ALL_PRODUCT_OF_SHOP,
+      id,
+    );
+  }
+
+  async getAllOrdersForAdmin() {
+    return this.producer.sendMessage(ORDER_PATTERN.GET_ALL_ORDERS_FOR_ADMIN);
+  }
+
+  async getAllOrdersForShop(shopId: string) {
+    return this.producer.sendMessage(
+      ORDER_PATTERN.GET_ALL_ORDERS_FOR_SHOP,
+      shopId,
+    );
+  }
+
+  async getAllOrdersPreparedForShop(shopId: string) {
+    return this.producer.sendMessage(
+      ORDER_PATTERN.GET_ALL_ORDERS_PREPARED_FOR_SHOP,
+      shopId,
+    );
   }
 }

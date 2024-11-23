@@ -12,7 +12,7 @@ import {
 } from '@libs/product/entities/category.entity';
 import { Shop, ShopDocument } from '@libs/product/entities/shop.entity';
 import slugify from 'slugify';
-import { RpcNotFound } from '@base/exception/exception.resolver';
+import { RpcBadRequest, RpcNotFound } from '@base/exception/exception.resolver';
 import { CreateProductDto } from '@libs/product/dto/product/withUser/create-product.dto';
 import { UpdateProductDto } from '@libs/product/dto/product/withUser/update-product.dto';
 import { UpdateBrandDto } from '@libs/product/dto/brand/update-brand.dto';
@@ -34,6 +34,10 @@ import { SEARCHING_PATTERN } from '@constants';
 import { CacheService } from '@libs/cache';
 import { plainToInstance } from 'class-transformer';
 import { ElasticsearchService } from '@libs/searching/elasticsearch.service';
+import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
+import { ApproveShopDto } from '@libs/product/dto/shop/approveShop.dto';
+import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
+import { Role } from '@auth';
 
 @Injectable()
 export class ProductService {
@@ -157,9 +161,23 @@ export class ProductService {
             ward: seller.ward,
             detailAddress: seller.detailAddress,
           };
-          newShop.slug = this.getSlugName(seller.name);
+          const slug = this.getSlugName(seller.name);
+          newShop.slug = slug;
 
           product.seller = await this.shopModel.create(newShop);
+          const newUser = this.userRepo.create();
+          newUser.name = newShop.name;
+          newUser.isEmailVerified = true;
+          newUser.password = await this.authService.hashPassword('123456789');
+          newUser.email = `${slug}@gmail.com`;
+
+          newUser.gender = GENDER.MALE;
+          newUser.birthday = new Date('2000-01-01');
+          newUser.accountType = ACCOUNT_TYPE.EMAIL;
+          newUser.hasPassword = true;
+          newUser.avatarUrl = `https://avatar.iran.liara.run/public/boy?username=${newShop.name}`;
+          // @ts-ignore
+          newUser.shopId = newShop._id;
         } else {
           product.seller = shopEntity;
         }
@@ -277,7 +295,6 @@ export class ProductService {
 
   async findAll(productFilterDto: ProductFilterDto) {
     const isElasticEnable = !!this.configService.get('ES_ENABLE');
-    console.log(productFilterDto);
     if (isElasticEnable) {
       if (productFilterDto.usingKnn) {
         return this.producerService.sendMessage(
@@ -365,7 +382,7 @@ export class ProductService {
       ...productDto,
     });
 
-    void this.deleleKeyFromRedis(`product:${productDto.productId}`);
+    void this.deleteKeyFromRedis(`product:${productDto.productId}`);
     void this.saveToRedis(`product:${productDto.productId}`, savedProduct);
 
     void this.elasticsearchService.updateProduct(
@@ -374,10 +391,16 @@ export class ProductService {
     );
   }
 
-  async remove(id: string) {
+  async remove(deleteProductDto: DeleteProductDto) {
+    const { id, user } = deleteProductDto;
+    const seller = await this.findOne(id);
+    if (seller._id.toString() !== user.shopId) {
+      throw new RpcBadRequest('You do not have permission to do this');
+    }
+
     void this.model.deleteOne({ id }).exec();
 
-    void this.deleleKeyFromRedis(id);
+    void this.deleteKeyFromRedis(id);
     void this.elasticsearchService.deleteProduct(id);
     return null;
   }
@@ -466,12 +489,22 @@ export class ProductService {
   }
 
   // SHOP
-  async createShop(createShopDto) {
-    const { name } = createShopDto;
-    return this.shopModel.create({
+  async createShop(createShopDto: CreateShopDto) {
+    const { name, address, logo, description, user } = createShopDto;
+    const slug = this.getSlugName(name);
+    const createdShop = await this.shopModel.create({
       name,
-      slug: this.getSlugName(name),
+      slug,
+      url: `http://localhost:5173/shop/${slug}`,
+      address,
+      logo,
+      description,
+      approved: false,
     });
+
+    user.shopId = createdShop._id.toString();
+    await this.userRepo.save(user);
+    return createdShop;
   }
 
   async getShop(shopId: string) {
@@ -504,6 +537,31 @@ export class ProductService {
     });
   }
 
+  async getAllShopsNotApproved() {
+    return this.shopModel
+      .find({ approved: false })
+      .sort({ createdAt: -1 })
+      .exec();
+  }
+
+  async approveShop(approveShopDto: ApproveShopDto) {
+    const { shopId } = approveShopDto;
+    const shop = await this.getShop(shopId);
+
+    const user = await this.userRepo.findOneBy({ shopId });
+    if (user) {
+      user.role = Role.SHOP;
+      await this.userRepo.save(user);
+    }
+
+    shop.approved = true;
+    return this.shopModel.create(shop);
+  }
+
+  async findAllProductsOfShop(shopId: string) {
+    return this.model.find({ seller: shopId }).exec();
+  }
+
   private getSlugName(name: string): string {
     return slugify(name, {
       locale: 'vi',
@@ -516,7 +574,7 @@ export class ProductService {
     void this.cacheService.setKey(key, document);
   }
 
-  private deleleKeyFromRedis(key: string) {
+  private deleteKeyFromRedis(key: string) {
     void this.cacheService.delKey(key);
   }
 }

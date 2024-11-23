@@ -178,7 +178,9 @@ export class ElasticsearchService {
     void this.client.deleteByQuery({
       index: this.elasticIndex,
       query: {
-        match: id,
+        match: {
+          id,
+        },
       },
     });
   }

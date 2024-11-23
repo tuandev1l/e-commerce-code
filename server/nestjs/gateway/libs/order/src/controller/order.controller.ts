@@ -41,6 +41,21 @@ export class OrderController {
     return this.service.getAllOrders(user);
   }
 
+  @MessagePattern(ORDER_PATTERN.GET_ALL_ORDERS_FOR_ADMIN)
+  async getAllOrdersForAdmin() {
+    return this.service.getAllOrdersForAdmin();
+  }
+
+  @MessagePattern(ORDER_PATTERN.GET_ALL_ORDERS_FOR_SHOP)
+  async getAllOrdersForShop(@Payload() shopId: string) {
+    return this.service.getAllOrdersForShop(shopId);
+  }
+
+  @MessagePattern(ORDER_PATTERN.GET_ALL_ORDERS_PREPARED_FOR_SHOP)
+  async getAllOrdersPreparedForShop(@Payload() shopId: string) {
+    return this.service.getAllOrdersPreparedForShop(shopId);
+  }
+
   @MessagePattern(ORDER_PATTERN.GET_ORDER)
   async getOrder(@Payload() getOrderDto: GetOrderDto) {
     return this.service.getOrder(getOrderDto);

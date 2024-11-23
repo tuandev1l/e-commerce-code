@@ -75,6 +75,11 @@ export class OrderService {
   }
 
   async createOrder(orderPayload: BulkCreateOrderDto) {
+    const { user } = orderPayload;
+    if (user.role !== Role.SHOP) {
+      throw new RpcBadRequest('Can not create order with this role');
+    }
+
     const {
       paymentMethod,
       vnp_TransactionDate,
@@ -123,6 +128,8 @@ export class OrderService {
 
     const newOrders = orders.map((order) => {
       order.status = status;
+      // @ts-ignore
+      order.shopId = order.item.seller._id;
       return order;
     });
 
@@ -168,22 +175,17 @@ export class OrderService {
   }
 
   async updateOrderStatus(updateOrderStatusDto: UpdateOrderStatusDto) {
-    const { orderId, status, data, user } = updateOrderStatusDto;
+    const { orderId, status, user } = updateOrderStatusDto;
     const order = await this.repository.findOneBy({ id: orderId });
     if (!order) {
       throw new RpcNotFound('There is no order with this ID');
     }
 
-    if (user.role === Role.SHOP && order.status !== ORDER_STATUS.SHIPPING) {
+    if (user.role === Role.SHOP && order.status !== ORDER_STATUS.PREPARED) {
       throw new RpcBadRequest('Insufficient permission');
     }
 
     order.status = status;
-    order.statusHistories.push({
-      status: status,
-      data: data,
-      createdAt: new Date().toString(),
-    });
 
     return this.repository.save(order);
   }
@@ -252,6 +254,24 @@ export class OrderService {
       status: 'success',
       paymentUrl,
     };
+  }
+
+  async getAllOrdersForAdmin() {
+    return this.repository
+      .createQueryBuilder('order')
+      .where(`order.status=:shipping`, {
+        shipping: ORDER_STATUS.SHIPPING,
+      })
+      .orderBy('order.createdAt', 'DESC')
+      .getMany();
+  }
+
+  async getAllOrdersPreparedForShop(shopId: string) {
+    return this.repository.findBy({ shopId, status: ORDER_STATUS.PREPARED });
+  }
+
+  async getAllOrdersForShop(shopId: string) {
+    return this.repository.findBy({ shopId });
   }
 
   private async vnpayHandler(amount: number, uuid: string) {

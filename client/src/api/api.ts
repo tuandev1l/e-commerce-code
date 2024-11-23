@@ -1,4 +1,5 @@
 import { IResetPasswordState } from '../components/auth';
+import { IShopDto } from '../components/shop-admin/ShopAdminRegister';
 import { IChangePassword } from '../components/user/ChangePassword';
 import { instance } from '../config/axiosConfig';
 import { ICartDto } from '../dto/cart.dto';
@@ -8,6 +9,7 @@ import { ICreateOrder } from '../dto/createOrder.dto';
 import { ICreateRatingDto } from '../dto/createRating.dto';
 import { IProductFilter } from '../dto/productFilter.dto';
 import { IUpdateRatingDto } from '../dto/updateRating.dto';
+import { IOrderStatus, IShop } from '../interfaces';
 import { ILogin } from '../interfaces/login.interface';
 import { ISignup } from '../interfaces/signup.interface';
 import { IUserAddress } from '../interfaces/userAddress.interface';
@@ -59,8 +61,22 @@ export const setDefaultAddressApi = (addressId: string) =>
 export const deleteAddressApi = (addressId: string) =>
   instance.delete(`auth/delete-address/${addressId}`);
 
+export const createShopApi = (shopDto: IShopDto) =>
+  instance.post('shop', shopDto);
 export const getShopInfoApi = (shopName: string) =>
   instance.get(`shop/${shopName}`);
+export const getShopInfoByIdApi = (shopId: string) =>
+  instance.get(`shop/id/${shopId}`);
+export const updateShopApi = (shopDto: IShop) =>
+  instance.patch(`shop/${shopDto._id}`, shopDto);
+export const getAllProductsOfShopApi = (shopId: string) =>
+  instance.get(`product/shop/${shopId}`);
+export const deleteProductApi = (productId: string) =>
+  instance.delete(`product/${productId}`);
+export const getAllShopsNotApprovedApi = () =>
+  instance.get('shop/not-approved');
+export const approveShopApi = (shopId: string) =>
+  instance.patch(`shop/approved/${shopId}`);
 export const getAllPaymentsApi = () => instance.get('payment');
 export const getAllShippingMethodsApi = () => instance.get('shipping');
 
@@ -68,6 +84,14 @@ export const createOrderApi = (orderDto: ICreateOrder) =>
   instance.post('order', orderDto);
 export const createCheckoutApi = (checkoutDto: ICreateCheckout) =>
   instance.post('order/get-payment-url', checkoutDto);
+export const getAllOrdersForAdminApi = () =>
+  instance.get('order/order-for-admin');
+export const updateOrderStatusApi = (updateOrderStatusDto: IOrderStatus) =>
+  instance.patch('order', updateOrderStatusDto);
+export const getAllOrdersPreparedForShopApi = (shopId: string) =>
+  instance.get(`order/order-prepared-for-shop/${shopId}`);
+export const getAllOrdersForShopApi = (shopId: string) =>
+  instance.get(`order/order-for-shop/${shopId}`);
 
 export const getAllOrdersApi = () => instance.get('order');
 export const getProductRatingApi = (productId: string) =>

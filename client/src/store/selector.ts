@@ -5,6 +5,8 @@ export const usernameSelector = (state: RootState) => state.auth.user.name;
 export const dobSelector = (state: RootState) => state.auth.user.birthday;
 export const genderSelector = (state: RootState) => state.auth.user.gender;
 export const addressSelector = (state: RootState) => state.auth.user.address;
+export const shopIdSelector = (state: RootState) => state.auth.user.shopId;
+export const roleSelector = (state: RootState) => state.auth.user.role;
 
 export const productsSelector = (state: RootState) => state.product.products;
 export const productSelector = (state: RootState) => state.product.product;

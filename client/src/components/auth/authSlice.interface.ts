@@ -1,5 +1,5 @@
-import { IShopAddress } from '../../interfaces';
 import { IUserAddress } from '../../interfaces/userAddress.interface';
+import { Role } from './../../enum/role.user.enum';
 
 export interface IAuthSlice {
   isLoading: boolean;
@@ -18,6 +18,8 @@ export interface IAuthSlice {
     phoneNumber?: string;
     avatarUrl?: string;
     address?: IUserAddress[];
+    shopId: string;
+    role: Role;
   };
 }
 
@@ -33,6 +35,8 @@ const user = JSON.parse(localStorage.getItem('user')) || {
   isVerifyPhone: '',
   email: '',
   avatarUrl: '',
+  shopId: '',
+  role: Role.USER,
 };
 
 export const authSliceInitialState: IAuthSlice = {

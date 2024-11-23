@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ORDER_STATUS } from '@libs/order/enum';
 import { Type } from 'class-transformer';
 import { User } from '@user/entities/user.entity';
@@ -12,10 +18,11 @@ export class UpdateOrderStatusDto {
   @IsEnum(ORDER_STATUS)
   status: ORDER_STATUS;
 
+  @IsOptional()
   @IsString()
-  data: string;
+  data?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @Type(() => User)
-  user: User;
+  user?: User;
 }

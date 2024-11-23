@@ -10,7 +10,7 @@ import {
 } from '../../api/api';
 import { Layout } from '../../common/layout/Layout';
 import { IAxiosError } from '../../config/axiosError.interface';
-import { IProductFilter, SearchType } from '../../dto/productFilter.dto';
+import { IProductFilter } from '../../dto/productFilter.dto';
 import useToast from '../../hook/useToast';
 import {
   brandSelectedSelector,

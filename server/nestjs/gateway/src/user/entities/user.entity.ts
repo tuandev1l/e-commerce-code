@@ -71,6 +71,9 @@ export class User extends BaseEntity {
   @Column({ default: 0 })
   totalThank: number;
 
+  @Column({ name: 'shop_id', nullable: true })
+  shopId: string;
+
   @Exclude()
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];

@@ -31,9 +31,12 @@ const authSlice = createSlice({
       state.user.phoneNumber = payload.user.phoneNumber;
       state.user.avatarUrl = payload.user.avatarUrl;
       state.user.address = payload.user.address;
+      state.user.role = payload.user.role;
+      state.user.shopId = payload.user.shopId;
     },
     logout: (state) => {
       state.isLogin = false;
+      // @ts-ignore
       state.user = {};
       state.accessToken = '';
       localStorage.clear();
@@ -42,10 +45,14 @@ const authSlice = createSlice({
       state.user.address = payload;
       localStorage.setItem('user', JSON.stringify(state.user));
     },
+    setShopId: (state, { payload }) => {
+      state.user.shopId = payload;
+      localStorage.setItem('user', JSON.stringify(state.user));
+    },
   },
   extraReducers: () => {},
 });
 
-export const { loginSuccess, logout, addNewAddressDispatch } =
+export const { loginSuccess, logout, addNewAddressDispatch, setShopId } =
   authSlice.actions;
 export default authSlice;

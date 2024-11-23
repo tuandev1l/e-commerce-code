@@ -33,13 +33,16 @@ import {
   fromNumberSelector,
   isLoginSelector,
   keywordSelector,
+  roleSelector,
   searchingTypeSelector,
+  shopIdSelector,
   toNumberSelector,
   usernameSelector,
   usingKnnSelector,
 } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { uploadFile } from '../uploadFile';
+import { Role } from '../../enum/role.user.enum';
 
 type Props = {};
 
@@ -59,8 +62,10 @@ export const Header = ({}: Props) => {
   const toNumber = useSelector(toNumberSelector);
   const usingKnn = useSelector(usingKnnSelector);
   const searchingType = useSelector(searchingTypeSelector);
+  const shopId = useSelector(shopIdSelector);
   const [checked, setChecked] = useState<boolean>(false);
   const [imgUpload, setImgUpload] = useState<File>();
+  const userRole = useSelector(roleSelector);
 
   useEffect(() => {
     if (addresses?.length && addresses?.length > 0) {
@@ -179,7 +184,7 @@ export const Header = ({}: Props) => {
                       type='checkbox'
                       checked={checked}
                       className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500'
-                      onClick={() => setChecked(!checked)}
+                      onChange={() => setChecked(!checked)}
                     />
                     <label
                       htmlFor='default-checkbox'
@@ -216,13 +221,39 @@ export const Header = ({}: Props) => {
               <h3>{username}</h3>
             </Link>
             {isLogin && (
-              <button
-                onClick={logoutHandler}
-                type='button'
-                className='py-1 px-5 mr-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100'
-              >
-                Log out
-              </button>
+              <>
+                <button
+                  onClick={logoutHandler}
+                  type='button'
+                  className='py-1 px-5 mr-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700'
+                >
+                  Log out
+                </button>
+                {userRole === Role.ADMIN ? (
+                  <Link to={'/admin'}>
+                    <button
+                      type='button'
+                      className='py-1 px-5 mr-2 text-sm font-medium text-gray-900 focus:outline-none bg-gray-200 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700'
+                    >
+                      Admin
+                    </button>
+                  </Link>
+                ) : (
+                  <Link
+                    to={`${
+                      shopId ? `/shop-admin/${shopId}` : '/shop-admin/register'
+                    }`}
+                  >
+                    <button
+                      // onClick={}
+                      type='button'
+                      className='py-1 px-5 mr-2 text-sm font-medium text-gray-900 focus:outline-none bg-gray-200 rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700'
+                    >
+                      Shop
+                    </button>
+                  </Link>
+                )}
+              </>
             )}
             <Link to='/cart' className='border-l border-slate-400 px-2 flex'>
               <ShoppingCartIcon className='borde-slate-400 w-6' />

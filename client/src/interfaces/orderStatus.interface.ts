@@ -1,5 +1,6 @@
 export interface IOrderStatus {
-  id: number;
+  orderId: number;
   status: string;
-  createdAt: string;
+  data?: string;
+  createdAt?: string;
 }

@@ -6,6 +6,8 @@ import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
 import { UpdateShopDtoWithoutId } from '@libs/product/dto/shop/update-shop-wid.dto';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
+import { GetUser } from '@auth/decorator/get-user.decorator';
+import { User } from '@user/entities/user.entity';
 
 @ApiTags('Gateway')
 @Controller(SHOP_PREFIX)
@@ -13,19 +15,31 @@ export class GatewayShopController {
   constructor(private readonly service: GatewayService) {}
 
   @Auth(Role.ADMIN)
-  @Post()
-  async createShop(@Body() createShop: CreateShopDto) {
-    return this.service.createShop(createShop);
+  @Get('not-approved')
+  async getShopsNotApproved() {
+    return this.service.getAllShopsNotApproved();
   }
 
-  // @Get(':id')
-  // async getShop(@Param('id') shopId: string) {
-  //   return this.service.getShop(shopId);
-  // }
+  // @Auth(Role.ADMIN)
+  @Post()
+  async createShop(@GetUser() user: User, @Body() createShop: CreateShopDto) {
+    return this.service.createShop({ ...createShop, user });
+  }
+
+  @Get('id/:id')
+  async getShop(@Param('id') shopId: string) {
+    return this.service.getShop(shopId);
+  }
 
   @Get(':name')
   async getShopByName(@Param('name') shopName: string) {
     return this.service.getShopByName(shopName);
+  }
+
+  @Auth(Role.ADMIN)
+  @Patch('approved/:id')
+  async approveShop(@Param('id') shopId: string) {
+    return this.service.approveShop({ shopId });
   }
 
   @Get()

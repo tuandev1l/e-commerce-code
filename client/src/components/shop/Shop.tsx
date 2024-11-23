@@ -7,6 +7,7 @@ import { useAppDispatch } from '../../store/store';
 import { getShopInfo, setProductsOfShop } from './shopSlice';
 import { useSelector } from 'react-redux';
 import { productsOfShopSelector, shopSelector } from '../../store/selector';
+import { ProductItem } from '../product/ProductItem';
 
 type Props = {};
 
@@ -145,9 +146,9 @@ export const Shop = ({}: Props) => {
             <div className='text-2xl '>BEST SELLER</div>
             <div className='text-blue-500'>Xem tất cả</div>
           </div>
-          {/* {products.map((product) => (
+          {products.map((product) => (
             <ProductItem product={product} />
-          ))} */}
+          ))}
         </div>
       </>
     </Layout>
