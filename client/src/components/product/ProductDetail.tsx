@@ -1,38 +1,26 @@
-import { Rating } from 'react-simple-star-rating';
-import { Layout } from '../../common/layout/Layout';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import moment from 'moment';
+import 'moment/dist/locale/vi';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
-import { priceSplit } from '../../common/price/priceSplit';
-import { productSelector, usernameSelector } from '../../store/selector';
-import { useAppDispatch } from '../../store/store';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { Rating } from 'react-simple-star-rating';
 import {
   addToCartApi,
-  getAllRatingsOfProductApi,
   getDetailProductApi,
   getProductRatingApi,
 } from '../../api/api';
-import { getDetailProduct } from './productSlice';
-import useToast from '../../hook/useToast';
+import { Layout } from '../../common/layout/Layout';
+import { priceSplit } from '../../common/price/priceSplit';
 import { IAxiosError } from '../../config/axiosError.interface';
+import useToast from '../../hook/useToast';
 import { IRatingProduct } from '../../interfaces/ratingProduct.interface';
-import { IRating } from '../../interfaces/rating.interface';
-import moment from 'moment';
-import 'moment/dist/locale/vi';
+import { productSelector, usernameSelector } from '../../store/selector';
+import { useAppDispatch } from '../../store/store';
+import { ProductRating } from './ProductRating';
+import { getDetailProduct } from './productSlice';
 
 type Props = {};
-
-const fitlerBy = [
-  'Mới nhất',
-  'Có hình ảnh',
-  'Đã mua hàng',
-  '5 sao',
-  '4 sao',
-  '3 sao',
-  '2 sao',
-  '1 sao',
-];
 
 export const ProductDetail = ({}: Props) => {
   moment.locale('vi');
@@ -45,7 +33,6 @@ export const ProductDetail = ({}: Props) => {
   const [quantity, setQuantity] = useState<number>(1);
   const username = useSelector(usernameSelector);
   const [ratingProduct, setRatingProduct] = useState<IRatingProduct>();
-  const [ratings, setRatings] = useState<IRating[]>([]);
 
   const { data } = useQuery({
     queryKey: [`product/getAllProducts/${productId}`],
@@ -68,21 +55,6 @@ export const ProductDetail = ({}: Props) => {
       setRatingProduct(ratingProductData);
     }
   }, [ratingProductData]);
-
-  const { data: ratingData } = useQuery({
-    queryKey: [`product/ratingsOfProduct/${productId}`],
-    queryFn: () => getAllRatingsOfProductApi(productId),
-    enabled: !!productId,
-    gcTime: 60 * 1000 * 3,
-    staleTime: 60 * 1000 * 3,
-  });
-
-  useEffect(() => {
-    if (ratingData) {
-      // @ts-ignore
-      setRatings(ratingData);
-    }
-  }, [ratingData]);
 
   useEffect(() => {
     if (data) {
@@ -236,7 +208,7 @@ export const ProductDetail = ({}: Props) => {
                                     }}
                                     className={`px-4 py-1 rounded-lg solid border-gray-200 border-2 hover:cursor-pointer ${
                                       option[configIdx] === valueIdx &&
-                                      'border-blue-600'
+                                      'border-blue-700'
                                     }`}
                                   >
                                     {value.label}
@@ -394,107 +366,9 @@ export const ProductDetail = ({}: Props) => {
                       ))
                       .reverse()}
                 </div>
-                <div className='mt-4'>
-                  <div>Tất cả hình ảnh</div>
-                  <div>{/* images here */}</div>
-                </div>
-                <div className='mt-4'>
-                  <div className='mb-2'>Lọc theo</div>
-                  <div className='flex gap-4'>
-                    {fitlerBy.map((el) => (
-                      <div
-                        className='px-4 py-1 rounded-xl border-gray-200 border-2'
-                        key={el}
-                      >
-                        {el}
-                      </div>
-                    ))}
-                  </div>
-                </div>
                 {/* Rating element */}
                 <div className='mt-8'>
-                  {ratings.map((rating) => (
-                    <div
-                      key={rating.id}
-                      className='flex gap-8 items-start mb-8'
-                    >
-                      <div className='w-3/12'>
-                        <div className='flex items-center mt-4'>
-                          {/* Avatar */}
-                          <div className='rounded-full flex items-center justify-center text-gray-600 text-xl font-semibold'>
-                            <img
-                              src={rating.user?.avatarUrl}
-                              className='w-12 h-12'
-                            />
-                          </div>
-                          <div className='ml-4'>
-                            <p className='font-semibold'>{rating.user?.name}</p>
-                            <p className='text-sm text-gray-500'>
-                              Đã tham gia{' '}
-                              {rating.user?.joinedTime ||
-                                moment(rating.user?.createdAt).fromNow()}
-                            </p>
-                          </div>
-                        </div>
-                        <div className='flex justify-between mt-4 text-sm items-end'>
-                          <div className='flex gap-4 items-end'>
-                            <img
-                              src='https://salt.tikicdn.com/ts/upload/c6/67/f1/444fc9e1869b5d4398cdec3682af7f14.png'
-                              width={24}
-                            />
-                            <div className='text-gray-500'>Đã viết</div>
-                          </div>
-                          <div>{rating.user?.totalReview} Đánh giá</div>
-                        </div>
-                        <div className='flex justify-between mt-4 text-sm items-end'>
-                          <div className='flex gap-4 items-end'>
-                            <img
-                              src='https://salt.tikicdn.com/ts/upload/cc/86/cd/1d5ac6d4e00abbf6aa4e4636489c9d80.png'
-                              width={24}
-                            />
-                            <div className='text-gray-500'>Đã nhận</div>
-                          </div>
-                          <div>{rating.user?.totalThank} Lượt cảm ơn</div>
-                        </div>
-                      </div>
-                      <div className='flex-1'>
-                        <div className='flex items-center gap-3'>
-                          <Rating
-                            size={16}
-                            readonly
-                            transition
-                            allowFraction
-                            initialValue={rating.rating}
-                            SVGclassName={'inline-block'}
-                          />
-                          <div className='font-semibold text-lg'>
-                            {rating.title}
-                          </div>
-                        </div>
-                        <p className='mt-4'>{rating.content}</p>
-                        {rating.images.length > 0 && (
-                          <div className='mt-4 w-36 rounded-lg flex gap-2'>
-                            {rating.images.map((img) => (
-                              <img src={img.fullPath} />
-                            ))}
-                          </div>
-                        )}
-
-                        <div className='mt-4 text-gray-500'>
-                          {rating.productAttributes.map((attr) => (
-                            <p>{attr}</p>
-                          ))}
-                        </div>
-                        <button className='flex items-center text-blue-500 gap-2 mt-4'>
-                          <img
-                            src='https://salt.tikicdn.com/ts/upload/10/9f/8b/54e5f6b084fb9e3445036b4646bc48b5.png'
-                            width={20}
-                          />
-                          <span>Hữu ích</span>
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                  <ProductRating productId={productId} />
                 </div>
               </div>
             </div>
