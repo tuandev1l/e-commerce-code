@@ -20,11 +20,24 @@ import { UpdateProductDtoWithoutUser } from '@libs/product/dto/product/withoutUs
 import { GetUser } from '@auth/decorator/get-user.decorator';
 import { User } from '@user/entities/user.entity';
 import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
+import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/withUser/get-5-products-in-the-same-category.dto';
 
 @ApiTags('Gateway')
 @Controller(PRODUCT_PREFIX)
 export class GatewayProductController {
   constructor(private readonly service: GatewayService) {}
+
+  @SkipAuth()
+  @Get('five-products-similar')
+  async find5Products(@Query() dto: Get5ProductsInTheSameCategoryDto) {
+    return this.service.find5Products(dto);
+  }
+
+  @SkipAuth()
+  @Get('random-products')
+  async randomProducts() {
+    return this.service.randomProducts();
+  }
 
   @SkipAuth()
   @Post(SEARCHING_PREFIX)

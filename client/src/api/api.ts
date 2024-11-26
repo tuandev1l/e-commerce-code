@@ -96,6 +96,16 @@ export const getAllOrdersForShopApi = (shopId: string) =>
 export const getAllOrdersApi = () => instance.get('order');
 export const getProductRatingApi = (productId: string) =>
   instance.get(`rating/product-rating/${productId}`);
+export const get5ProductsInSimilarCategoryApi = (
+  productId: string,
+  categoryId: string
+) =>
+  instance.get(
+    `product/five-products-similar?productId=${productId}&categoryId=${categoryId}`
+  );
+
+export const getRandomProductsApi = () =>
+  instance.get('product/random-products');
 
 export const getAllRatingsOfProductApi = (productId: string) =>
   instance.get(`rating/product/${productId}`);

@@ -1,4 +1,10 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { PaymentMethodEnum } from '@share/enums/payment.enum';
 
 export class BulkCreateOrderDtoWithoutUser {
@@ -8,21 +14,13 @@ export class BulkCreateOrderDtoWithoutUser {
 
   @IsOptional()
   @IsString()
-  vnpayParams?: string;
-
-  @IsOptional()
-  @IsString()
   orderInfo?: string;
 
   @IsOptional()
-  @IsString()
-  vnp_TransactionDate?: string;
+  @IsNumber()
+  vnp_TransactionNo?: number;
 
   @IsOptional()
   @IsString()
   vnp_TxnRef?: string;
-
-  @IsOptional()
-  @IsString()
-  vnp_TransactionStatus?: string;
 }

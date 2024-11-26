@@ -38,6 +38,7 @@ import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
 import { ApproveShopDto } from '@libs/product/dto/shop/approveShop.dto';
 import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
 import { Role } from '@auth';
+import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/withUser/get-5-products-in-the-same-category.dto';
 
 @Injectable()
 export class ProductService {
@@ -560,6 +561,28 @@ export class ProductService {
 
   async findAllProductsOfShop(shopId: string) {
     return this.model.find({ seller: shopId }).exec();
+  }
+
+  async find5ProductInSameCategory(dto: Get5ProductsInTheSameCategoryDto) {
+    const { categoryId, productId } = dto;
+    const isElasticEnable = !!this.configService.get('ES_ENABLE');
+    if (isElasticEnable) {
+      return this.elasticsearchService.find5ProductsInSameCategory(
+        categoryId,
+        productId,
+      );
+    }
+
+    return [];
+  }
+
+  async getRandomProducts() {
+    const isElasticEnable = !!this.configService.get('ES_ENABLE');
+    if (isElasticEnable) {
+      return this.elasticsearchService.otherRandomProducts();
+    }
+
+    return [];
   }
 
   private getSlugName(name: string): string {

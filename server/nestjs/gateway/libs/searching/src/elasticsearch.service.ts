@@ -81,6 +81,60 @@ export class ElasticsearchService {
     })();
   }
 
+  async find5ProductsInSameCategory(categoryId: string, productId: string) {
+    const data = await this.client.search({
+      index: this.elasticIndex,
+      size: 5,
+      query: {
+        bool: {
+          must: {
+            match: {
+              'categories.id': categoryId,
+            },
+          },
+          must_not: {
+            match: {
+              id: productId,
+            },
+          },
+        },
+      },
+      _source_includes: [
+        'id',
+        'name',
+        'thumbnailUrl',
+        'discountRate',
+        'price',
+        'ratingAverage',
+        'quantitySold.value',
+      ],
+    });
+
+    return data.hits.hits.map((el) => el._source);
+  }
+
+  async otherRandomProducts() {
+    const data = await this.client.search({
+      query: {
+        function_score: {
+          random_score: {},
+        },
+      },
+      _source_includes: [
+        'id',
+        'name',
+        'thumbnailUrl',
+        'discountRate',
+        'price',
+        'ratingAverage',
+        'quantitySold.value',
+      ],
+      size: 10,
+    });
+
+    return data.hits.hits.map((el) => el._source);
+  }
+
   async searchProductNormal(productFilterDto: ProductFilterDto) {
     const { page } = productFilterDto;
     const query = this.createQueryBuilder(productFilterDto);
@@ -95,7 +149,6 @@ export class ElasticsearchService {
       _source_includes: [
         'id',
         'name',
-        'description',
         'thumbnailUrl',
         'discountRate',
         'price',
@@ -132,7 +185,6 @@ export class ElasticsearchService {
       _source_includes: [
         'id',
         'name',
-        'description',
         'thumbnailUrl',
         'discountRate',
         'price',

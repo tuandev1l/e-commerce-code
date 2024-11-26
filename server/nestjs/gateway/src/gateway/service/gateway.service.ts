@@ -34,6 +34,7 @@ import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
 import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 import { ApproveShopDto } from '@libs/product/dto/shop/approveShop.dto';
 import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
+import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/withUser/get-5-products-in-the-same-category.dto';
 
 @Injectable()
 export class GatewayService {
@@ -318,5 +319,16 @@ export class GatewayService {
       ORDER_PATTERN.GET_ALL_ORDERS_PREPARED_FOR_SHOP,
       shopId,
     );
+  }
+
+  async find5Products(dto: Get5ProductsInTheSameCategoryDto) {
+    return this.producer.sendMessage(
+      PRODUCT_PATTERN.FIND_5_PRODUCTS_IN_THE_SAME_CATEGORY,
+      dto,
+    );
+  }
+
+  async randomProducts() {
+    return this.producer.sendMessage(PRODUCT_PATTERN.OTHER_RANDOM_PRODUCT);
   }
 }

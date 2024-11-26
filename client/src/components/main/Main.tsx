@@ -234,7 +234,7 @@ export const Main = ({}: Props) => {
               <h2 className='text-xl font-semibold text-gray-900 sm:text-2xl m-3'>
                 Tất cả sản phẩm
               </h2>
-              <div className='px-4 mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-3'>
+              <div className='px-4 mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4'>
                 {products.map((product) => (
                   <ProductItem key={product._id} product={product} />
                 ))}

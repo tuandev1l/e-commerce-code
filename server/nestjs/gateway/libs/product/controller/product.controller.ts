@@ -7,6 +7,7 @@ import { CreateProductDto } from '@libs/product/dto/product/withUser/create-prod
 import { UpdateProductDto } from '@libs/product/dto/product/withUser/update-product.dto';
 import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
+import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/withUser/get-5-products-in-the-same-category.dto';
 
 @Controller()
 @UseFilters(new ExceptionFilter())
@@ -26,6 +27,18 @@ export class ProductController {
   @MessagePattern(PRODUCT_PATTERN.FIND_ALL_PRODUCT)
   async findAll(@Payload() productFilterDto: ProductFilterDto) {
     return this.productService.findAll(productFilterDto);
+  }
+
+  @MessagePattern(PRODUCT_PATTERN.FIND_5_PRODUCTS_IN_THE_SAME_CATEGORY)
+  async find5ProductsInTheSameCategory(
+    @Payload() dto: Get5ProductsInTheSameCategoryDto,
+  ) {
+    return this.productService.find5ProductInSameCategory(dto);
+  }
+
+  @MessagePattern(PRODUCT_PATTERN.OTHER_RANDOM_PRODUCT)
+  async getRandomProducts() {
+    return this.productService.getRandomProducts();
   }
 
   @MessagePattern(PRODUCT_PATTERN.FIND_ALL_PRODUCT_OF_SHOP)

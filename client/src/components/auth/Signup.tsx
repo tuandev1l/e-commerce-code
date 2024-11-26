@@ -176,9 +176,9 @@ export const Signup = ({}: Props) => {
                           setFormData({ ...formData, gender: e.target.value })
                         }
                       >
-                        <option value='Male'>Male</option>
-                        <option value='Female'>Female</option>
-                        <option value='Other'>Other</option>
+                        <option value='MALE'>Male</option>
+                        <option value='FEMALE'>Female</option>
+                        <option value='OTHER'>Other</option>
                       </select>
                     </div>
                   </div>

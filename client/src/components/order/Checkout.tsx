@@ -171,7 +171,7 @@ const Checkout = () => {
               </div> */}
 
                 <div className='pt-4'>
-                  <div className='flex justify-end'>
+                  {/* <div className='flex justify-end'>
                     <div className='flex w-7/12 justify-between items-center mb-4'>
                       <div>Voucher của shop</div>
                       <button
@@ -181,7 +181,7 @@ const Checkout = () => {
                         Chọn Voucher
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                   <div className='flex justify-end gap-4'>
                     <div className='flex w-7/12 gap-2'>
                       <p className='text-gray-600'>Phương thức vận chuyển:</p>

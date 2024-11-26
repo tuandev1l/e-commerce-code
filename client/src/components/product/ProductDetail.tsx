@@ -7,8 +7,10 @@ import { Link, useParams } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
 import {
   addToCartApi,
+  get5ProductsInSimilarCategoryApi,
   getDetailProductApi,
   getProductRatingApi,
+  getRandomProductsApi,
 } from '../../api/api';
 import { Layout } from '../../common/layout/Layout';
 import { priceSplit } from '../../common/price/priceSplit';
@@ -19,6 +21,8 @@ import { productSelector, usernameSelector } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { ProductRating } from './ProductRating';
 import { getDetailProduct } from './productSlice';
+import { IProduct } from '../../interfaces';
+import { ProductItem } from './ProductItem';
 
 type Props = {};
 
@@ -33,6 +37,10 @@ export const ProductDetail = ({}: Props) => {
   const [quantity, setQuantity] = useState<number>(1);
   const username = useSelector(usernameSelector);
   const [ratingProduct, setRatingProduct] = useState<IRatingProduct>();
+  const [similarProducts, setSimilarProducts] = useState<IProduct[]>([]);
+  const [otherRandomProducts, setOtherRandomProducts] = useState<IProduct[]>(
+    []
+  );
 
   const { data } = useQuery({
     queryKey: [`product/getAllProducts/${productId}`],
@@ -67,6 +75,36 @@ export const ProductDetail = ({}: Props) => {
       setOption(new Array(product.configurableOptions.length).fill(0));
     }
   }, [product]);
+
+  const { data: similarProductsData } = useQuery({
+    queryKey: [
+      `get5ProductsInSimilarCategory/productId=${productId}&categoryId=${product.categories?.id}`,
+    ],
+    queryFn: () =>
+      get5ProductsInSimilarCategoryApi(productId, product.categories?.id!),
+    enabled: !!productId && !!product.categories?.id,
+  });
+
+  const { data: randomProductsData } = useQuery({
+    queryKey: [`randomProducts`],
+    queryFn: getRandomProductsApi,
+    gcTime: 0,
+    staleTime: 0,
+  });
+
+  useEffect(() => {
+    if (randomProductsData) {
+      // @ts-ignore
+      setOtherRandomProducts(randomProductsData);
+    }
+  }, [randomProductsData]);
+
+  useEffect(() => {
+    if (similarProductsData) {
+      // @ts-ignore
+      setSimilarProducts(similarProductsData);
+    }
+  }, [similarProductsData]);
 
   const { mutate } = useMutation({
     mutationKey: [`addToCart/${username}`],
@@ -171,12 +209,9 @@ export const ProductDetail = ({}: Props) => {
                         <p className='font-medium leading-none text-gray-500 '>
                           {`(${product.reviewCount})`}
                         </p>
-                        <a
-                          href='#'
-                          className='font-medium leading-none text-gray-900'
-                        >
+                        <div className='font-medium leading-none text-gray-900'>
                           {`Đã bán: ${product.quantitySold.value}`}
-                        </a>
+                        </div>
                       </div>
                       <div className='mt-4 sm:items-center sm:gap-4 sm:flex'>
                         <p className='text-2xl font-extrabold text-gray-900 text-red-500 font-bold'>
@@ -222,7 +257,7 @@ export const ProductDetail = ({}: Props) => {
                     </div>
                   </div>
                   <div className='mt-4'>
-                    <div className='p-6 bg-white rounded-lg scroll'>
+                    {/* <div className='p-6 bg-white rounded-lg scroll'>
                       <div className=''>
                         <div className='font-bold text-lg'>
                           Thông tin vận chuyển
@@ -252,7 +287,7 @@ export const ProductDetail = ({}: Props) => {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                     <div className='mt-4 p-6 bg-white rounded-lg'>
                       <div className=''>
                         <div className='font-bold text-lg'>
@@ -319,6 +354,26 @@ export const ProductDetail = ({}: Props) => {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+              <div className='p-6 bg-white rounded-lg scroll mt-8'>
+                <div className='font-bold text-lg mb-2'>
+                  Sản phẩm cùng danh mục
+                </div>
+                <div className='grid grid-cols-5 gap-3'>
+                  {similarProducts.map((pd) => (
+                    <ProductItem product={pd} key={pd._id} />
+                  ))}
+                </div>
+              </div>
+              <div className='p-6 bg-white rounded-lg scroll mt-8'>
+                <div className='font-bold text-lg mb-2'>
+                  Sản phẩm có thể bạn quan tâm
+                </div>
+                <div className='grid grid-cols-5 gap-3'>
+                  {otherRandomProducts.map((pd) => (
+                    <ProductItem product={pd} key={pd._id} />
+                  ))}
                 </div>
               </div>
               {/* Rating */}

@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { getAllOrdersApi } from '../../api/api';
 import { ORDER_STATUS } from '../../enum';
 import { IOrder } from '../../interfaces';
-import { ordersSelector } from '../../store/selector';
+import { ordersSelector, usernameSelector } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { UserLayout } from '../user/UserLayout';
 import { getAllOrderDispatch } from './orderSlice';
@@ -32,6 +32,7 @@ export const Order = ({}: Props) => {
   const orders = useSelector(ordersSelector);
   const [selectedOrders, setSelectedOrders] = useState<IOrder[]>(orders);
   const [search, setSearch] = useState<string>('');
+  const username = useSelector(usernameSelector);
 
   useEffect(() => {
     if (orders.length) {
@@ -40,7 +41,7 @@ export const Order = ({}: Props) => {
   }, [orders]);
 
   const { data } = useQuery({
-    queryKey: [''],
+    queryKey: [`getAllOrders/${username}`],
     queryFn: getAllOrdersApi,
   });
 

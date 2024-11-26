@@ -7,9 +7,23 @@ import { Shipping } from '@libs/order/entity/shipping.entity';
 import { PaymentController } from '@libs/order/controller/payment.controller';
 import { ShippingController } from '@libs/order/controller/shipping.controller';
 import { OrderController } from '@libs/order/controller/order.controller';
+import { VnpayModule } from 'nestjs-vnpay';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Cart } from '@libs/cart/entity/cart.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, Payment, Shipping])],
+  imports: [
+    VnpayModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secureSecret: configService.getOrThrow<string>('vnp_HashSecret'),
+        tmnCode: configService.getOrThrow<string>('vnp_TmnCode'),
+        enableLog: false,
+      }),
+      inject: [ConfigService],
+    }),
+    TypeOrmModule.forFeature([Order, Payment, Shipping, Cart]),
+  ],
   controllers: [OrderController, PaymentController, ShippingController],
   providers: [OrderService],
 })

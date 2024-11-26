@@ -18,8 +18,16 @@ import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
 import { ConfigService } from '@nestjs/config';
 import * as moment from 'moment';
 import * as crypto from 'crypto';
-import * as querystring from 'qs';
 import { v4 as uuidv4 } from 'uuid';
+import { VnpayService } from 'nestjs-vnpay';
+import {
+  dateFormat,
+  generateRandomString,
+  getDateInGMT7,
+  ProductCode,
+  VnpLocale,
+} from 'vnpay';
+import { Cart } from '@libs/cart/entity/cart.entity';
 
 declare const Buffer;
 
@@ -39,7 +47,9 @@ export class OrderService {
     @InjectRepository(Order) private readonly repository: Repository<Order>,
     @InjectRepository(Shipping)
     private readonly shippingRepo: Repository<Shipping>,
+    @InjectRepository(Cart) private readonly cartRepository: Repository<Cart>,
     private readonly config: ConfigService,
+    private readonly VnpayService: VnpayService,
   ) {}
 
   async getAllOrders(user: User) {
@@ -76,44 +86,26 @@ export class OrderService {
 
   async createOrder(orderPayload: BulkCreateOrderDto) {
     const { user } = orderPayload;
-    if (user.role !== Role.SHOP) {
+    if (user.role !== Role.USER) {
       throw new RpcBadRequest('Can not create order with this role');
     }
 
-    const {
-      paymentMethod,
-      vnp_TransactionDate,
-      vnp_TxnRef,
-      orderInfo,
-      vnp_TransactionStatus,
-    } = orderPayload;
+    const { paymentMethod, vnp_TransactionNo, vnp_TxnRef, orderInfo } =
+      orderPayload;
 
     const uuid = orderInfo.split(':')[1];
     let status: ORDER_STATUS;
 
     const orders = await this.repository.findBy({ uuid });
-    if (!orders.length) {
-      throw new RpcBadRequest('Vnpay wrong credentials');
-    }
 
     switch (paymentMethod) {
       case PaymentMethodEnum.VNPAY:
-        // try {
-        //   const requestBody = this.VNPayBodyOrderStatus(
-        //     orderInfo,
-        //     vnp_TransactionDate,
-        //     vnp_TxnRef,
-        //   );
-        //   console.log(requestBody);
-        //   const { data } = await axios.post(
-        //     `https://sandbox.vnpayment.vn/merchant_webapi/api/transaction`,
-        //     requestBody,
-        //   );
-        //   console.log(data);
-        // } catch (e) {
-        //   console.log(JSON.stringify(e));
-        // }
-        if (vnp_TransactionStatus === '00') {
+        const transactionStatus = await this.vnPaycheckPaymentStatus(
+          vnp_TxnRef,
+          vnp_TransactionNo,
+          orderInfo,
+        );
+        if (`${transactionStatus}` === '00') {
           status = ORDER_STATUS.PREPARED;
         } else {
           status = ORDER_STATUS.UNSUCCESSFUL;
@@ -126,14 +118,46 @@ export class OrderService {
         break;
     }
 
+    const cart = await this.cartRepository.findOneBy({ userId: user.id });
+    let productItems = cart.productItems;
+    // console.log(`Initial: ${productItems}`);
     const newOrders = orders.map((order) => {
+      productItems = productItems.filter(
+        (item) => item.uuid !== order.item.uuid,
+      );
+      // console.log(`uuid: ${order.uuid}`);
+      // console.log(`filter: ${productItems}`);
       order.status = status;
       // @ts-ignore
       order.shopId = order.item.seller._id;
       return order;
     });
 
+    cart.productItems = productItems;
+    // console.log(`After: ${cart.productItems}`);
+
+    await this.cartRepository.save(cart);
     return this.repository.save(newOrders);
+  }
+
+  async vnPaycheckPaymentStatus(
+    vnp_TxnRef: string,
+    vnp_TransactionNo: number,
+    vnp_OrderInfo: string,
+  ) {
+    const date = dateFormat(getDateInGMT7(new Date()));
+
+    const data = await this.VnpayService.queryDr({
+      vnp_IpAddr: OrderService.vnp_IpAddr,
+      vnp_TxnRef,
+      vnp_TransactionNo,
+      vnp_OrderInfo,
+      vnp_TransactionDate: date,
+      vnp_CreateDate: date,
+      vnp_RequestId: generateRandomString(16),
+    });
+
+    return data.vnp_ResponseCode;
   }
 
   async createPayment(payments: { name: string; imgUrl: string }[]) {
@@ -276,37 +300,47 @@ export class OrderService {
 
   private async vnpayHandler(amount: number, uuid: string) {
     const date = new Date();
-    const createDate = moment(date).format('YYYYMMDDHHmmss');
 
-    const secretKey = this.config.get('vnp_HashSecret');
-    let vnpUrl = this.config.get('vnp_Url');
-    const returnUrl = 'http://localhost:5173/vnpay-payment';
     const orderId = moment(date).format('DDHHmmss');
-
-    const vnp_Params = {};
-    vnp_Params['vnp_Version'] = OrderService.vnp_Version;
-    vnp_Params['vnp_Command'] = OrderService.vnp_Command;
-    vnp_Params['vnp_TmnCode'] = this.config.get('vnp_TmnCode');
-    vnp_Params['vnp_Locale'] = OrderService.vnp_Locale;
-    vnp_Params['vnp_CurrCode'] = OrderService.vnp_CurrCode;
-    vnp_Params['vnp_TxnRef'] = orderId;
-    vnp_Params['vnp_OrderInfo'] = 'Thanh toan cho ma GD:' + uuid;
-    vnp_Params['vnp_OrderType'] = OrderService.vnp_OrderType;
-    vnp_Params['vnp_Amount'] = amount * 100;
-    vnp_Params['vnp_ReturnUrl'] = returnUrl;
-    vnp_Params['vnp_IpAddr'] = OrderService.vnp_IpAddr;
-    vnp_Params['vnp_CreateDate'] = createDate;
-    vnp_Params['vnp_BankCode'] = OrderService.vnp_BankCode;
-
-    const vnp_ParamsSorted = this.sortObject(vnp_Params);
-    const signData = querystring.stringify(vnp_ParamsSorted, { encode: false });
-    const hmac = crypto.createHmac('sha512', secretKey);
-    vnp_Params['vnp_SecureHash'] = hmac
-      .update(Buffer.from(signData, 'utf-8'))
-      .digest('hex');
-    vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
-
-    return vnpUrl;
+    return this.VnpayService.buildPaymentUrl({
+      vnp_Amount: amount,
+      vnp_IpAddr: OrderService.vnp_IpAddr,
+      vnp_TxnRef: orderId,
+      vnp_OrderInfo: `Thanh toan cho ma GD:${uuid}`,
+      vnp_OrderType: ProductCode.Other,
+      vnp_ReturnUrl: this.config.get('vnp_ReturnUrl'),
+      vnp_Locale: VnpLocale.VN,
+      vnp_BankCode: OrderService.vnp_BankCode,
+    });
+    //
+    // const secretKey = this.config.get('vnp_HashSecret');
+    // let vnpUrl = this.config.get('vnp_Url');
+    // const returnUrl = 'http://localhost:5173/vnpay-payment';
+    //
+    // const vnp_Params = {};
+    // vnp_Params['vnp_Version'] = OrderService.vnp_Version;
+    // vnp_Params['vnp_Command'] = OrderService.vnp_Command;
+    // vnp_Params['vnp_TmnCode'] = this.config.get('vnp_TmnCode');
+    // vnp_Params['vnp_Locale'] = OrderService.vnp_Locale;
+    // vnp_Params['vnp_CurrCode'] = OrderService.vnp_CurrCode;
+    // vnp_Params['vnp_TxnRef'] = orderId;
+    // vnp_Params['vnp_OrderInfo'] = 'Thanh toan cho ma GD:' + uuid;
+    // vnp_Params['vnp_OrderType'] = OrderService.vnp_OrderType;
+    // vnp_Params['vnp_Amount'] = amount * 100;
+    // vnp_Params['vnp_ReturnUrl'] = returnUrl;
+    // vnp_Params['vnp_IpAddr'] = OrderService.vnp_IpAddr;
+    // vnp_Params['vnp_CreateDate'] = createDate;
+    // vnp_Params['vnp_BankCode'] = OrderService.vnp_BankCode;
+    //
+    // const vnp_ParamsSorted = this.sortObject(vnp_Params);
+    // const signData = querystring.stringify(vnp_ParamsSorted, { encode: false });
+    // const hmac = crypto.createHmac('sha512', secretKey);
+    // vnp_Params['vnp_SecureHash'] = hmac
+    //   .update(Buffer.from(signData, 'utf-8'))
+    //   .digest('hex');
+    // vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
+    //
+    // return vnpUrl;
   }
 
   private sortObject(obj: object) {

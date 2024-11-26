@@ -24,8 +24,8 @@ export const VNPayPayment = ({}: Props) => {
   const username = useSelector(usernameSelector);
   const query = new URLSearchParams(search);
   const orderInfo = query.get('vnp_OrderInfo');
-  const vnp_PayDate = query.get('vnp_PayDate');
   const vnp_TxnRef = query.get('vnp_TxnRef');
+  const vnp_TransactionNo = query.get('vnp_TransactionNo');
   const vnp_TransactionStatus = query.get('vnp_TransactionStatus');
 
   const { mutate } = useMutation({
@@ -48,25 +48,12 @@ export const VNPayPayment = ({}: Props) => {
   });
 
   useEffect(() => {
-    console.log(search);
-    console.log(orderInfo);
-    console.log(vnp_PayDate);
-    console.log(vnp_TxnRef);
-
-    if (
-      search &&
-      orderInfo &&
-      vnp_PayDate &&
-      vnp_TxnRef &&
-      vnp_TransactionStatus
-    ) {
+    if (orderInfo && vnp_TxnRef) {
       mutate({
         paymentMethod: PaymentMethodEnum.VNPAY,
-        vnpayParams: search,
         orderInfo,
-        vnp_TransactionDate: vnp_PayDate,
+        vnp_TransactionNo: +vnp_TransactionNo!,
         vnp_TxnRef,
-        vnp_TransactionStatus,
       });
     }
   }, [selectedAddress, products]);
