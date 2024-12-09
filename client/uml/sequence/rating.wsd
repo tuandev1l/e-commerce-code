@@ -1,0 +1,19 @@
+@startuml ProductRating
+
+hide footbox
+autonumber
+participant Customer as customer
+boundary "Giao diện đánh giá sản phẩm" as ratingUI
+control "RatingController" as ratingController
+entity "Rating" as ratingEntity
+
+customer -> ratingUI: Chọn sản phẩm để đánh giá
+ratingUI -> customer: Hiển thị form đánh giá sản phẩm
+customer -> ratingUI: Nhập nội dung đánh giá, số sao, và upload hình ảnh (nếu có)
+ratingUI -> ratingController: Gửi yêu cầu đánh giá sản phẩm (bao gồm nội dung, số sao, hình ảnh)
+ratingController -> ratingEntity: Lưu đánh giá vào cơ sở dữ liệu
+ratingEntity --> ratingController: Trả về kết quả lưu đánh giá
+ratingController --> ratingUI: Thông báo thành công hoặc lỗi
+ratingUI --> customer: Hiển thị thông báo thành công hoặc lỗi
+
+@enduml

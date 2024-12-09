@@ -29,6 +29,11 @@ export class ProductController {
     return this.productService.findAll(productFilterDto);
   }
 
+  @MessagePattern(PRODUCT_PATTERN.BACK_TO_SELL)
+  async backToSell(@Payload() deleteProductDto: DeleteProductDto) {
+    return this.productService.backToSell(deleteProductDto);
+  }
+
   @MessagePattern(PRODUCT_PATTERN.FIND_5_PRODUCTS_IN_THE_SAME_CATEGORY)
   async find5ProductsInTheSameCategory(
     @Payload() dto: Get5ProductsInTheSameCategoryDto,

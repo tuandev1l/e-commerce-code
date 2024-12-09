@@ -12,7 +12,7 @@ export const ProductItem = ({ product }: Props) => {
 
   return (
     <div
-      className={`rounded-lg border border-gray-200 bg-white shadow-sm p-6`}
+      className={`rounded-lg border border-gray-200 bg-white shadow-sm p-6 hover:cursor-pointer`}
       onClick={() =>
         (document.location.href = `/product/${product._id ?? product.id}`)
       }

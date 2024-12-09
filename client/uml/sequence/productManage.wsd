@@ -1,0 +1,21 @@
+@startuml ManageProduct
+
+hide footbox
+autonumber
+participant Shop as shop
+control "ShopController" as shopController
+entity "Shop" as shopEntity
+
+shop -> shopController: Chọn thêm hoặc cập nhật sản phẩm
+shopController -> shop: Hiển thị form nhập thông tin sản phẩm
+shop -> shopController: Nhập thông tin sản phẩm (tên, mô tả, giá, hình ảnh...)
+shopController -> shopController: Validate dữ liệu đầu vào
+alt Dữ liệu hợp lệ
+    shopController -> shopEntity: Thêm hoặc cập nhật sản phẩm vào cơ sở dữ liệu
+    shopEntity --> shopController: Trả về kết quả thêm/cập nhật thành công
+    shopController --> shop: Thông báo thành công
+else Dữ liệu không hợp lệ
+    shopController --> shop: Thông báo lỗi (có thể do thiếu thông tin, giá trị không hợp lệ...)
+end
+
+@enduml

@@ -1,0 +1,23 @@
+@startuml ApproveShopRequest
+
+hide footbox
+autonumber
+participant Admin as admin
+control "AdminController" as adminController
+control "ShopController" as shopController
+entity "Shop" as shopEntity
+
+admin -> adminController: Chọn duyệt các đơn yêu cầu mở cửa hàng
+adminController -> shopController: Gửi yêu cầu lấy danh sách đơn yêu cầu mở cửa hàng
+shopController -> shopEntity: Lấy danh sách các đơn yêu cầu mở cửa hàng
+shopEntity --> shopController: Trả về danh sách đơn yêu cầu mở cửa hàng
+shopController --> adminController: Trả về danh sách đơn yêu cầu mở cửa hàng
+adminController --> admin: Hiển thị danh sách đơn yêu cầu mở cửa hàng
+
+admin -> adminController: Chọn duyệt đơn đăng ký cửa hàng
+adminController -> shopController: Duyệt đơn đăng ký cửa hàng (approve)
+shopController -> shopEntity: Cập nhật trạng thái của cửa hàng
+shopEntity --> adminController: Cập nhật trạng thái đơn đăng ký thành công
+adminController --> admin: Thông báo đơn đăng ký đã được duyệt thành công
+
+@enduml

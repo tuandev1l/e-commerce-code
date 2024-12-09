@@ -60,7 +60,16 @@ export const Admin = ({}: Props) => {
               className='flex gap-4 mb-4 items-center bg-white p-4 rounded-md'
             >
               <div>
-                <img src={shop.logo} className='w-24' />
+                <img
+                  src={
+                    shop.logo
+                      ? shop.logo.startsWith('http')
+                        ? shop.logo
+                        : `https://salt.tikicdn.com/cache/w220/ts/seller/${shop.logo}`
+                      : 'https://vcdn.tikicdn.com/cache/w100/ts/seller/8d/05/90/e3a5a6a97a3f5cce051cbf7d6c9e325f.png.webp'
+                  }
+                  className='w-24'
+                />
               </div>
               <div className='flex flex-col gap-2'>
                 <div>{shop.name}</div>

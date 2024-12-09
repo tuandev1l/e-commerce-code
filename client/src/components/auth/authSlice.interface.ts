@@ -1,3 +1,4 @@
+import { Gender } from '../../enum/userGender.enum';
 import { IUserAddress } from '../../interfaces/userAddress.interface';
 import { Role } from './../../enum/role.user.enum';
 
@@ -11,7 +12,7 @@ export interface IAuthSlice {
     name?: string;
     birthday?: string;
     accountType?: string;
-    gender?: string;
+    gender?: Gender;
     isVerifyEmail?: string;
     isVerifyPhone?: string;
     email?: string;

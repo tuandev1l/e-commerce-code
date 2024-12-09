@@ -2,7 +2,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "outDir": "../../dist/libs/order"
+    "outDir": "../../dist/libs/order",
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "src/**/*"

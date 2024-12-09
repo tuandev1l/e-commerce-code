@@ -23,6 +23,7 @@ import { ProductRating } from './ProductRating';
 import { getDetailProduct } from './productSlice';
 import { IProduct } from '../../interfaces';
 import { ProductItem } from './ProductItem';
+import { TryOn } from './TryOn';
 
 type Props = {};
 
@@ -55,6 +56,7 @@ export const ProductDetail = ({}: Props) => {
     enabled: !!productId,
     gcTime: 60 * 1000 * 3,
     staleTime: 60 * 1000 * 3,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -83,6 +85,7 @@ export const ProductDetail = ({}: Props) => {
     queryFn: () =>
       get5ProductsInSimilarCategoryApi(productId, product.categories?.id!),
     enabled: !!productId && !!product.categories?.id,
+    refetchOnWindowFocus: false,
   });
 
   const { data: randomProductsData } = useQuery({
@@ -90,6 +93,7 @@ export const ProductDetail = ({}: Props) => {
     queryFn: getRandomProductsApi,
     gcTime: 0,
     staleTime: 0,
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
@@ -210,7 +214,7 @@ export const ProductDetail = ({}: Props) => {
                           {`(${product.reviewCount})`}
                         </p>
                         <div className='font-medium leading-none text-gray-900'>
-                          {`Đã bán: ${product.quantitySold.value}`}
+                          {`Đã bán: ${product.quantitySold?.value ?? 0}`}
                         </div>
                       </div>
                       <div className='mt-4 sm:items-center sm:gap-4 sm:flex'>
@@ -243,7 +247,7 @@ export const ProductDetail = ({}: Props) => {
                                     }}
                                     className={`px-4 py-1 rounded-lg solid border-gray-200 border-2 hover:cursor-pointer ${
                                       option[configIdx] === valueIdx &&
-                                      'border-blue-700'
+                                      'border-blue-600'
                                     }`}
                                   >
                                     {value.label}
@@ -376,6 +380,9 @@ export const ProductDetail = ({}: Props) => {
                   ))}
                 </div>
               </div>
+
+              <TryOn image={product.images[0].baseUrl} />
+
               {/* Rating */}
               <div className='col-span-4 bg-white p-6 rounded-lg mt-8'>
                 <div className='font-bold text-lg'>Khách hàng đánh giá</div>
@@ -502,7 +509,7 @@ export const ProductDetail = ({}: Props) => {
                   <div className='mt-4'>
                     <button
                       type='button'
-                      className='focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900 w-full'
+                      className='focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-600 dark:focus:ring-red-900 w-full'
                     >
                       Mua ngay
                     </button>

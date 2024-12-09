@@ -4,14 +4,15 @@ import { priceSplit } from '../../common/price/priceSplit';
 import useToast from '../../hook/useToast';
 import { IProduct } from '../../interfaces';
 import { useMutation } from '@tanstack/react-query';
-import { deleteProductApi } from '../../api/api';
+import { backToSellApi, deleteProductApi } from '../../api/api';
 import { IAxiosError } from '../../config/axiosError.interface';
 
 type Props = {
   product: IProduct;
+  deleteProduct: Function;
 };
 
-export const ProductItemShop = ({ product }: Props) => {
+export const ProductItemShop = ({ product, deleteProduct }: Props) => {
   const shopId = useParams()['shopId'];
   const toast = useToast();
 
@@ -19,7 +20,8 @@ export const ProductItemShop = ({ product }: Props) => {
     mutationKey: [`deleteProduct/${product._id}`],
     mutationFn: deleteProductApi,
     onSuccess: () => {
-      toast({ type: 'success', message: 'delete product successfully' });
+      toast({ type: 'success', message: 'Stop selling product successfully' });
+      deleteProduct(product._id, 'DELETE');
     },
     onError: (error: IAxiosError) => {
       toast({ type: 'error', message: error.message });
@@ -29,6 +31,24 @@ export const ProductItemShop = ({ product }: Props) => {
   const deleteProductHandler = () => {
     if (product._id && confirm('Are you sure about that?')) {
       mutate(product._id);
+    }
+  };
+
+  const { mutate: backToSellMutate } = useMutation({
+    mutationKey: [`backToSell/${product._id}`],
+    mutationFn: backToSellApi,
+    onSuccess: () => {
+      toast({ type: 'success', message: 'Back to sell successfully' });
+      deleteProduct(product._id, 'BACK');
+    },
+    onError: (error: IAxiosError) => {
+      toast({ type: 'error', message: error.message });
+    },
+  });
+
+  const backToSellHandler = () => {
+    if (confirm('Are you sure about that?')) {
+      backToSellMutate(product._id);
     }
   };
 
@@ -70,29 +90,41 @@ export const ProductItemShop = ({ product }: Props) => {
           </div>
         </div>
       </Link>
-      <div className='flex gap-2'>
+      {!product.stopSelling ? (
+        <div className='flex gap-2'>
+          <div className='w-full'>
+            <button
+              type='button'
+              className='flex items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 font-medium gap-2 bg-blue-600 mt-2 hover:bg-blue-700 text-white w-full'
+              onClick={() =>
+                toast({
+                  type: 'success',
+                  message: 'Sử dụng Postman để demo thay thế chức năng này',
+                })
+              }
+            >
+              Update
+            </button>
+          </div>
+          <button
+            type='button'
+            className='flex items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 font-medium gap-2 bg-red-600 mt-2 hover:bg-red-700 text-white w-full'
+            onClick={deleteProductHandler}
+          >
+            Stop selling
+          </button>
+        </div>
+      ) : (
         <div className='w-full'>
           <button
             type='button'
             className='flex items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 font-medium gap-2 bg-blue-600 mt-2 hover:bg-gray-300 text-white w-full'
-            onClick={() =>
-              toast({
-                type: 'success',
-                message: 'Sử dụng Postman để demo thay thế chức năng này',
-              })
-            }
+            onClick={backToSellHandler}
           >
-            Update
+            Back to sell
           </button>
         </div>
-        <button
-          type='button'
-          className='flex items-center justify-center rounded-lg bg-primary-700 px-5 py-2.5 font-medium gap-2 bg-red-600 mt-2 hover:bg-gray-300 text-white w-full'
-          onClick={deleteProductHandler}
-        >
-          Delete
-        </button>
-      </div>
+      )}
     </div>
   );
 };

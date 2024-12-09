@@ -16,6 +16,8 @@ export const ShopAdminProduct = ({}: Props) => {
     queryKey: [`productsOfShop/${shopId}`],
     queryFn: () => getAllProductsOfShopApi(shopId!),
     enabled: !!shopId,
+    gcTime: 0,
+    staleTime: 0,
   });
 
   useEffect(() => {
@@ -25,13 +27,25 @@ export const ShopAdminProduct = ({}: Props) => {
     }
   }, [data]);
 
+  const deleteProduct = (productId: string, type: 'DELETE' | 'BACK') => {
+    const newProduct = products.find((product) => product._id === productId);
+    if (newProduct) {
+      newProduct.stopSelling = type === 'DELETE' ? true : false;
+      setProducts([...products]);
+    }
+  };
+
   return (
     <ShopAdminLayout>
       <div>
         {products.length > 0 ? (
           <div className='px-4 mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-3'>
             {products.map((product) => (
-              <ProductItemShop key={product._id} product={product} />
+              <ProductItemShop
+                key={product._id}
+                product={product}
+                deleteProduct={deleteProduct}
+              />
             ))}
           </div>
         ) : (

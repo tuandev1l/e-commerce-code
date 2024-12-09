@@ -11,7 +11,7 @@ import { JwtStrategy } from '@auth/jwt.strategy';
 import { BullModule } from '@nestjs/bullmq';
 import { Repository } from 'typeorm';
 import { Role } from '@auth/role.enum';
-import { ACCOUNT_TYPE } from '@share/enums';
+import { ACCOUNT_TYPE, GENDER } from '@share/enums';
 
 @Module({
   imports: [
@@ -45,8 +45,16 @@ export class AuthModule implements OnModuleInit {
       return;
     }
     const accounts = [
-      { email: 'admin@gmail.com', role: Role.ADMIN, name: 'ADMIN' },
-      { email: 'tuantm@gmail.com', role: Role.USER, name: 'tuantm' },
+      {
+        email: 'admin@gmail.com',
+        role: Role.ADMIN,
+        name: 'ADMIN',
+      },
+      {
+        email: 'tuantm@gmail.com',
+        role: Role.USER,
+        name: 'tuantm',
+      },
     ];
 
     await Promise.all(
@@ -60,6 +68,8 @@ export class AuthModule implements OnModuleInit {
           password: await this.authService.hashPassword('123456789'),
           avatarUrl: `https://avatar.iran.liara.run/public/boy?username=${acc.email}`,
           role: acc.role,
+          gender: GENDER.MALE,
+          birthday: '2000-01-01',
         }),
       ),
     );

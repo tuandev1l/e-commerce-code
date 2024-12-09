@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
 import {
+  cancelOrderApi,
   createRatingApi,
   deleteRatingApi,
   updateOrderStatusApi,
@@ -18,7 +19,7 @@ import useToast from '../../hook/useToast';
 import { IOrder, IOrderStatus } from '../../interfaces';
 import { IRatingImage } from '../../interfaces/ratingImage.interface';
 import { useAppDispatch } from '../../store/store';
-import { removeOrderRating } from './orderSlice';
+import { cancelOrder, removeOrderRating } from './orderSlice';
 import { useSelector } from 'react-redux';
 import { roleSelector } from '../../store/selector';
 import { Role } from '../../enum/role.user.enum';
@@ -208,6 +209,24 @@ export const SelectedOrder = ({ order }: Props) => {
     order.status = ORDER_STATUS.SHIPPING;
   };
 
+  const cancelOrderhandler = () => {
+    if (confirm('Are you sure about that?')) {
+      cancelMutate(order.id);
+      dispatch(cancelOrder(order.id));
+    }
+  };
+
+  const { mutate: cancelMutate } = useMutation({
+    mutationKey: [`cancelOrder/${order.id}`],
+    mutationFn: cancelOrderApi,
+    onSuccess: () => {
+      toast({ type: 'success', message: 'Cancel order successfully' });
+    },
+    onError: (error: IAxiosError) => {
+      toast({ type: 'error', message: error.message });
+    },
+  });
+
   return (
     <div
       key={order.item?.seller?._id}
@@ -271,12 +290,12 @@ export const SelectedOrder = ({ order }: Props) => {
         </div>
 
         {/* Delete Column */}
-        <div className='w-8 text-center flex justify-center items-center'>
+        {/* <div className='w-8 text-center flex justify-center items-center'>
           <TrashIcon
             width={24}
             className='text-gray-500 hover:text-red-500 cursor-pointer'
           />
-        </div>
+        </div> */}
       </div>
 
       <div>
@@ -309,7 +328,8 @@ export const SelectedOrder = ({ order }: Props) => {
               </button>
             </div>
           ) : (
-            !isStatisticPage && (
+            !isStatisticPage &&
+            userRole === Role.USER && (
               <div className='flex gap-3'>
                 {order.status === ORDER_STATUS.COMPLETE &&
                   !order.ratingId &&
@@ -326,6 +346,14 @@ export const SelectedOrder = ({ order }: Props) => {
                     Mua Lại
                   </button>
                 </Link>
+                {order.status === ORDER_STATUS.PREPARED && (
+                  <button
+                    className='bg-red-500 text-white px-4 py-2 rounded'
+                    onClick={cancelOrderhandler}
+                  >
+                    Hủy đơn hàng
+                  </button>
+                )}
                 <button className='border border-gray-300 text-gray-700 px-4 py-2 rounded'>
                   Liên Hệ Người Bán
                 </button>
@@ -341,7 +369,7 @@ export const SelectedOrder = ({ order }: Props) => {
             <Rating
               size={28}
               transition
-              initialValue={5}
+              initialValue={rateNumber}
               readonly={!edit}
               SVGclassName={'inline-block'}
               onClick={ratingStarHandler}

@@ -1,0 +1,17 @@
+@startuml SearchProductKNN
+
+hide footbox
+autonumber
+participant User as user
+boundary "Giao diện website" as web
+control "SearchingController" as controller
+entity "Product" as productEntity
+
+user -> web: Chọn checkbox và nhập từ khóa vào ô tìm kiếm hoặc upload ảnh
+web -> controller: Gửi yêu cầu tìm kiếm (bằng KNN hoặc qua hình ảnh)
+controller -> productEntity: Truy vấn sản phẩm bằng KNN
+productEntity --> controller: Trả về danh sách sản phẩm tương tự
+controller --> web: Trả về kết quả tìm kiếm
+web --> user: Hiển thị kết quả sản phẩm
+
+@enduml

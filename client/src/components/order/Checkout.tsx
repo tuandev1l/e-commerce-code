@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { createCheckoutApi, getAllPaymentsApi } from '../../api/api';
 import { Layout } from '../../common/layout/Layout';
@@ -30,6 +30,7 @@ const Checkout = () => {
     0
   );
   const priceForShipping = 10000 * products.length;
+  const [selectPayment, setSelectPayment] = useState<PaymentMethodEnum>();
 
   const { data: paymentData } = useQuery({
     queryKey: ['payments'],
@@ -49,10 +50,10 @@ const Checkout = () => {
   });
 
   const purchaseHandler = () => {
-    if (address?.phoneNumber) {
+    if (address?.phoneNumber && selectPayment) {
       const checkoutProduct: ICreateCheckout = {
         orders: [],
-        paymentMethod: PaymentMethodEnum.VNPAY,
+        paymentMethod: selectPayment,
         amount: priceForProduct + priceForShipping,
       };
       for (const product of products) {
@@ -70,6 +71,9 @@ const Checkout = () => {
       }
       console.log(checkoutProduct);
       mutate(checkoutProduct);
+    } else {
+      toast({ type: 'error', message: 'Missing fields' });
+      return;
     }
   };
 
@@ -87,6 +91,10 @@ const Checkout = () => {
   }, [addresses]);
 
   const changeAddressHandler = () => {};
+
+  const paymentSelectHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectPayment(e.target.value as PaymentMethodEnum);
+  };
 
   return (
     <Layout>
@@ -224,9 +232,10 @@ const Checkout = () => {
                     <input
                       id={payment.method}
                       type='radio'
-                      value=''
+                      value={payment.value}
                       name='payment-method'
                       className='w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 outline:none'
+                      onChange={(e) => paymentSelectHandler(e)}
                     />
                     <label
                       htmlFor={payment.method}

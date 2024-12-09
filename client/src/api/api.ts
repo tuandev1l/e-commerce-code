@@ -1,5 +1,6 @@
 import { IResetPasswordState } from '../components/auth';
 import { IShopDto } from '../components/shop-admin/ShopAdminRegister';
+import { IUserInfo } from '../components/user';
 import { IChangePassword } from '../components/user/ChangePassword';
 import { instance } from '../config/axiosConfig';
 import { ICartDto } from '../dto/cart.dto';
@@ -28,6 +29,8 @@ export const resetPasswordApi = (
 ) => instance.post(`auth/reset-password/${resetToken}`, resetPassword);
 export const changePasswordApi = (data: IChangePassword) =>
   instance.post('auth/change-password', data);
+export const updateUserInfoApi = (userInfo: IUserInfo) =>
+  instance.patch('auth/user-info', userInfo);
 
 export const getAllCategoriesApi = () => instance.get('category');
 export const getAllBrandsApi = () => instance.get('brand');
@@ -44,6 +47,8 @@ export const getAllProductsApi = (dto: IProductFilter) => {
 
 export const getDetailProductApi = (productId: string) =>
   instance.get(`product/${productId}`);
+export const backToSellApi = (productId: string) =>
+  instance.patch(`product/back-to-sell/${productId}`);
 
 export const addToCartApi = (cartDto: ICartDto) =>
   instance.post('cart/add-to-cart', cartDto);
@@ -92,6 +97,8 @@ export const getAllOrdersPreparedForShopApi = (shopId: string) =>
   instance.get(`order/order-prepared-for-shop/${shopId}`);
 export const getAllOrdersForShopApi = (shopId: string) =>
   instance.get(`order/order-for-shop/${shopId}`);
+export const cancelOrderApi = (orderId: number) =>
+  instance.patch('order/cancel', { orderId });
 
 export const getAllOrdersApi = () => instance.get('order');
 export const getProductRatingApi = (productId: string) =>

@@ -57,7 +57,8 @@ export const Order = ({}: Props) => {
     const lowerSearch = search.toLowerCase();
     const filterOrders = orders.filter((order) =>
       idx === 0
-        ? true
+        ? order.item.seller?.name.toLowerCase().includes(lowerSearch) ||
+          order.item.name.toLocaleLowerCase().includes(lowerSearch)
         : status.includes(order.status) &&
           (order.item.seller?.name.toLowerCase().includes(lowerSearch) ||
             order.item.name.toLocaleLowerCase().includes(lowerSearch))

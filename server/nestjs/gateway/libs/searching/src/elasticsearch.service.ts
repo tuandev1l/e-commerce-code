@@ -8,10 +8,9 @@ import { SearchType } from '@libs/searching/searchType.enum';
 import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 import { QueryDslQueryContainer } from '@elastic/elasticsearch/lib/api/types';
 
-import { readFile } from 'fs/promises';
-
 @Injectable()
 export class ElasticsearchService {
+  private static isImported = false;
   private static LIMIT = 0;
   private readonly client: Client;
   private readonly embeddedHost: string;
@@ -37,48 +36,51 @@ export class ElasticsearchService {
       },
     });
 
-    (async () => {
-      try {
-        await this.client.indices.get({
-          index: this.elasticIndex,
-        });
-      } catch (_: any) {
-        console.log('Mapping ecommerce does not exist');
-        await this.getClient().indices.create({
-          index: this.elasticIndex,
-          mappings: {
-            properties: {
-              descriptionVector: {
-                type: 'dense_vector',
-                dims: 768,
-              },
-              imgVector: {
-                type: 'dense_vector',
-                dims: 768,
-              },
-            },
-          },
-        });
-      }
-
-      const records = (
-        await this.client.search({
-          index: this.elasticIndex,
-        })
-      ).hits.hits;
-
-      if (records.length == 0) {
-        const data = (await readFile('./vector.json')).toString();
-        // console.log(data);
-        const jsonData = JSON.parse(data);
-        for (const record of jsonData) {
-          void this.client.index({
-            index: this.elasticIndex,
-            body: record,
-          });
-        }
-      }
-    })();
+    // if (!ElasticsearchService.isImported) {
+    //   ElasticsearchService.isImported = true;
+    //   (async () => {
+    //     try {
+    //       await this.client.indices.get({
+    //         index: this.elasticIndex,
+    //       });
+    //     } catch (_: any) {
+    //       console.log('Mapping ecommerce does not exist');
+    //       await this.getClient().indices.create({
+    //         index: this.elasticIndex,
+    //         mappings: {
+    //           properties: {
+    //             descriptionVector: {
+    //               type: 'dense_vector',
+    //               dims: 768,
+    //             },
+    //             imgVector: {
+    //               type: 'dense_vector',
+    //               dims: 768,
+    //             },
+    //           },
+    //         },
+    //       });
+    //     }
+    //
+    //     const records = (
+    //       await this.client.search({
+    //         index: this.elasticIndex,
+    //       })
+    //     ).hits.hits;
+    //
+    //     if (records.length === 0) {
+    //       const data = (await readFile('./vector.json')).toString();
+    //       // console.log(data);
+    //       const jsonData = JSON.parse(data);
+    //       for (const record of jsonData) {
+    //         void this.client.index({
+    //           index: this.elasticIndex,
+    //           body: record,
+    //         });
+    //       }
+    //     }
+    //   })();
+    // }
   }
 
   async find5ProductsInSameCategory(categoryId: string, productId: string) {
@@ -146,6 +148,11 @@ export class ElasticsearchService {
       from: (filterPage - 1) * ElasticsearchService.LIMIT,
       size: ElasticsearchService.LIMIT,
       query,
+      // sort: {
+      //   createdAt: {
+      //     order: 'desc',
+      //   },
+      // },
       _source_includes: [
         'id',
         'name',
@@ -180,6 +187,11 @@ export class ElasticsearchService {
         field: SearchType.TEXT ? 'descriptionVector' : 'imgVector',
       },
       query,
+      // sort: {
+      //   createdAt: {
+      //     order: 'desc',
+      //   },
+      // },
       from: (filterPage - 1) * ElasticsearchService.LIMIT,
       size: ElasticsearchService.LIMIT,
       _source_includes: [
@@ -215,7 +227,7 @@ export class ElasticsearchService {
   }
 
   async createProduct<E>(product: E) {
-    void this.client.index({
+    return this.client.index({
       index: this.elasticIndex,
       document: product,
     });
@@ -223,17 +235,41 @@ export class ElasticsearchService {
 
   async updateProduct<E>(productId: string, product: E) {
     await this.deleteProduct(productId);
-    void this.createProduct(product);
+    await this.createProduct(product);
   }
 
-  async deleteProduct(id: string) {
-    void this.client.deleteByQuery({
+  async stopSellingProduct(id: string) {
+    await this.client.updateByQuery({
       index: this.elasticIndex,
       query: {
         match: {
           id,
         },
       },
+      script: 'ctx._source.stopSelling=true',
+    });
+  }
+
+  async deleteProduct(id: string) {
+    return this.client.deleteByQuery({
+      index: this.elasticIndex,
+      query: {
+        match: {
+          id,
+        },
+      },
+    });
+  }
+
+  async backToSell(id: string) {
+    await this.client.updateByQuery({
+      index: this.elasticIndex,
+      query: {
+        match: {
+          id,
+        },
+      },
+      script: 'ctx._source.stopSelling=false',
     });
   }
 
@@ -306,7 +342,7 @@ export class ElasticsearchService {
       });
     }
 
-    if (fromNumber && toNumber) {
+    if (fromNumber || toNumber) {
       mustQuery.push({
         range: {
           price: {
@@ -320,6 +356,11 @@ export class ElasticsearchService {
     const query: QueryDslQueryContainer = {
       bool: {
         must: mustQuery,
+        must_not: {
+          match: {
+            stopSelling: true,
+          },
+        },
       },
     };
 

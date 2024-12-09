@@ -72,6 +72,9 @@ export class Product {
   @Prop()
   description: string;
 
+  @Prop({ default: false })
+  stopSelling: boolean;
+
   @Prop()
   images: IProductImage[];
 

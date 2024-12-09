@@ -32,11 +32,11 @@ export const AdminLayout = ({ children }: Props) => {
       link: `/admin/change-order-status`,
       Icon: <AdjustmentsHorizontalIcon width={24} />,
     },
-    {
-      title: 'Sản phẩm tố cáo',
-      link: `/admin/product-report`,
-      Icon: <FlagIcon width={24} />,
-    },
+    // {
+    //   title: 'Sản phẩm tố cáo',
+    //   link: `/admin/product-report`,
+    //   Icon: <FlagIcon width={24} />,
+    // },
   ];
 
   const activeTabIdx = tabs.findIndex((tab) => tab.link === location.pathname);

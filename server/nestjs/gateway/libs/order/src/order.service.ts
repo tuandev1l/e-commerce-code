@@ -17,7 +17,6 @@ import { Role } from '@auth';
 import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
 import { ConfigService } from '@nestjs/config';
 import * as moment from 'moment';
-import * as crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { VnpayService } from 'nestjs-vnpay';
 import {
@@ -28,6 +27,8 @@ import {
   VnpLocale,
 } from 'vnpay';
 import { Cart } from '@libs/cart/entity/cart.entity';
+import * as crypto from 'crypto';
+import axios from 'axios';
 
 declare const Buffer;
 
@@ -90,32 +91,47 @@ export class OrderService {
       throw new RpcBadRequest('Can not create order with this role');
     }
 
-    const { paymentMethod, vnp_TransactionNo, vnp_TxnRef, orderInfo } =
-      orderPayload;
+    const {
+      paymentMethod,
+      vnp_TransactionNo,
+      vnp_TxnRef,
+      orderInfo,
+      momoRequestId,
+    } = orderPayload;
 
     const uuid = orderInfo.split(':')[1];
+    let isSuccessOrder = true;
     let status: ORDER_STATUS;
+    let transactionStatus;
 
     const orders = await this.repository.findBy({ uuid });
 
     switch (paymentMethod) {
       case PaymentMethodEnum.VNPAY:
-        const transactionStatus = await this.vnPaycheckPaymentStatus(
+        transactionStatus = await this.vnPaycheckPaymentStatus(
           vnp_TxnRef,
           vnp_TransactionNo,
           orderInfo,
         );
-        if (`${transactionStatus}` === '00') {
-          status = ORDER_STATUS.PREPARED;
-        } else {
-          status = ORDER_STATUS.UNSUCCESSFUL;
+        if (`${transactionStatus}` !== '00') {
+          isSuccessOrder = false;
         }
 
         break;
       case PaymentMethodEnum.STRIPE:
         break;
       case PaymentMethodEnum.MOMO:
+        transactionStatus = await this.momoPaymentStatus(momoRequestId);
+        if (`${transactionStatus}` !== '0') {
+          isSuccessOrder = false;
+        }
         break;
+    }
+
+    if (isSuccessOrder) {
+      status = ORDER_STATUS.PREPARED;
+    } else {
+      status = ORDER_STATUS.UNSUCCESSFUL;
     }
 
     const cart = await this.cartRepository.findOneBy({ userId: user.id });
@@ -169,6 +185,7 @@ export class OrderService {
     const paymentEntities = payments.map((payment) => {
       return this.paymentRepo.create({
         method: payment.name,
+        value: payment.name.toUpperCase(),
         imgUrl: payment.imgUrl,
         status: PaymentEnum.AVAILABLE,
         description: `Thanh toán thông qua cổng ${payment}`,
@@ -251,6 +268,7 @@ export class OrderService {
         break;
       case PaymentMethodEnum.MOMO:
         paymentId = 2;
+        paymentUrl = await this.momoHandler(payOrderDto.amount, uuid);
         break;
       case PaymentMethodEnum.STRIPE:
         paymentId = 1;
@@ -298,6 +316,129 @@ export class OrderService {
     return this.repository.findBy({ shopId });
   }
 
+  async momoHandler(amount: number, uuid: string) {
+    const partnerCode = this.config.get('momoPartnerCode');
+    const accessKey = this.config.get('momoAccessKey');
+    const secretKey = this.config.get('momoSecretKey');
+    const requestId = partnerCode + new Date().getTime();
+    const orderId = requestId;
+
+    const orderInfo = `Thanh toan cho ma GD:${uuid}`;
+    const redirectUrl = this.config.get('vnp_ReturnUrl');
+    const ipnUrl = 'https://callback.url/notify';
+    const requestType = 'payWithCC';
+    const extraData = '';
+
+    const rawSignature =
+      'accessKey=' +
+      accessKey +
+      '&amount=' +
+      amount +
+      '&extraData=' +
+      extraData +
+      '&ipnUrl=' +
+      ipnUrl +
+      '&orderId=' +
+      orderId +
+      '&orderInfo=' +
+      orderInfo +
+      '&partnerCode=' +
+      partnerCode +
+      '&redirectUrl=' +
+      redirectUrl +
+      '&requestId=' +
+      requestId +
+      '&requestType=' +
+      requestType;
+
+    const signature = crypto
+      .createHmac('sha256', secretKey)
+      .update(rawSignature)
+      .digest('hex');
+
+    const requestBody = JSON.stringify({
+      partnerCode: partnerCode,
+      accessKey: accessKey,
+      requestId: requestId,
+      amount: amount,
+      orderId: orderId,
+      orderInfo: orderInfo,
+      redirectUrl: redirectUrl,
+      ipnUrl: ipnUrl,
+      extraData: extraData,
+      requestType: requestType,
+      signature: signature,
+      lang: 'vi',
+    });
+
+    console.log(requestBody);
+
+    // try {
+    const { data } = await axios.post(
+      'https://test-payment.momo.vn/v2/gateway/api/create',
+      requestBody,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(requestBody),
+        },
+      },
+    );
+
+    // @ts-ignore
+    return data.payUrl;
+
+    //   console.log(data);
+    // } catch (e) {
+    //   console.log(e.response.data);
+    // }
+  }
+
+  async momoPaymentStatus(requestId: string) {
+    const partnerCode = this.config.get('momoPartnerCode');
+    const accessKey = this.config.get('momoAccessKey');
+    const secretKey = this.config.get('momoSecretKey');
+
+    const orderId = requestId;
+
+    const rawSignature =
+      'accessKey=' +
+      accessKey +
+      '&orderId=' +
+      orderId +
+      '&partnerCode=' +
+      partnerCode +
+      '&requestId=' +
+      requestId;
+
+    const signature = crypto
+      .createHmac('sha256', secretKey)
+      .update(rawSignature)
+      .digest('hex');
+
+    const requestBody = JSON.stringify({
+      partnerCode: partnerCode,
+      requestId: requestId,
+      orderId: orderId,
+      signature: signature,
+      lang: 'vi',
+    });
+
+    const { data } = await axios.post(
+      'https://test-payment.momo.vn/v2/gateway/api/query',
+      requestBody,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(requestBody),
+        },
+      },
+    );
+
+    // @ts-ignore
+    return data.resultCode;
+  }
+
   private async vnpayHandler(amount: number, uuid: string) {
     const date = new Date();
 
@@ -312,103 +453,5 @@ export class OrderService {
       vnp_Locale: VnpLocale.VN,
       vnp_BankCode: OrderService.vnp_BankCode,
     });
-    //
-    // const secretKey = this.config.get('vnp_HashSecret');
-    // let vnpUrl = this.config.get('vnp_Url');
-    // const returnUrl = 'http://localhost:5173/vnpay-payment';
-    //
-    // const vnp_Params = {};
-    // vnp_Params['vnp_Version'] = OrderService.vnp_Version;
-    // vnp_Params['vnp_Command'] = OrderService.vnp_Command;
-    // vnp_Params['vnp_TmnCode'] = this.config.get('vnp_TmnCode');
-    // vnp_Params['vnp_Locale'] = OrderService.vnp_Locale;
-    // vnp_Params['vnp_CurrCode'] = OrderService.vnp_CurrCode;
-    // vnp_Params['vnp_TxnRef'] = orderId;
-    // vnp_Params['vnp_OrderInfo'] = 'Thanh toan cho ma GD:' + uuid;
-    // vnp_Params['vnp_OrderType'] = OrderService.vnp_OrderType;
-    // vnp_Params['vnp_Amount'] = amount * 100;
-    // vnp_Params['vnp_ReturnUrl'] = returnUrl;
-    // vnp_Params['vnp_IpAddr'] = OrderService.vnp_IpAddr;
-    // vnp_Params['vnp_CreateDate'] = createDate;
-    // vnp_Params['vnp_BankCode'] = OrderService.vnp_BankCode;
-    //
-    // const vnp_ParamsSorted = this.sortObject(vnp_Params);
-    // const signData = querystring.stringify(vnp_ParamsSorted, { encode: false });
-    // const hmac = crypto.createHmac('sha512', secretKey);
-    // vnp_Params['vnp_SecureHash'] = hmac
-    //   .update(Buffer.from(signData, 'utf-8'))
-    //   .digest('hex');
-    // vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
-    //
-    // return vnpUrl;
-  }
-
-  private sortObject(obj: object) {
-    const sorted = {};
-    const str = [];
-    let key;
-    for (key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        str.push(encodeURIComponent(key));
-      }
-    }
-    str.sort();
-    for (key = 0; key < str.length; key++) {
-      sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, '+');
-    }
-    return sorted;
-  }
-
-  private VNPayBodyOrderStatus(
-    vnp_OrderInfo: string,
-    vnp_TransactionDate: string,
-    vnp_TxnRef: string,
-  ) {
-    const date = new Date();
-    const vnp_RequestId = moment(date).format('HHmmss');
-    const vnp_CreateDate = moment(date).format('YYYYMMDDHHmmss');
-    const vnp_Command = 'querydr';
-
-    const data =
-      vnp_RequestId +
-      '|' +
-      OrderService.vnp_Version +
-      '|' +
-      OrderService.vnp_Command +
-      '|' +
-      this.config.get('vnp_TmnCode') +
-      '|' +
-      vnp_TxnRef +
-      '|' +
-      vnp_TransactionDate +
-      '|' +
-      vnp_CreateDate +
-      '|' +
-      OrderService.vnp_IpAddr +
-      '|' +
-      vnp_OrderInfo;
-
-    console.log(data);
-
-    const secretKey = this.config.get('vnp_HashSecret');
-    const hmac = crypto.createHmac('sha512', secretKey);
-    const vnp_SecureHash = hmac
-      .update(Buffer.from(data, 'utf-8'))
-      .digest('hex');
-
-    const body: { [key: string]: string } = {
-      vnp_RequestId,
-      vnp_Version: OrderService.vnp_Version,
-      vnp_Command,
-      vnp_TmnCode: this.config.get('vnp_TmnCode'),
-      vnp_TxnRef,
-      vnp_OrderInfo: vnp_OrderInfo,
-      vnp_TransactionDate: vnp_TransactionDate,
-      vnp_CreateDate,
-      vnp_IpAddr: OrderService.vnp_IpAddr,
-      vnp_SecureHash,
-    };
-
-    return body;
   }
 }

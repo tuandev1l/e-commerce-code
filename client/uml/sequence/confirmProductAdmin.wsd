@@ -1,0 +1,28 @@
+@startuml ApproveOrderComplete
+
+hide footbox
+autonumber
+participant Admin as admin
+boundary "Giao diện duyệt trạng thái đơn hàng" as orderStatusUI
+control "AdminController" as adminController
+control "OrderController" as orderController
+entity "Order" as orderEntity
+
+admin -> orderStatusUI: Mở giao diện duyệt trạng thái đơn hàng
+orderStatusUI -> adminController: Yêu cầu lấy thông tin đơn hàng
+adminController -> orderController: Gửi yêu cầu lấy thông tin đơn hàng
+orderController -> orderEntity: Lấy trạng thái hiện tại của đơn hàng
+orderEntity --> orderController: Trả về danh sách đơn hàng cần duyệt
+orderController --> adminController: Trả về danh sách đơn hàng cần duyệt
+adminController --> orderStatusUI: Hiển thị thông tin đơn hàng và trạng thái
+
+admin -> orderStatusUI: Chọn chuyển trạng thái đơn hàng thành COMPLETE
+orderStatusUI -> adminController: Gửi yêu cầu chuyển trạng thái đơn hàng
+adminController -> orderController: Cập nhật trạng thái đơn hàng thành COMPLETE
+orderController -> orderEntity: Thực hiện cập nhật trạng thái đơn hàng
+orderEntity --> orderController: Trả về kết quả cập nhật thành công
+orderController --> adminController: Xác nhận trạng thái đơn hàng đã được chuyển
+adminController --> orderStatusUI: Hiển thị thông báo cập nhật thành công
+orderStatusUI --> admin: Thông báo đơn hàng đã chuyển sang COMPLETE
+
+@enduml

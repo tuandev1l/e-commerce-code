@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getShopInfoByIdApi, updateShopApi } from '../../api/api';
 import { IShop } from '../../interfaces';
 import { ShopAdminLayout } from './ShopAdminLayout';
@@ -30,6 +30,7 @@ export const ShopAdmin = ({}: Props) => {
   const [shopInfo, setShopInfo] = useState<IShop>(shopDefault);
   const shopId = useParams()['shopId'];
   const toast = useToast();
+  const navigate = useNavigate();
 
   const { data } = useQuery({
     queryKey: [`getShop/${shopId}`],
@@ -39,6 +40,11 @@ export const ShopAdmin = ({}: Props) => {
 
   useEffect(() => {
     if (data) {
+      // @ts-ignore
+      if (!data.approved) {
+        toast({ type: 'error', message: 'Shop has not approved by admin yet' });
+        navigate(-1);
+      }
       // @ts-ignore
       setShopInfo(data);
       // @ts-ignore
@@ -91,7 +97,7 @@ export const ShopAdmin = ({}: Props) => {
                 <div className='w-1/3 flex justify-center items-center'>
                   <img
                     src={
-                      shopInfo?.logo
+                      shopInfo.logo
                         ? shopInfo.logo.startsWith('http')
                           ? shopInfo.logo
                           : `https://salt.tikicdn.com/cache/w220/ts/seller/${shopInfo.logo}`

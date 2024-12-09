@@ -1,0 +1,28 @@
+@startuml ApproveOrderComplete
+
+hide footbox
+autonumber
+participant Shop as shop
+boundary "Giao diện duyệt trạng thái đơn hàng" as orderStatusUI
+control "ShopController" as shopController
+control "OrderController" as orderController
+entity "Order" as orderEntity
+
+shop -> orderStatusUI: Mở giao diện duyệt trạng thái đơn hàng
+orderStatusUI -> shopController: Yêu cầu lấy thông tin đơn hàng
+shopController -> orderController: Gửi yêu cầu lấy thông tin đơn hàng
+orderController -> orderEntity: Lấy trạng thái hiện tại của đơn hàng
+orderEntity --> orderController: Trả về danh sách đơn hàng cần duyệt
+orderController --> shopController: Trả về danh sách đơn hàng cần duyệt
+shopController --> orderStatusUI: Hiển thị thông tin đơn hàng và trạng thái
+
+shop -> orderStatusUI: Chọn chuyển trạng thái đơn hàng thành SHIPPING
+orderStatusUI -> shopController: Gửi yêu cầu chuyển trạng thái đơn hàng
+shopController -> orderController: Cập nhật trạng thái đơn hàng thành SHIPPING
+orderController -> orderEntity: Thực hiện cập nhật trạng thái đơn hàng
+orderEntity --> orderController: Trả về kết quả cập nhật thành công
+orderController --> shopController: Xác nhận trạng thái đơn hàng đã được chuyển
+shopController --> orderStatusUI: Hiển thị thông báo cập nhật thành công
+orderStatusUI --> shop: Thông báo đơn hàng đã chuyển sang SHIPPING
+
+@enduml

@@ -1,6 +1,7 @@
 export interface ICreateOrder {
-  paymentMethod: string;
-  orderInfo?: string;
-  vnp_TransactionNo?: number;
-  vnp_TxnRef?: string;
+  paymentMethod: string | null;
+  orderInfo?: string | null;
+  vnp_TransactionNo?: number | null;
+  vnp_TxnRef?: string | null;
+  momoRequestId: string | null;
 }

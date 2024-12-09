@@ -156,10 +156,6 @@ export class RatingService {
   ) {
     const ratingProduct = await this.productRatingRepo.findOneBy({ productId });
 
-    console.log(ratingProduct);
-    console.log(productId);
-    console.log(rating);
-
     const stars = ratingProduct.stars;
     if (type === UpdateProductReviewType.CREATE) {
       stars[rating].count += 1;

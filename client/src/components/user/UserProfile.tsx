@@ -9,10 +9,25 @@ import {
 } from '../../store/selector';
 import { useSelector } from 'react-redux';
 import { Gender } from '../../enum/userGender.enum';
+import { useMutation } from '@tanstack/react-query';
+import { updateUserInfoApi } from '../../api/api';
+import useToast from '../../hook/useToast';
+import { useAppDispatch } from '../../store/store';
+import { IAxiosError } from '../../config/axiosError.interface';
+import { updateUserInfo } from '../auth';
+import moment from 'moment';
 
 type Props = {};
 
+export interface IUserInfo {
+  name: string;
+  birthday: Date;
+  gender: Gender;
+}
+
 export const UserProfile = ({}: Props) => {
+  const dispatch = useAppDispatch();
+  const toast = useToast();
   const dob = useSelector(dobSelector);
   const [fullname, setFullName] = useState<string>(
     useSelector(usernameSelector) || ''
@@ -21,18 +36,51 @@ export const UserProfile = ({}: Props) => {
   const [month, setMonth] = useState<number>(1);
   const [year, setYear] = useState<number>(2000);
 
-  const [gender, setGender] = useState<string>(
-    useSelector(genderSelector) || ''
+  const [gender, setGender] = useState<Gender>(
+    useSelector(genderSelector) || Gender.MALE
   );
 
   useEffect(() => {
     if (dob) {
-      const date = new Date(dob);
-      setDate(date.getDay());
-      setMonth(date.getMonth());
-      setYear(date.getFullYear());
+      const date = moment(dob).local();
+      console.log(date);
+      setDate(date.date());
+      console.log(date.date());
+      setMonth(date.month() + 1);
+      console.log(date.month());
+      setYear(date.year());
     }
   }, [dob]);
+
+  const { mutate } = useMutation({
+    mutationKey: [`updateUserInfo/${fullname}`],
+    mutationFn: updateUserInfoApi,
+    onSuccess: (data) => {
+      toast({ type: 'success', message: 'Update user info successfully' });
+      dispatch(updateUserInfo(data));
+    },
+    onError: (error: IAxiosError) => {
+      toast({ type: 'error', message: error.message });
+    },
+  });
+
+  const updateProfileHandler = () => {
+    const birthday = moment(`${year}-${month}-${date}`);
+    const isValidBirthday =
+      birthday.isAfter(moment('1900-01-01')) &&
+      birthday.isBefore(new Date().toISOString().split('T')[0]);
+
+    if (!isValidBirthday) {
+      toast({ type: 'error', message: 'Birthday is not valid' });
+      return;
+    }
+    const userInfo: IUserInfo = {
+      name: fullname,
+      birthday: birthday.local().toDate(),
+      gender,
+    };
+    mutate(userInfo);
+  };
 
   return (
     <UserLayout>
@@ -44,8 +92,10 @@ export const UserProfile = ({}: Props) => {
             <div className='flex items-center mb-4 w-full'>
               <div className='flex items-center w-full'>
                 <div className='mr-12'>
-                  <div className='w-32 h-32 p-4 rounded-full bg-gray-200 flex items-center justify-center'>
-                    <UserIcon color='blue' />
+                  <div className='w-32 h-32 flex items-center justify-center'>
+                    <img
+                      src={`https://avatar.iran.liara.run/public/boy?username=${fullname}`}
+                    />
                   </div>
                 </div>
                 <div className='flex flex-col justify-center w-full'>
@@ -94,7 +144,7 @@ export const UserProfile = ({}: Props) => {
                   </select>
                   <select
                     className='py-2 px-6 border border-gray-300 rounded bg-white border-1'
-                    value={month + 1}
+                    value={month}
                     onChange={(e) => {
                       setMonth(+e.target.value);
                     }}
@@ -183,7 +233,10 @@ export const UserProfile = ({}: Props) => {
                 value={'tuanprogrammer001@gmail.com'}
               />
             </div> */}
-            <button className='bg-blue-500 text-white mt-6 py-2 w-full rounded'>
+            <button
+              className='bg-blue-500 text-white mt-6 py-2 w-full rounded'
+              onClick={updateProfileHandler}
+            >
               Lưu thay đổi
             </button>
           </div>

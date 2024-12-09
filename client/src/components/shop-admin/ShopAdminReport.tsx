@@ -3,7 +3,7 @@ import { Chart, registerables } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
 type Props = {
-  dataReport: IReport;
+  dataReport: IReport[];
 };
 
 Chart.register(...registerables);
@@ -14,11 +14,11 @@ export const ShopAdminReport = ({ dataReport }: Props) => {
   return (
     <Bar
       data={{
-        labels: Object.keys(dataReport),
+        labels: dataReport.map((el) => el.key),
         datasets: [
           {
             label: 'Đơn hàng',
-            data: Object.values(dataReport),
+            data: dataReport.map((el) => el.value),
             backgroundColor: '#54b7ff',
             barThickness: 'flex',
             maxBarThickness: 54,

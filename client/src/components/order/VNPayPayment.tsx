@@ -23,17 +23,22 @@ export const VNPayPayment = ({}: Props) => {
   const selectedAddress = useSelector(selectedAddressSelector);
   const username = useSelector(usernameSelector);
   const query = new URLSearchParams(search);
-  const orderInfo = query.get('vnp_OrderInfo');
+
+  // VNPay
+  const orderInfo = query.get('vnp_OrderInfo') || query.get('orderInfo');
   const vnp_TxnRef = query.get('vnp_TxnRef');
   const vnp_TransactionNo = query.get('vnp_TransactionNo');
   const vnp_TransactionStatus = query.get('vnp_TransactionStatus');
 
+  // MOMO
+  const momoRequestId = query.get('requestId');
+  const momoResultCode = query.get('resultCode');
+
   const { mutate } = useMutation({
     mutationKey: [`createOrder/${username}`],
     mutationFn: createOrderApi,
-    onSuccess: (data) => {
-      console.log(data);
-      if (vnp_TransactionStatus === '00') {
+    onSuccess: () => {
+      if (vnp_TransactionStatus === '00' || momoResultCode === '0') {
         toast({ type: 'success', message: 'Create order successfully' });
       } else {
         toast({ type: 'error', message: 'Something went wrong with payment' });
@@ -48,19 +53,30 @@ export const VNPayPayment = ({}: Props) => {
   });
 
   useEffect(() => {
-    if (orderInfo && vnp_TxnRef) {
+    console.log(`orderInfo: ${orderInfo}`);
+    console.log(`vnp_TransactionStatus: ${vnp_TransactionStatus}`);
+    console.log(`momoResultCode: ${momoResultCode}`);
+
+    if (
+      orderInfo &&
+      (vnp_TransactionStatus !== null || momoResultCode !== null)
+    ) {
+      console.log('requesting...');
       mutate({
-        paymentMethod: PaymentMethodEnum.VNPAY,
+        paymentMethod: vnp_TransactionStatus
+          ? PaymentMethodEnum.VNPAY
+          : PaymentMethodEnum.MOMO,
         orderInfo,
         vnp_TransactionNo: +vnp_TransactionNo!,
         vnp_TxnRef,
+        momoRequestId,
       });
     }
   }, [selectedAddress, products]);
 
   return (
     <Layout>
-      {query.get('vnp_TransactionStatus') ? (
+      {vnp_TransactionStatus || momoResultCode ? (
         <div>Đang xử lý giao dịch</div>
       ) : (
         <div className='mt-8'>Hành động không hợp lệ, vui lòng thử lại sau</div>

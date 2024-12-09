@@ -21,6 +21,7 @@ export interface IProduct {
   reviewText: string;
   favouriteCount: number;
   thumbnailUrl: string;
+  stopSelling: boolean;
   inventoryStatus: InventoryStatusEnum;
   seller?: IShop;
   allTimeQuantitySold: number;

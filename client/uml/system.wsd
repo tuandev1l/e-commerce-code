@@ -1,0 +1,53 @@
+@startuml System
+
+actor User as user
+rectangle "Web client" as fe
+rectangle "Gateway service" as gateway
+rectangle "Cart service" as cart
+rectangle "Order service" as order
+rectangle "Product service" as product
+rectangle "Rating service" as rating
+rectangle "Search service" as search
+rectangle "Tryon service" as tryon
+queue "Queue" as q1
+queue "Queue" as q2
+queue "Queue" as q3
+queue "Queue" as q4
+queue "Queue" as q5
+queue "Queue" as q6
+
+user -> fe:request
+fe->user:response
+fe->gateway:request
+gateway->fe:response
+gateway -> q1: request
+q1 -> gateway: response
+q1 -> cart: request
+cart -> q1: response
+
+gateway -> q2: request
+q2 -> gateway: response
+q2 -> order: request
+order -> q2: response
+
+gateway -> q3: request
+q3 -> gateway: response
+q3 -> product: request
+product -> q3: response
+
+gateway -> q4: request
+q4 -> gateway: response
+q4 -> rating: request
+rating -> q4: response
+
+gateway -> q5: request
+q5 -> gateway: response
+q5 -> search: request
+search -> q5: response
+
+gateway -> q6: request
+q6 -> gateway: response
+q6 -> tryon: request
+tryon -> q6: response
+
+@enduml

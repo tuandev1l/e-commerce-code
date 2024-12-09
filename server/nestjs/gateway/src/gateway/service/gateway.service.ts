@@ -331,4 +331,8 @@ export class GatewayService {
   async randomProducts() {
     return this.producer.sendMessage(PRODUCT_PATTERN.OTHER_RANDOM_PRODUCT);
   }
+
+  async backToSell(dto: DeleteProductDto) {
+    return this.producer.sendMessage(PRODUCT_PATTERN.BACK_TO_SELL, dto);
+  }
 }

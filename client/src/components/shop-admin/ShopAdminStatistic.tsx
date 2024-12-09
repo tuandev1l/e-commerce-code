@@ -14,7 +14,8 @@ import { SelectedOrder } from '../order/SelectedOrder';
 type Props = {};
 
 export interface IReport {
-  [key: string | number]: number;
+  key: string | number;
+  value: number;
 }
 
 export enum StatisticType {
@@ -40,9 +41,13 @@ const endOfYear = today.clone().endOf('year');
 
 const reportByWeek = () => {
   let day = startOfWeek.clone();
-  const data: IReport = {};
+  const data: IReport[] = [];
   while (day.isSameOrBefore(endOfWeek)) {
-    data[day.date()] = 0;
+    const tmp: IReport = {
+      key: `${day.date()}-${day.month() + 1}`,
+      value: 0,
+    };
+    data.push(tmp);
     day = day.add(1, 'day');
   }
   return data;
@@ -50,9 +55,13 @@ const reportByWeek = () => {
 
 const reportByMonth = () => {
   let day = startOfMonth.clone();
-  const data: IReport = {};
+  const data: IReport[] = [];
   while (day.isSameOrBefore(endOfMonth)) {
-    data[day.date()] = 0;
+    const tmp: IReport = {
+      key: `${day.date()}-${day.month() + 1}`,
+      value: 0,
+    };
+    data.push(tmp);
     day = day.add(1, 'day');
   }
   return data;
@@ -60,9 +69,13 @@ const reportByMonth = () => {
 
 const reportByYear = () => {
   let day = startOfYear.clone();
-  const data: IReport = {};
+  const data: IReport[] = [];
   while (day.isSameOrBefore(endOfYear)) {
-    data[day.month() + 1] = 0;
+    const tmp: IReport = {
+      key: `${day.month() + 1}`,
+      value: 0,
+    };
+    data.push(tmp);
     day = day.add(1, 'month');
   }
   return data;
@@ -70,13 +83,15 @@ const reportByYear = () => {
 
 export const ShopAdminStatistic = ({}: Props) => {
   const [orders, setOrders] = useState<IOrder[]>([]);
-  const [dataReport, setDataReport] = useState<IReport>({});
+  const [dataReport, setDataReport] = useState<IReport[]>([]);
   const shopId = useSelector(shopIdSelector);
 
   const { data } = useQuery({
     queryKey: [`getAllOrdersOfShop/${shopId}`],
     queryFn: () => getAllOrdersForShopApi(shopId),
     enabled: !!shopId,
+    gcTime: 0,
+    staleTime: 0,
   });
 
   useEffect(() => {
@@ -85,11 +100,18 @@ export const ShopAdminStatistic = ({}: Props) => {
       setOrders(data);
       const dataReport = reportByWeek();
 
+      console.log(dataReport);
+
       (data as unknown as IOrder[]).forEach((order) => {
         const price = order.item.quantity * order.item.price;
         const createOrder = moment(order.createdAt);
 
-        dataReport[createOrder.date()] += 1;
+        const dataReportIdx = dataReport.findIndex(
+          (el) => el.key === `${createOrder.date()}-${createOrder.month() + 1}`
+        );
+        if (dataReportIdx !== -1) {
+          dataReport[dataReportIdx].value += 1;
+        }
 
         if (
           order.status === ORDER_STATUS.PENDING ||
@@ -132,7 +154,7 @@ export const ShopAdminStatistic = ({}: Props) => {
   const selectChangeHandler = (e: ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
 
-    let dataReport: IReport;
+    let dataReport: IReport[];
 
     if (value === StatisticType.WEEK) {
       dataReport = reportByWeek();
@@ -147,13 +169,24 @@ export const ShopAdminStatistic = ({}: Props) => {
       case StatisticType.MONTH:
         (data as unknown as IOrder[]).forEach((order) => {
           const createOrder = moment(order.createdAt);
-          dataReport[createOrder.date()] += 1;
+          const dataReportIdx = dataReport.findIndex(
+            (el) =>
+              el.key === `${createOrder.date()}-${createOrder.month() + 1}`
+          );
+          if (dataReportIdx !== -1) {
+            dataReport[dataReportIdx].value += 1;
+          }
         });
         break;
       case StatisticType.YEAR:
         (data as unknown as IOrder[]).forEach((order) => {
           const createOrder = moment(order.createdAt);
-          dataReport[createOrder.month() + 1] += 1;
+          const dataReportIdx = dataReport.findIndex(
+            (el) => el.key === `${createOrder.month() + 1}`
+          );
+          if (dataReportIdx !== -1) {
+            dataReport[dataReportIdx].value += 1;
+          }
         });
         break;
     }
@@ -200,7 +233,7 @@ export const ShopAdminStatistic = ({}: Props) => {
             <div className=''>
               <div className=''>Trả hàng / Hoàn tiền xử lý</div>
               <div className='font-bold text-2xl'>
-                {priceSplit(notPaidYetMoney)}
+                {priceSplit(cancelMoney)}
               </div>
             </div>
           </div>

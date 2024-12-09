@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const uploadFile = async (file: File) => {
+export const uploadFile = async (file: File | Blob) => {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', 'ml_default');

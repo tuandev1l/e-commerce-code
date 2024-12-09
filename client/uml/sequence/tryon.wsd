@@ -1,0 +1,19 @@
+@startuml TryOn
+
+hide footbox
+autonumber
+participant User as user
+boundary "Giao diện website" as web
+boundary "Giao diện chi tiết đơn hàng" as orderDetail
+control "TryOnController" as tryOnController
+
+user -> web: Nhấn chọn sản phẩm muốn thử đồ
+web -> orderDetail: Hiển thị chi tiết đơn hàng với tùy chọn thử đồ
+user -> orderDetail: Chọn tùy chọn thử đồ và nhấn "Thử đồ"
+orderDetail -> tryOnController: Gửi yêu cầu thử đồ
+tryOnController -> tryOnController: Chờ kết quả thử đồ
+tryOnController --> orderDetail: Trả về kết quả thử đồ
+orderDetail --> web: Hiển thị kết quả thử đồ
+web --> user: Hiển thị kết quả thử đồ cho người dùng
+
+@enduml

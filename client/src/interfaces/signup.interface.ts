@@ -15,7 +15,6 @@ export const signupDefault = {
   name: '',
   birthday: '',
   gender: Gender.MALE,
-  avatar:
-    'https://w7.pngwing.com/pngs/867/694/png-transparent-user-profile-default-computer-icons-network-video-recorder-avatar-cartoon-maker-blue-text-logo-thumbnail.png',
+  avatar: 'https://avatar.iran.liara.run/public/boy?username=',
   confirmPassword: '',
 };

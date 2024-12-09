@@ -1,0 +1,206 @@
+entity Brand {
+  name
+  slug
+}
+
+entity Category {
+  name
+  slug
+}
+
+entity Shop {
+  name
+  logo
+  telephone
+  streetAddress
+  addressLocality
+  postalCode
+  addressRegion
+  addressCountry
+}
+
+entity ProductBadge {
+  code
+  type
+  index
+  icon
+  icon_width
+  icon_height
+  text_color
+  background_color
+  href
+  text
+}
+
+entity ProductImage {
+  base_url
+  is_gallery
+  label
+  large_url
+  medium_url
+  position
+  small_url
+  thumbnail_url
+}
+
+
+entity Product {
+  brand_id
+  category_id
+  shop_id
+  badges
+  images
+  name
+  short_description
+  price
+  list_price
+  original_price
+  discount
+  discount_rate
+  rating_average
+  review_count
+  review_text
+  favourite_count
+  thumbnail_url
+  inventory_status
+  day_ago_created
+  all_time_quantity_sold
+  meta_title
+  meta_description
+  meta_keywords
+  description
+  gift_item_title
+  video_url
+  is_seller_in_chat_whitelist
+  return_and_exchange_policy
+}
+
+entity Cart {
+  total_pages
+  total_items
+  current_page
+  page_size
+}
+
+entity Customer {
+  cart_id
+  order_id
+  birthday
+  country
+  account_type
+  is_phone_verified
+  gender
+  is_email_verified
+  real_name
+  reward_point
+  email
+  has_password
+  is_new
+  avatar_url
+  nationality
+  active_orders
+  name
+  phone_number
+  created_date
+  cart_item_count
+  username
+  street
+  ward
+  district
+  region
+  country_id
+  payment
+}
+
+entity Order {
+  status
+  created_at
+  updated_at
+  items_count
+  items_quantity
+  total
+  collectible_amount
+  discount_amount
+  shipping_amount_after_discount
+  shipping_discount_amount
+  handling_fee
+  other_fee
+  purchased_at
+  shipping
+  payment
+}
+
+entity OrderStatus {
+  order_id
+  status
+  created_at
+}
+
+
+entity Payment {
+  method
+  is_prepaid
+  status
+  description
+}
+
+
+entity ProductItem {
+  cart_id
+  order_id
+  qty
+  product_name
+  product_id
+  final_price
+  seller_id
+  list_price
+  attributeset_group_name
+  product_url
+  url_key
+  discount_amount
+  price
+  subtotal
+  variant_text
+  product_type
+  original_price
+  thumbnail_url
+}
+
+
+entity ProductRating {
+  customer_id
+  rating_average
+  reviews_count
+  review_photo_total
+  review_photo_total_photo
+}
+
+
+entity Rating {
+  title
+  content
+  thank_count
+  customer_id
+  comment_count
+  rating
+  created_at
+  product_id
+  review_created_date
+  delivery_date
+  current_date
+  explain
+}
+
+entity RatingImage {
+  rating_id
+  full_path
+}
+
+entity Shipping {
+  partner_id
+  partner_name
+  tracking_code
+  status
+  promised_delivery_date
+  description
+}

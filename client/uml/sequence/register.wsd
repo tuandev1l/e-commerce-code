@@ -1,0 +1,32 @@
+@startuml Register
+
+hide footbox
+autonumber
+participant User as user
+boundary "Giao diện website" as web
+boundary "Giao diện đăng kí" as register
+control "RegisterController" as controller
+entity "UserEntity" as userEntity
+
+user -> web: Nhấn chọn đăng ký
+web -> register: Redirect tới trang đăng ký
+register --> user: Hiển thị giao diện đăng ký
+user -> register: Nhập thông tin đăng ký và nhấn nút "Đăng ký"
+register -> controller: Gửi yêu cầu đăng ký với thông tin người dùng
+controller -> userEntity: Kiểm tra email có tồn tại chưa
+alt Email đã tồn tại
+    controller --> register: Trả về lỗi "Email đã tồn tại"
+    register --> user: Hiển thị thông báo lỗi
+else Email chưa tồn tại
+    controller -> userEntity: Thêm tài khoản mới vào cơ sở dữ liệu
+    alt Thông tin không hợp lệ (ví dụ: mật khẩu yếu, thiếu thông tin)
+        controller --> register: Trả về lỗi "Thông tin đăng ký không hợp lệ"
+        register --> user: Hiển thị thông báo lỗi
+    else Thông tin hợp lệ
+        userEntity --> controller: Trả về thông tin người dùng
+        controller --> register: Gửi accessToken và thông tin người dùng
+        register --> user: Hiển thị thông báo đăng ký thành công và accessToken
+    end
+end
+
+@enduml

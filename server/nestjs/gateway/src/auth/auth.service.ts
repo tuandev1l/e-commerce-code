@@ -23,6 +23,7 @@ import * as crypto from 'crypto';
 import { AddNewAddressDto } from '@auth/dto/addNewAddress.dto';
 import { SetDefaultAddressDto } from '@auth/dto/setDefaultAddress.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateUserInfo } from '@auth/dto/updateUserInfo';
 
 export class IAuthRes {
   @ApiProperty()
@@ -238,6 +239,14 @@ export class AuthService {
   //
   //   return this.repository.findOneBy({ phoneNumber: username });
   // }
+
+  async updateUserInfo(user: User, updateUserInfo: UpdateUserInfo) {
+    const { name, birthday, gender } = updateUserInfo;
+    user.name = name;
+    user.birthday = birthday;
+    user.gender = gender;
+    return this.repository.save(user);
+  }
 
   private validateUsername(username: string) {
     const emailReg = new RegExp(emailRegex, 'gi');

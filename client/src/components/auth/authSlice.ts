@@ -49,10 +49,19 @@ const authSlice = createSlice({
       state.user.shopId = payload;
       localStorage.setItem('user', JSON.stringify(state.user));
     },
+    updateUserInfo: (state, { payload }) => {
+      state.user = payload;
+      localStorage.setItem('user', JSON.stringify(state.user));
+    },
   },
   extraReducers: () => {},
 });
 
-export const { loginSuccess, logout, addNewAddressDispatch, setShopId } =
-  authSlice.actions;
+export const {
+  loginSuccess,
+  logout,
+  addNewAddressDispatch,
+  setShopId,
+  updateUserInfo,
+} = authSlice.actions;
 export default authSlice;

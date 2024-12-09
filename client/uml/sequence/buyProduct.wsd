@@ -1,0 +1,61 @@
+@startuml Purchase
+
+hide footbox
+autonumber
+participant Customer as customer
+boundary "Giao diện website" as web
+boundary "Giao diện chi tiết sản phẩm" as productDetail
+boundary "Giao diện giỏ hàng" as cart
+boundary "Giao diện chi tiết đơn hàng" as orderDetail
+boundary "Giao diện thanh toán" as payment
+boundary "Giao diện danh sách đơn hàng" as orderList
+control "ProductDetailController" as productDetailController
+control "CartController" as cartController
+control "OrderController" as orderController
+control "PaymentController" as paymentController
+entity "Product" as productEntity
+entity "Cart" as cartEntity
+entity "Order" as orderEntity
+
+customer -> web: Click vào sản phẩm
+web -> productDetail: Redirect tới chi tiết sản phẩm
+productDetail -> productDetailController: Gọi API lấy thông tin sản phẩm
+productDetailController -> productEntity: Truy vấn thông tin sản phẩm
+productEntity --> productDetailController: Trả về thông tin sản phẩm
+productDetailController --> productDetail: Hiển thị thông tin sản phẩm
+productDetail --> customer: Hiển thị thông tin chi tiết sản phẩm
+
+customer -> productDetail: Nhấn "Thêm vào giỏ hàng"
+productDetail -> cartController: Thêm sản phẩm vào giỏ hàng
+cartController -> cartEntity: Cập nhật giỏ hàng
+cartEntity --> cartController: Trả về giỏ hàng cập nhật
+cartController --> cart: Hiển thị giỏ hàng
+
+customer -> cart: Click vào "Giỏ hàng"
+cart -> cartController: Gọi API lấy danh sách sản phẩm trong giỏ hàng
+cartController -> cartEntity: Lấy thông tin giỏ hàng
+cartEntity --> cartController: Trả về danh sách giỏ hàng
+cartController --> cart: Hiển thị danh sách giỏ hàng
+
+customer -> cart: Chọn các mặt hàng và nhấn "Thanh toán"
+cart -> orderDetail: Redirect tới giao diện thanh toán
+orderDetail --> customer: Hiển thị danh sách các mặt hàng cần mua
+
+customer -> orderDetail: Nhấn "Thanh toán"
+orderDetail -> paymentController: Gửi yêu cầu thanh toán
+paymentController --> payment: Trả về URL thanh toán và hiển thị giao diện thanh toán
+
+customer -> payment: Nhập thông tin thanh toán và nhấn "Thanh toán"
+payment -> paymentController: Gửi thông tin thanh toán
+paymentController -> paymentController: Xử lý thanh toán
+alt Thanh toán thành công
+    paymentController --> payment: Trả về kết quả thanh toán thành công
+    payment --> orderList: Chuyển hướng tới danh sách đơn hàng với trạng thái PREPARED
+else Thanh toán thất bại
+    paymentController --> payment: Trả về kết quả thanh toán thất bại
+    payment --> orderList: Chuyển hướng tới danh sách đơn hàng với trạng thái UNSUCCESSFUL
+end
+
+orderList --> customer: Hiển thị danh sách đơn hàng
+
+@enduml

@@ -82,9 +82,15 @@ export class GatewayProductController {
     return this.service.removeProduct({ user, id });
   }
 
-  // @Auth(Role.ADMIN, Role.SHOP)
+  @Auth(Role.ADMIN, Role.SHOP)
   @Get('shop/:id')
   async getAllProductOfShop(@Param('id') id: string) {
     return this.service.getAllProductsOfShop(id);
+  }
+
+  @Auth(Role.ADMIN, Role.SHOP)
+  @Patch('back-to-sell/:id')
+  async backToSell(@GetUser() user: User, @Param('id') id: string) {
+    return this.service.backToSell({ user, id });
   }
 }

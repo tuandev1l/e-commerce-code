@@ -8,6 +8,9 @@ export class Payment extends BaseEntity {
   @Column()
   method: string;
 
+  @Column({ nullable: true })
+  value: string;
+
   @Column({ name: 'is_prepaid', default: true })
   isPrepaid: boolean;
 

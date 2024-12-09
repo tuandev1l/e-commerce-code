@@ -65,11 +65,9 @@ export class ProductService {
   async insertData() {
     const blacklist = [
       'mông',
-      'biển',
       'ngực',
       'đồ ngủ',
       'khỏa thân',
-      'đồ bơi',
       'sau sinh',
       'độn',
     ];
@@ -83,6 +81,7 @@ export class ProductService {
     const savedProducts = [];
 
     for (const product of data) {
+      console.log(product.name);
       try {
         if (blacklist.some((el) => product.name.includes(el))) {
           continue;
@@ -152,6 +151,7 @@ export class ProductService {
           newShop.name = seller.name;
           newShop.url = seller['link'];
           newShop.logo = seller.logo;
+          newShop.approved = true;
           // @ts-ignore
           newShop.telephone = product.telephone;
           newShop.address = {
@@ -171,6 +171,7 @@ export class ProductService {
           newUser.isEmailVerified = true;
           newUser.password = await this.authService.hashPassword('123456789');
           newUser.email = `${slug}@gmail.com`;
+          newUser.role = Role.SHOP;
 
           newUser.gender = GENDER.MALE;
           newUser.birthday = new Date('2000-01-01');
@@ -178,7 +179,9 @@ export class ProductService {
           newUser.hasPassword = true;
           newUser.avatarUrl = `https://avatar.iran.liara.run/public/boy?username=${newShop.name}`;
           // @ts-ignore
-          newUser.shopId = newShop._id;
+          newUser.shopId = product.seller._id.toString();
+
+          await this.userRepo.save(newUser);
         } else {
           product.seller = shopEntity;
         }
@@ -291,7 +294,18 @@ export class ProductService {
   }
 
   async create(productDto: CreateProductDto) {
-    return this.model.create(productDto);
+    productDto.seller = await this.shopModel
+      .findOne({
+        _id: productDto.user.shopId,
+      })
+      .exec();
+    productDto.categories = (await this.categoryModel.find().exec())[0];
+    productDto.brand = (await this.brandModel.find().exec())[1];
+    const product = await this.model.create(productDto);
+
+    const newProduct = this.returnNewProductESFormat(product);
+    void this.elasticsearchService.createProduct(newProduct);
+    return product;
   }
 
   async findAll(productFilterDto: ProductFilterDto) {
@@ -378,31 +392,63 @@ export class ProductService {
 
   async update(productDto: UpdateProductDto) {
     const product = await this.findOne(productDto.productId);
-    const savedProduct = await this.model.create({
-      _id: product._id,
-      ...productDto,
-    });
+    await this.model
+      .updateOne(
+        { _id: product._id },
+        {
+          ...productDto,
+          seller: product.seller,
+          categories: product.categories,
+          brand: product.brand,
+        },
+      )
+      .exec();
 
-    void this.deleteKeyFromRedis(`product:${productDto.productId}`);
-    void this.saveToRedis(`product:${productDto.productId}`, savedProduct);
+    const savedProduct = await this.findOne(productDto.productId);
 
-    void this.elasticsearchService.updateProduct(
+    const newProduct = this.returnNewProductESFormat(savedProduct);
+
+    await this.deleteKeyFromRedis(`product:${productDto.productId}`);
+
+    await this.elasticsearchService.updateProduct(
       productDto.productId,
-      savedProduct,
+      newProduct,
     );
+
+    return savedProduct;
   }
 
   async remove(deleteProductDto: DeleteProductDto) {
     const { id, user } = deleteProductDto;
-    const seller = await this.findOne(id);
-    if (seller._id.toString() !== user.shopId) {
+    const product = await this.findOne(id);
+
+    // @ts-ignore
+    if (product.seller._id.toString() !== user.shopId) {
       throw new RpcBadRequest('You do not have permission to do this');
     }
 
-    void this.model.deleteOne({ id }).exec();
+    product.stopSelling = true;
+    await this.model.create(product);
 
-    void this.deleteKeyFromRedis(id);
-    void this.elasticsearchService.deleteProduct(id);
+    await this.deleteKeyFromRedis(id);
+    await this.elasticsearchService.stopSellingProduct(id);
+    return null;
+  }
+
+  async backToSell(deleteProductDto: DeleteProductDto) {
+    const { id, user } = deleteProductDto;
+    const product = await this.findOne(id);
+
+    // @ts-ignore
+    if (product.seller._id.toString() !== user.shopId) {
+      throw new RpcBadRequest('You do not have permission to do this');
+    }
+
+    product.stopSelling = false;
+    await this.model.create(product);
+
+    await this.deleteKeyFromRedis(id);
+    await this.elasticsearchService.backToSell(id);
     return null;
   }
 
@@ -593,11 +639,39 @@ export class ProductService {
     });
   }
 
-  private saveToRedis<E>(key: string, document: E) {
-    void this.cacheService.setKey(key, document);
+  private async saveToRedis<E>(key: string, document: E) {
+    await this.cacheService.setKey(key, document);
   }
 
-  private deleteKeyFromRedis(key: string) {
-    void this.cacheService.delKey(key);
+  private async deleteKeyFromRedis(key: string) {
+    await this.cacheService.delKey(key);
+  }
+
+  private returnNewProductESFormat(product: ProductDocument) {
+    // @ts-ignore
+    const newProduct = { ...product._doc, id: product._id };
+    delete newProduct._id;
+
+    newProduct.seller = {
+      // @ts-ignore
+      ...newProduct.seller._doc,
+      id: newProduct.seller._id,
+    };
+    delete newProduct.seller._id;
+
+    newProduct.categories = {
+      // @ts-ignore
+      ...newProduct.categories._doc,
+      id: newProduct.categories._id,
+    };
+    delete newProduct.categories['_id'];
+
+    newProduct.brand = {
+      // @ts-ignore
+      ...newProduct.brand._doc,
+      id: newProduct.brand._id,
+    };
+    delete newProduct.brand['_id'];
+    return newProduct;
   }
 }

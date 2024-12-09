@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { AuthService, IAuthRes } from '@auth/auth.service';
@@ -20,6 +21,7 @@ import { ForgotPasswordDto } from '@auth/dto/forgotPassword.dto';
 import { ResetPasswordDto } from '@auth/dto/resetPassword.dto';
 import { AddNewAddressDto } from '@auth/dto/addNewAddress.dto';
 import { SetDefaultAddressDto } from '@auth/dto/setDefaultAddress.dto';
+import { UpdateUserInfo } from '@auth/dto/updateUserInfo';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -80,6 +82,16 @@ export class AuthController {
     @Body() resetPasswordDto: ResetPasswordDto,
   ) {
     return this.service.resetPassword(resetToken, resetPasswordDto);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'add-address' })
+  @Patch('user-info')
+  async updateUserInfo(
+    @GetUser() user: User,
+    @Body() updateUserInfo: UpdateUserInfo,
+  ) {
+    return this.service.updateUserInfo(user, updateUserInfo);
   }
 
   @HttpCode(HttpStatus.OK)

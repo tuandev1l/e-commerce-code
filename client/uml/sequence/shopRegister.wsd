@@ -1,0 +1,19 @@
+@startuml RegisterShop
+
+hide footbox
+autonumber
+participant Customer as customer
+boundary "Giao diện đăng ký shop" as registerShopUI
+control "RegisterShopController" as registerShopController
+entity "Shop" as shopEntity
+
+customer -> registerShopUI: Chọn mở đơn đăng ký shop
+registerShopUI -> customer: Hiển thị form đăng ký shop
+customer -> registerShopUI: Nhập tên shop, mô tả, hình ảnh và nhấn "Đăng ký"
+registerShopUI -> registerShopController: Gửi thông tin đăng ký shop (tên, mô tả, hình ảnh)
+registerShopController -> shopEntity: Lưu thông tin shop vào cơ sở dữ liệu
+shopEntity --> registerShopController: Trả về kết quả lưu shop
+registerShopController --> registerShopUI: Thông báo thành công hoặc lỗi
+registerShopUI --> customer: Hiển thị thông báo thành công hoặc lỗi
+
+@enduml

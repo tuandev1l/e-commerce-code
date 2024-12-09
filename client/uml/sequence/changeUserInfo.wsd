@@ -1,0 +1,21 @@
+@startuml UpdateUserProfile
+
+hide footbox
+autonumber
+participant User as user
+boundary "Giao diện website" as web
+boundary "Giao diện chỉnh sửa thông tin cá nhân" as updateInfo
+control "ProfileController" as controller
+entity "User" as userEntity
+
+user -> web: Nhấn chọn cập nhật thông tin cá nhân
+web -> updateInfo: Redirect tới trang cập nhật thông tin cá nhân
+updateInfo --> user: Hiển thị form chỉnh sửa thông tin cá nhân
+user -> updateInfo: Nhập thông tin mới và nhấn nút "Cập nhật"
+updateInfo -> controller: Gửi thông tin mới của user
+controller -> userEntity: Cập nhật thông tin vào cơ sở dữ liệu
+userEntity --> controller: Trả về kết quả cập nhật thành công
+controller --> updateInfo: Thông báo cập nhật thành công
+updateInfo --> user: Hiển thị thông báo thành công
+
+@enduml

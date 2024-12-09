@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { orderInitialState } from './orderInitialState';
+import { ORDER_STATUS } from '../../enum';
 
 const orderSlice = createSlice({
   name: 'product',
@@ -15,9 +16,16 @@ const orderSlice = createSlice({
         order.rating = null;
       }
     },
+    cancelOrder: (state, { payload }) => {
+      const order = state.orders.find((ord) => ord.id === payload);
+      if (order) {
+        order.status = ORDER_STATUS.CANCEL;
+      }
+    },
   },
 });
 
-export const { getAllOrderDispatch, removeOrderRating } = orderSlice.actions;
+export const { getAllOrderDispatch, removeOrderRating, cancelOrder } =
+  orderSlice.actions;
 
 export default orderSlice;

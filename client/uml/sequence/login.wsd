@@ -1,0 +1,20 @@
+@startuml Login
+hide footbox
+actor User as U
+boundary "Giao diện đăng nhập" as UI
+control "LoginController" as LC
+entity "UserEntity" as UE
+
+U -> UI: Nhập thông tin đăng nhập
+UI -> LC: Gửi thông tin đăng nhập
+LC -> UE: Tìm kiếm người dùng bằng email
+UE --> LC: Trả về thông tin người dùng
+alt Kiểm tra mật khẩu đúng
+    LC -> LC: Tạo JWT Token
+    LC --> UI: Trả về JWT Token
+    UI --> U: Hiển thị thông báo đăng nhập thành công
+else Kiểm tra mật khẩu sai
+    LC --> UI: Thông báo lỗi đăng nhập
+    UI --> U: Hiển thị thông báo lỗi
+end
+@enduml

@@ -1,0 +1,78 @@
+@startuml Sơ đồ usecase của hệ thống
+title Sơ đồ usecase của hệ thống
+'user
+usecase "Đăng kí" as register
+usecase "Quên mật khẩu" as forgotPassword
+usecase "Xem danh sách sản phẩm" as listAllProducts
+usecase "Đổi mật khẩu" as changePassword
+usecase "Xem chi tiết sản phẩm" as productDetail
+usecase "Tìm kiếm sản phẩm" as searchProduct
+usecase "Thay đổi thông tin cá nhân" as changeUserInfo
+usecase "Trải nghiệm thử đồ" as tryOn
+usecase "Thêm vào giỏ hàng" as addToCart
+usecase "Đăng nhập" as login
+'customer
+usecase "Đặt hàng" as order
+usecase "Thanh toán" as payment
+usecase "Tìm kiếm đơn hàng" as searchOrder
+usecase "Filter đơn hàng" as filterOrder
+usecase "Đánh giá sản phẩm" as rating
+usecase "Đăng kí mở shop" as shopRegister
+' seller
+usecase "Thay đổi thông tin shop" as changeShopInfo
+usecase "Xem danh sách các sản phẩm mình đang bán" as listAllProductsOfShop
+usecase "Sửa sản phẩm mình đang bán" as editProductOfShop
+usecase "Ngừng bán sản phẩm" as stopSelling
+usecase "Duyệt trạng thái đơn hàng" as changeOrderStatusFromPreparedToShipping
+usecase "Thống kê" as statistic
+' admin
+usecase "Duyệt đơn đăng kí của shop" as approvedShopRegister
+usecase "Duyệt trạng thái đơn hàng" as changeOrderStatusFromShippingToComplete
+
+' (changePassword) .> (login) : include
+' (productDetail) .> (login) : include
+' (searchProduct) .> (login) : include
+' (changeUserInfo) .> (login) : include
+' (tryOn) .> (login) : include
+' (addToCart) .> (login) : include
+' (order) .> (login) : include
+' (payment) .> (login) : include
+' (searchOrder) .> (login) : include
+' (filterOrder) .> (login) : include
+' (rating) .> (login) : include
+' (shopRegister) .> (login) : include
+' (changeShopInfo) .> (login) : include
+' (listAllProductsOfShop) .> (login) : include
+' (editProductOfShop) .> (login) : include
+' (stopSelling) .> (login) : include
+' (changeOrderStatusFromPreparedToShipping) .> (login) : include
+' (statistic) .> (login) : include
+' (register) .> (login) : include
+' (approvedShopRegister) .> (login) : include
+' (changeOrderStatusFromShippingToComplete) .> (login) : include
+
+
+customer --> register
+customer --> forgotPassword
+customer --> addToCart
+customer --> order
+customer --> payment
+customer --> searchOrder
+customer --> filterOrder
+customer --> rating
+customer --> shopRegister
+
+seller --> register
+seller --> forgotPassword
+seller --> changeShopInfo
+seller --> listAllProductsOfShop
+seller --> editProductOfShop
+seller --> stopSelling
+seller --> changeOrderStatusFromPreparedToShipping
+seller --> statistic
+seller --> register
+
+admin --> approvedShopRegister
+admin --> changeOrderStatusFromShippingToComplete
+
+@enduml

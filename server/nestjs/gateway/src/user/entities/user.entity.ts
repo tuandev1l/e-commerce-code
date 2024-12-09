@@ -27,23 +27,23 @@ export class User extends BaseEntity {
   @Column({ type: 'enum', enum: ACCOUNT_TYPE })
   accountType: ACCOUNT_TYPE;
 
-  @Column()
-  isPhoneVerified: boolean = false;
+  @Column({ default: false })
+  isPhoneVerified: boolean;
 
   @Column({ type: 'enum', enum: GENDER })
   gender: GENDER;
 
-  @Column()
-  isEmailVerified: boolean = false;
+  @Column({ default: false })
+  isEmailVerified: boolean;
 
-  @Column()
-  rewardPoint: number = 0;
+  @Column({ default: 0 })
+  rewardPoint: number;
 
-  @Column({ nullable: true })
-  email?: string;
+  @Column({ nullable: false, unique: true })
+  email: string;
 
-  @Column()
-  hasPassword: boolean = true;
+  @Column({ default: true })
+  hasPassword: boolean;
 
   @Column({ nullable: true })
   avatarUrl?: string;

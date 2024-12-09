@@ -18,17 +18,17 @@ import { BullModule } from '@nestjs/bullmq';
 import { QueueModule } from '@libs/queue';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { SocketGatewayModule } from '@socket/socket.gateway.module';
-import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
 import { CacheModule } from '@libs/cache';
+import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
 
 @Module({
   controllers: [],
   imports: [
+    ElasticsearchModule,
     CacheModule,
     AuthModule,
     UserModule,
     LoggingModule,
-    ElasticsearchModule,
     SocketGatewayModule,
     ConfigModule.forRoot({
       envFilePath: ['.env'],

@@ -68,12 +68,16 @@ export const ProductRating = ({ productId }: Props) => {
   return (
     <>
       <div className='mt-4'>
-        <div className='mb-2'>Tất cả hình ảnh</div>
-        <div className='flex gap-2 overflow-x-scroll'>
-          {ratingImgs.map((img) => (
-            <img src={img.fullPath} className='w-16' key={img.fullPath} />
-          ))}
-        </div>
+        {ratingImgs.length > 0 && (
+          <>
+            <div className='mb-2'>Tất cả hình ảnh</div>
+            <div className='flex gap-2 overflow-x-scroll'>
+              {ratingImgs.map((img) => (
+                <img src={img.fullPath} className='w-16' key={img.fullPath} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
       <div className='my-4'>
         <div className='mb-2'>Lọc theo</div>
@@ -81,7 +85,7 @@ export const ProductRating = ({ productId }: Props) => {
           {fitlerBy.map((el, idx) => (
             <div
               className={`px-4 py-1 rounded-xl border-gray-200 border-2 ${
-                idx === selectedNumber && 'border-blue-700'
+                idx === selectedNumber && 'border-blue-600'
               }`}
               key={el}
               onClick={() => filterHandler(idx)}

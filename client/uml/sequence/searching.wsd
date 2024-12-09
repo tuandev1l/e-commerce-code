@@ -1,0 +1,17 @@
+@startuml SearchProduct
+
+hide footbox
+autonumber
+participant User as user
+boundary "Giao diện website" as web
+control "SearchController" as controller
+entity "Product" as productEntity
+
+user -> web: Nhập thông tin tìm kiếm (text, category, price range, brand)
+web -> controller: Gửi yêu cầu tìm kiếm với filter
+controller -> productEntity: Truy vấn sản phẩm theo các bộ lọc
+productEntity --> controller: Trả về danh sách sản phẩm
+controller --> web: Trả về kết quả tìm kiếm
+web --> user: Hiển thị kết quả sản phẩm
+
+@enduml

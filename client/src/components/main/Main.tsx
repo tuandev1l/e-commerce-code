@@ -214,7 +214,14 @@ export const Main = ({}: Props) => {
                     className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-0 removeArrow'
                     placeholder='₫ TỪ'
                     value={fromNumber}
-                    onChange={(e) => dispatch(setFromNumber(e.target.value))}
+                    min={0}
+                    onChange={(e) => {
+                      let val = +e.target.value;
+                      if (val < 0) {
+                        val = 0;
+                      }
+                      dispatch(setFromNumber(val));
+                    }}
                   />
                   <input
                     type='number'
@@ -222,7 +229,14 @@ export const Main = ({}: Props) => {
                     className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-0'
                     placeholder='₫ ĐẾN'
                     value={toNumber}
-                    onChange={(e) => dispatch(setToNumber(e.target.value))}
+                    max={99999999}
+                    onChange={(e) => {
+                      let val = +e.target.value;
+                      if (val > 99999999) {
+                        val = 99999999;
+                      }
+                      dispatch(setToNumber(val));
+                    }}
                   />
                 </div>
               </div>

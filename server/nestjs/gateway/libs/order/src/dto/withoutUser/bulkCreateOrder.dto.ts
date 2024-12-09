@@ -23,4 +23,8 @@ export class BulkCreateOrderDtoWithoutUser {
   @IsOptional()
   @IsString()
   vnp_TxnRef?: string;
+
+  @IsOptional()
+  @IsString()
+  momoRequestId?: string;
 }

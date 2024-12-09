@@ -8,6 +8,7 @@ import useToast from '../../hook/useToast';
 import { IUserAddress } from '../../interfaces/userAddress.interface';
 import { useAppDispatch } from '../../store/store';
 import { setShopId } from '../auth';
+import { uploadFile } from '../../common/uploadFile';
 
 type Props = {};
 
@@ -25,9 +26,10 @@ export const ShopAdminRegister = ({}: Props) => {
   const toast = useToast();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [logoFile, setLogoFile] = useState<File>();
   const [formData, setFormData] = useState<IShopDto>({
     name: '',
-    logo: 'https://salt.tikicdn.com/cache/w220/ts/seller/8d/05/90/e3a5a6a97a3f5cce051cbf7d6c9e325f.png',
+    logo: '',
     address: {
       detailAddress: '',
       district: '',
@@ -46,9 +48,9 @@ export const ShopAdminRegister = ({}: Props) => {
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // if (e.target.files && e.target.files.length > 0) {
-    //   setFormData({ ...formData, logo: e.target.files[0] });
-    // }
+    if (e.target.files && e.target.files.length > 0) {
+      setLogoFile(e.target.files[0]);
+    }
   };
 
   const { mutate } = useMutation({
@@ -58,7 +60,7 @@ export const ShopAdminRegister = ({}: Props) => {
       toast({
         type: 'success',
         message:
-          'Đăng kí shop thành công, shop sẽ được admin duyệt trong thời gian tới',
+          'Shop register successfully and will be approved in short time',
       });
       // @ts-ignore
       dispatch(setShopId(data._id));
@@ -71,10 +73,10 @@ export const ShopAdminRegister = ({}: Props) => {
     },
   });
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
 
+    formData.logo = await uploadFile(logoFile!);
     if (Object.values(formData).some((el) => !el)) {
       toast({ type: 'error', message: 'Missing fields' });
       return;

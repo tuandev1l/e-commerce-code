@@ -105,7 +105,11 @@ export const Signup = ({}: Props) => {
                         required={true}
                         value={formData.name}
                         onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
+                          setFormData({
+                            ...formData,
+                            name: e.target.value,
+                            avatar: `https://avatar.iran.liara.run/public/boy?username=${e.target.value}`,
+                          })
                         }
                       />
                     </div>
@@ -186,11 +190,11 @@ export const Signup = ({}: Props) => {
                     <div className='mb-4 w-full flex justify-center items-center'>
                       <img className='h-40 rounded-lg' src={formData.avatar} />
                     </div>
-                    <input
+                    {/* <input
                       className='block w-8/12 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50'
                       id='file_input'
                       type='file'
-                    />
+                    /> */}
                   </div>
                 </div>
                 <div>
