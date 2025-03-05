@@ -1,7 +1,10 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { UpdateBrandWithoutId } from '@libs/product/dto/brand/update-brand-wid.dto';
 
-export class UpdateBrandDto extends UpdateBrandWithoutId {
+export class UpdateBrandDto {
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
   @IsNotEmpty()
   @IsString()
   brandId: string;

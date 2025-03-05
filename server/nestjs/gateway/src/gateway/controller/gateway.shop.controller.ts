@@ -3,11 +3,11 @@ import { GatewayService } from '@gateway/service/gateway.service';
 import { SHOP_PREFIX } from '@constants/requestPrefix';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
-import { UpdateShopDtoWithoutId } from '@libs/product/dto/shop/update-shop-wid.dto';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
-import { GetUser } from '@auth/decorator/get-user.decorator';
-import { User } from '@user/entities/user.entity';
+import { AddUserToBody } from '@decorator/add-user-to-body.dectorator';
+import { AddIdParamToBody } from '@decorator/add-id-to-body.dectorator';
+import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
 
 @ApiTags('Gateway')
 @Controller(SHOP_PREFIX)
@@ -22,8 +22,8 @@ export class GatewayShopController {
 
   // @Auth(Role.ADMIN)
   @Post()
-  async createShop(@GetUser() user: User, @Body() createShop: CreateShopDto) {
-    return this.service.createShop({ ...createShop, user });
+  async createShop(@AddUserToBody() @Body() createShop: CreateShopDto) {
+    return this.service.createShop(createShop);
   }
 
   @Get('id/:id')
@@ -51,8 +51,10 @@ export class GatewayShopController {
   @Patch(':id')
   async updateShop(
     @Param('id') shopId: string,
-    @Body() updateShopDto: UpdateShopDtoWithoutId,
+    @AddIdParamToBody({ paramDest: 'shopId' })
+    @Body()
+    updateShopDto: UpdateShopDto,
   ) {
-    return this.service.updateShop({ shopId, ...updateShopDto });
+    return this.service.updateShop(updateShopDto);
   }
 }

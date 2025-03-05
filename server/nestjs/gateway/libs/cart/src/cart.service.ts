@@ -3,13 +3,13 @@ import { User } from '@user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from '@libs/cart/entity/cart.entity';
 import { Repository } from 'typeorm';
-import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
-import { AddItemDto } from '@libs/cart/dto/withUser/addItem.dto';
 import { RpcBadRequest } from '@base/exception/exception.resolver';
 import { ProductService } from '@libs/product/product.service';
 import { IProductItem } from '@libs/product/interfaces';
 import { v4 as uuidv4 } from 'uuid';
-import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityInCart.dto';
+import { AddItemDto } from '@libs/cart/dto/addItem.dto';
+import { ChangeQuantityInCartDto } from '@libs/cart/dto/changeQuantityInCart.dto';
+import { DelItemDto } from '@libs/cart/dto/delItem.dto';
 
 @Injectable()
 export class CartService {

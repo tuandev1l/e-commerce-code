@@ -12,29 +12,29 @@ import {
 import { ISearch } from '@libs/searching/search.interface';
 import { User } from '@user/entities/user.entity';
 import { ProducerService } from '@gateway/service/producer.service';
-import { AddItemWithoutUserDto } from '@libs/cart/dto/withoutUser/addItemWithoutUser.dto';
-import { CancelOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/cancelOrder.dto';
-import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
-import { GetOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/getOrder.dto';
-import { BulkCreateOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/bulkCreateOrder.dto';
-import { CreateRatingDto } from '@libs/rating/dto/withUser/createRating.dto';
-import { UpdateRatingDto } from '@libs/rating/dto/withUser/updateRating.dto';
-import { GetAndDeleteRatingDto } from '@libs/rating/dto/withUser/getAndDeleteRating.dto';
-import { UpdateProductDto } from '@libs/product/dto/product/withUser/update-product.dto';
-import { CreateProductDto } from '@libs/product/dto/product/withUser/create-product.dto';
 import { CreateBrandDto } from '@libs/product/dto/brand/create-brand.dto';
 import { UpdateBrandDto } from '@libs/product/dto/brand/update-brand.dto';
 import { CreateCategoryDto } from '@libs/product/dto/category/create-category.dto';
 import { UpdateCategoryDto } from '@libs/product/dto/category/update-category.dto';
 import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
 import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
-import { ChangeQuantityInCartDto } from '@libs/cart/dto/withUser/changeQuantityInCart.dto';
-import { PayOrderDto } from '@libs/order/dto/withUser/payOrder.dto';
-import { DelItemDto } from '@libs/cart/dto/withUser/delItem.dto';
-import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 import { ApproveShopDto } from '@libs/product/dto/shop/approveShop.dto';
-import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
-import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/withUser/get-5-products-in-the-same-category.dto';
+import { AddItemDto } from '@libs/cart/dto/addItem.dto';
+import { CreateProductDto } from '@libs/product/dto/product/create-product.dto';
+import { ProductFilterDto } from '@libs/product/dto/product/productFilter.dto';
+import { UpdateProductDto } from '@libs/product/dto/product/update-product.dto';
+import { DeleteProductDto } from '@libs/product/dto/product/deleteProduct.dto';
+import { ChangeQuantityInCartDto } from '@libs/cart/dto/changeQuantityInCart.dto';
+import { DelItemDto } from '@libs/cart/dto/delItem.dto';
+import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/get-5-products-in-the-same-category.dto';
+import { BulkCreateOrderDto } from '@libs/order/dto/bulkCreateOrder.dto';
+import { CancelOrderDto } from '@libs/order/dto/cancelOrder.dto';
+import { PayOrderDto } from '@libs/order/dto/payOrder.dto';
+import { UpdateOrderStatusDto } from '@libs/order/dto/updateOrderStatus.dto';
+import { GetOrderDto } from '@libs/order/dto/getOrder.dto';
+import { CreateRatingDto } from '@libs/rating/dto/createRating.dto';
+import { UpdateRatingDto } from '@libs/rating/dto/updateRating.dto';
+import { GetAndDeleteRatingDto } from '@libs/rating/dto/getAndDeleteRating.dto';
 
 @Injectable()
 export class GatewayService {
@@ -81,11 +81,8 @@ export class GatewayService {
   }
 
   // CART
-  async addToCart(user: User, cartPayload: AddItemWithoutUserDto) {
-    return this.producer.sendMessage(CART_PATTERN.ADD_TO_CART, {
-      user,
-      ...cartPayload,
-    });
+  async addToCart(cartPayload: AddItemDto) {
+    return this.producer.sendMessage(CART_PATTERN.ADD_TO_CART, cartPayload);
   }
 
   async changeQuantity(changeQuantityDto: ChangeQuantityInCartDto) {
@@ -115,18 +112,12 @@ export class GatewayService {
     return this.producer.sendMessage(ORDER_PATTERN.PAY_ORDER, payOrderDto);
   }
 
-  async createOrder(user: User, orderPayload: BulkCreateOrderDtoWithoutUser) {
-    return this.producer.sendMessage(ORDER_PATTERN.CREATE_ORDER, {
-      user,
-      ...orderPayload,
-    });
+  async createOrder(orderPayload: BulkCreateOrderDto) {
+    return this.producer.sendMessage(ORDER_PATTERN.CREATE_ORDER, orderPayload);
   }
 
-  async cancelOrder(user: User, orderPayload: CancelOrderDtoWithoutUser) {
-    return this.producer.sendMessage(ORDER_PATTERN.CANCEL_ORDER, {
-      user,
-      ...orderPayload,
-    });
+  async cancelOrder(orderPayload: CancelOrderDto) {
+    return this.producer.sendMessage(ORDER_PATTERN.CANCEL_ORDER, orderPayload);
   }
 
   async updateOrderStatus(orderPayload: UpdateOrderStatusDto) {
@@ -140,11 +131,8 @@ export class GatewayService {
     return this.producer.sendMessage(ORDER_PATTERN.GET_ALL_ORDERS, user);
   }
 
-  async getOrder(user: User, getOrderDto: GetOrderDtoWithoutUser) {
-    return this.producer.sendMessage(ORDER_PATTERN.GET_ORDER, {
-      user,
-      ...getOrderDto,
-    });
+  async getOrder(getOrderDto: GetOrderDto) {
+    return this.producer.sendMessage(ORDER_PATTERN.GET_ORDER, getOrderDto);
   }
 
   async getAllPaymentMethod() {
@@ -286,10 +274,6 @@ export class GatewayService {
 
   async updateShop(updateShopDto: UpdateShopDto) {
     return this.producer.sendMessage(SHOP_PATTERN.UPDATE_SHOP, updateShopDto);
-  }
-
-  async findAllProductTest() {
-    return this.producer.sendMessage(PRODUCT_PATTERN.TEST);
   }
 
   async approveShop(approveShopDto: ApproveShopDto) {

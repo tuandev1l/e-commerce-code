@@ -3,13 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Rating } from '@libs/rating/entity/rating.entity';
 import { Repository } from 'typeorm';
 import { User } from '@user/entities/user.entity';
-import { CreateRatingDto } from '@libs/rating/dto/withUser/createRating.dto';
-import { UpdateRatingDto } from '@libs/rating/dto/withUser/updateRating.dto';
-import { GetAndDeleteRatingDto } from '@libs/rating/dto/withUser/getAndDeleteRating.dto';
 import { Order } from '@libs/order/entity/order.entity';
 import { ORDER_STATUS } from '@libs/order/enum';
 import { RpcBadRequest, RpcNotFound } from '@base/exception/exception.resolver';
 import { ProductRating } from '@libs/rating/entity/productRating.entity';
+import { CreateRatingDto } from '@libs/rating/dto/createRating.dto';
+import { GetAndDeleteRatingDto } from '@libs/rating/dto/getAndDeleteRating.dto';
+import { UpdateRatingDto } from '@libs/rating/dto/updateRating.dto';
 
 enum UpdateProductReviewType {
   'CREATE',

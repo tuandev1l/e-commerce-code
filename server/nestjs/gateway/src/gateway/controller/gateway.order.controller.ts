@@ -2,14 +2,15 @@ import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { GatewayService } from '@gateway/service/gateway.service';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from '@user/entities/user.entity';
-import { CancelOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/cancelOrder.dto';
 import { GetUser } from '@auth/decorator/get-user.decorator';
 import { ORDER_PREFIX } from '@constants/requestPrefix';
-import { BulkCreateOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/bulkCreateOrder.dto';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
-import { PayOrderDtoWithoutUser } from '@libs/order/dto/withoutUser/payOrder.dto';
-import { UpdateOrderStatusDto } from '@libs/order/dto/withUser/updateOrderStatus.dto';
+import { BulkCreateOrderDto } from '@libs/order/dto/bulkCreateOrder.dto';
+import { CancelOrderDto } from '@libs/order/dto/cancelOrder.dto';
+import { AddUserToBody } from '@decorator/add-user-to-body.dectorator';
+import { UpdateOrderStatusDto } from '@libs/order/dto/updateOrderStatus.dto';
+import { PayOrderDto } from '@libs/order/dto/payOrder.dto';
 
 @ApiTags('Gateway')
 @Controller(ORDER_PREFIX)
@@ -17,28 +18,23 @@ export class GatewayOrderController {
   constructor(private readonly service: GatewayService) {}
 
   @Post()
-  async createOrder(
-    @GetUser() user: User,
-    @Body() orderPayload: BulkCreateOrderDtoWithoutUser,
-  ) {
-    return this.service.createOrder(user, orderPayload);
+  async createOrder(@AddUserToBody() @Body() orderPayload: BulkCreateOrderDto) {
+    return this.service.createOrder(orderPayload);
   }
 
   @Patch('cancel')
-  async cancelOrder(
-    @GetUser() user: User,
-    @Body() orderPayload: CancelOrderDtoWithoutUser,
-  ) {
-    return this.service.cancelOrder(user, orderPayload);
+  async cancelOrder(@AddUserToBody() @Body() orderPayload: CancelOrderDto) {
+    return this.service.cancelOrder(orderPayload);
   }
 
   @Auth(Role.ADMIN, Role.SHOP)
   @Patch()
   async updateOrderStatus(
-    @GetUser() user: User,
-    @Body() orderPayload: UpdateOrderStatusDto,
+    @AddUserToBody()
+    @Body()
+    orderPayload: UpdateOrderStatusDto,
   ) {
-    return this.service.updateOrderStatus({ user, ...orderPayload });
+    return this.service.updateOrderStatus(orderPayload);
   }
 
   @Get()
@@ -66,14 +62,16 @@ export class GatewayOrderController {
 
   @Get(':id')
   async getOrder(@GetUser() user: User, @Param('id') id: string) {
-    return this.service.getOrder(user, { orderId: +id });
+    return this.service.getOrder({ user, orderId: +id });
   }
 
   @Post('get-payment-url')
   async getPaymentUrl(
     @GetUser() user: User,
-    @Body() payOrderDto: PayOrderDtoWithoutUser,
+    @AddUserToBody()
+    @Body()
+    payOrderDto: PayOrderDto,
   ) {
-    return this.service.getPaymentUrl({ user, ...payOrderDto });
+    return this.service.getPaymentUrl(payOrderDto);
   }
 }

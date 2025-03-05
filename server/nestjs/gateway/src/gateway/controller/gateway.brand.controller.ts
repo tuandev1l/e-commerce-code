@@ -3,10 +3,11 @@ import { CreateBrandDto } from '@libs/product/dto/brand/create-brand.dto';
 import { GatewayService } from '@gateway/service/gateway.service';
 import { BRAND_PREFIX } from '@constants/requestPrefix';
 import { ApiTags } from '@nestjs/swagger';
-import { UpdateBrandWithoutId } from '@libs/product/dto/brand/update-brand-wid.dto';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
 import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
+import { UpdateBrandDto } from '@libs/product/dto/brand/update-brand.dto';
+import { AddIdParamToBody } from '@decorator/add-id-to-body.dectorator';
 
 @ApiTags('Gateway')
 @Controller(BRAND_PREFIX)
@@ -39,8 +40,10 @@ export class GatewayBrandController {
   @Patch(':id')
   async updateBrand(
     @Param('id') brandId: string,
-    @Body() updateBrandDto: UpdateBrandWithoutId,
+    @AddIdParamToBody({ paramDest: 'brandId' })
+    @Body()
+    updateBrandDto: UpdateBrandDto,
   ) {
-    return this.service.updateBrand({ brandId, ...updateBrandDto });
+    return this.service.updateBrand(updateBrandDto);
   }
 }

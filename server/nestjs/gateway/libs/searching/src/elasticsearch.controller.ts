@@ -1,9 +1,9 @@
 import { ElasticsearchService } from '@libs/searching/elasticsearch.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { Controller } from '@nestjs/common';
-import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
 import { SEARCHING_PATTERN } from '@constants';
+import { ProductFilterDto } from '@libs/product/dto/product/productFilter.dto';
 
 @Controller('searching')
 @SkipAuth()

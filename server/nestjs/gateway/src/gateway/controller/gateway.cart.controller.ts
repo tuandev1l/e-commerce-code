@@ -12,8 +12,9 @@ import { CART_PREFIX } from '@constants/requestPrefix';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from '@user/entities/user.entity';
 import { GetUser } from '@auth/decorator/get-user.decorator';
-import { AddItemWithoutUserDto } from '@libs/cart/dto/withoutUser/addItemWithoutUser.dto';
-import { ChangeQuantityWithoutUserDto } from '@libs/cart/dto/withoutUser/changeQuantityWithoutUser.dto';
+import { AddItemDto } from '@libs/cart/dto/addItem.dto';
+import { AddUserToBody } from '@decorator/add-user-to-body.dectorator';
+import { ChangeQuantityInCartDto } from '@libs/cart/dto/changeQuantityInCart.dto';
 
 @ApiTags('Gateway')
 @Controller(CART_PREFIX)
@@ -22,18 +23,20 @@ export class GatewayCartController {
 
   @Post('add-to-cart')
   async addToCart(
-    @Body() cartPayload: AddItemWithoutUserDto,
-    @GetUser() user: User,
+    @AddUserToBody()
+    @Body()
+    cartPayload: AddItemDto,
   ) {
-    return this.service.addToCart(user, cartPayload);
+    return this.service.addToCart(cartPayload);
   }
 
   @Patch('quantity')
   async changeQuantity(
-    @Body() changeQuantityDto: ChangeQuantityWithoutUserDto,
-    @GetUser() user: User,
+    @AddUserToBody()
+    @Body()
+    changeQuantityDto: ChangeQuantityInCartDto,
   ) {
-    return this.service.changeQuantity({ ...changeQuantityDto, user });
+    return this.service.changeQuantity(changeQuantityDto);
   }
 
   @Delete(':productId')

@@ -35,15 +35,14 @@ services:
 
 #  elasticsearch:
 #    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION}
-#    container_name: lms_elastic_search
+#    container_name: elasticsearch
 #    restart: always
 #    #    volumes:
-#    #      - ./docker/elastic_data1:/usr/share/elasticsearch/data
+#    #      - ./docker/elastic_data:/usr/share/elasticsearch/data
 #    environment:
 #      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
 #      discovery.type: single-node
 #      xpack.security.enrollment.enabled: true
-#      # turn on or off
 #      xpack.security.enabled: true
 #
 #    env_file:
@@ -62,7 +61,7 @@ services:
 #    ports:
 #      - ${KIBANA_PORT}:5601
 #    environment:
-#      ELASTICSEARCH_URL: https://lms_elastic_search:9200
+#      ELASTICSEARCH_URL: http://elasticsearch:9200
 #      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: 17490b004b3d14959644ad26d145c69c
 #      XPACK_REPORTING_ENCRYPTIONKEY: 3ea4bfb67afc69d7b46f348833bd2b65
 #      XPACK_SECURITY_ENCRYPTIONKEY: 6cab6fe5de846b69a173f1b73611e402
@@ -76,8 +75,7 @@ services:
 volumes:
   postgres_data:
   rabbitmq_data:
-
-#  elastic_data:
+  elastic_data:
 
 networks:
   elastic:

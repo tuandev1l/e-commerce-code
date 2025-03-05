@@ -3,11 +3,11 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { ProductService } from '@libs/product/product.service';
 import { PRODUCT_PATTERN } from '@constants/pattern';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
-import { CreateProductDto } from '@libs/product/dto/product/withUser/create-product.dto';
-import { UpdateProductDto } from '@libs/product/dto/product/withUser/update-product.dto';
-import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
-import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
-import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/withUser/get-5-products-in-the-same-category.dto';
+import { CreateProductDto } from '@libs/product/dto/product/create-product.dto';
+import { ProductFilterDto } from '@libs/product/dto/product/productFilter.dto';
+import { DeleteProductDto } from '@libs/product/dto/product/deleteProduct.dto';
+import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/get-5-products-in-the-same-category.dto';
+import { UpdateProductDto } from '@libs/product/dto/product/update-product.dto';
 
 @Controller()
 @UseFilters(new ExceptionFilter())

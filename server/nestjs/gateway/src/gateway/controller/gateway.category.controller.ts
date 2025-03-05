@@ -3,10 +3,11 @@ import { GatewayService } from '@gateway/service/gateway.service';
 import { CATEGORY_PREFIX } from '@constants/requestPrefix';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateCategoryDto } from '@libs/product/dto/category/create-category.dto';
-import { UpdateCategoryDtoWithoutId } from '@libs/product/dto/category/update-category-wid.dto';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
 import { SkipAuth } from '@auth/decorator/skip-auth.decorator';
+import { AddIdParamToBody } from '@decorator/add-id-to-body.dectorator';
+import { UpdateCategoryDto } from '@libs/product/dto/category/update-category.dto';
 
 @ApiTags('Gateway')
 @Controller(CATEGORY_PREFIX)
@@ -34,8 +35,10 @@ export class GatewayCategoryController {
   @Patch(':id')
   async updateCategory(
     @Param('id') categoryId: string,
-    @Body() updateCategoryDto: UpdateCategoryDtoWithoutId,
+    @AddIdParamToBody({ paramDest: 'categoryId' })
+    @Body()
+    updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.service.updateCategory({ categoryId, ...updateCategoryDto });
+    return this.service.updateCategory(updateCategoryDto);
   }
 }

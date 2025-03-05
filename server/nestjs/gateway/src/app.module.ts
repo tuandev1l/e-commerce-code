@@ -47,7 +47,7 @@ import { ElasticsearchModule } from '@libs/searching/elasticsearch.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
-        uri: `mongodb+srv://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@cluster0.s5h2f.mongodb.net/${configService.get('MONGODB_NAME')}`,
+        uri: `mongodb+srv://${configService.get('MONGODB_USERNAME')}:${configService.get('MONGODB_PASSWORD')}@cluster0.t2kfn.mongodb.net/${configService.get('MONGODB_NAME')}`,
       }),
     }),
     BullModule.forRootAsync({

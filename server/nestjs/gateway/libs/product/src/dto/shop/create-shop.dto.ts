@@ -19,7 +19,7 @@ export class CreateShopDto {
   @IsNotEmpty()
   address: IUserAddress;
 
-  @IsOptional()
+  @IsNotEmpty()
   @Type(() => User)
   user?: User;
 }

@@ -13,8 +13,6 @@ import {
 import { Shop, ShopDocument } from '@libs/product/entities/shop.entity';
 import slugify from 'slugify';
 import { RpcBadRequest, RpcNotFound } from '@base/exception/exception.resolver';
-import { CreateProductDto } from '@libs/product/dto/product/withUser/create-product.dto';
-import { UpdateProductDto } from '@libs/product/dto/product/withUser/update-product.dto';
 import { UpdateBrandDto } from '@libs/product/dto/brand/update-brand.dto';
 import { UpdateCategoryDto } from '@libs/product/dto/category/update-category.dto';
 import { UpdateShopDto } from '@libs/product/dto/shop/update-shop.dto';
@@ -27,18 +25,20 @@ import { Rating } from '@libs/rating/entity/rating.entity';
 import { User } from '@user/entities/user.entity';
 import { AuthService } from '@auth/auth.service';
 import { ACCOUNT_TYPE, GENDER } from '@share/enums';
-import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 import { ConfigService } from '@nestjs/config';
 import { ProducerService } from '@gateway/service/producer.service';
-import { SEARCHING_PATTERN } from '@constants';
 import { CacheService } from '@libs/cache';
 import { plainToInstance } from 'class-transformer';
 import { ElasticsearchService } from '@libs/searching/elasticsearch.service';
 import { CreateShopDto } from '@libs/product/dto/shop/create-shop.dto';
 import { ApproveShopDto } from '@libs/product/dto/shop/approveShop.dto';
-import { DeleteProductDto } from '@libs/product/dto/product/withUser/deleteProduct.dto';
 import { Role } from '@auth';
-import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/withUser/get-5-products-in-the-same-category.dto';
+import { SEARCHING_PATTERN } from '@constants';
+import { CreateProductDto } from '@libs/product/dto/product/create-product.dto';
+import { ProductFilterDto } from '@libs/product/dto/product/productFilter.dto';
+import { UpdateProductDto } from '@libs/product/dto/product/update-product.dto';
+import { DeleteProductDto } from '@libs/product/dto/product/deleteProduct.dto';
+import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/get-5-products-in-the-same-category.dto';
 
 @Injectable()
 export class ProductService {
@@ -73,7 +73,7 @@ export class ProductService {
     ];
 
     const rawData = await readFile(
-      '/home/tuantm/schooling/ending_project/crawl/final_resolved_products.json',
+      '/home/tuantm/schooling/ending_project/crawl/final_resolved_products_v2.json',
       'utf-8',
     );
     const data = JSON.parse(rawData);

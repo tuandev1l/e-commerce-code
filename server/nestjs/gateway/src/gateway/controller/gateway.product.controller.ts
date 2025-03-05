@@ -15,12 +15,14 @@ import { ApiTags } from '@nestjs/swagger';
 import { ISearch } from '@libs/searching/search.interface';
 import { Auth } from '@auth/decorator/auth.decorator';
 import { Role } from '@auth';
-import { CreateProductDtoWithoutUser } from '@libs/product/dto/product/withoutUser/create-product.dto';
-import { UpdateProductDtoWithoutUser } from '@libs/product/dto/product/withoutUser/update-product.dto';
 import { GetUser } from '@auth/decorator/get-user.decorator';
 import { User } from '@user/entities/user.entity';
-import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
-import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/withUser/get-5-products-in-the-same-category.dto';
+import { AddUserToBody } from '@decorator/add-user-to-body.dectorator';
+import { CreateProductDto } from '@libs/product/dto/product/create-product.dto';
+import { Get5ProductsInTheSameCategoryDto } from '@libs/product/dto/product/get-5-products-in-the-same-category.dto';
+import { AddIdParamToBody } from '@decorator/add-id-to-body.dectorator';
+import { UpdateProductDto } from '@libs/product/dto/product/update-product.dto';
+import { ProductFilterDto } from '@libs/product/dto/product/productFilter.dto';
 
 @ApiTags('Gateway')
 @Controller(PRODUCT_PREFIX)
@@ -61,19 +63,23 @@ export class GatewayProductController {
   @Post()
   async createProduct(
     @GetUser() user: User,
-    @Body() productDto: CreateProductDtoWithoutUser,
+    @AddUserToBody()
+    @Body()
+    productDto: CreateProductDto,
   ) {
-    return this.service.createProduct({ user, ...productDto });
+    return this.service.createProduct(productDto);
   }
 
   @Auth(Role.SHOP)
   @Patch(':id')
   async updateProduct(
     @Param('id') id: string,
-    @GetUser() user: User,
-    @Body() productDto: UpdateProductDtoWithoutUser,
+    @AddIdParamToBody({ paramDest: 'productId' })
+    @AddUserToBody()
+    @Body()
+    productDto: UpdateProductDto,
   ) {
-    return this.service.updateProduct({ productId: id, user, ...productDto });
+    return this.service.updateProduct(productDto);
   }
 
   @Auth(Role.ADMIN, Role.SHOP)

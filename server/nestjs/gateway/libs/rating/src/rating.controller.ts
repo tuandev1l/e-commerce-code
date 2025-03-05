@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { RatingService } from '@libs/rating/rating.service';
-import { CreateRatingDto } from '@libs/rating/dto/withUser/createRating.dto';
-import { UpdateRatingDto } from '@libs/rating/dto/withUser/updateRating.dto';
 import { User } from '@user/entities/user.entity';
 import { RATING_PATTERN } from '@constants';
-import { GetAndDeleteRatingDto } from '@libs/rating/dto/withUser/getAndDeleteRating.dto';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
+import { CreateRatingDto } from '@libs/rating/dto/createRating.dto';
+import { UpdateRatingDto } from '@libs/rating/dto/updateRating.dto';
+import { GetAndDeleteRatingDto } from '@libs/rating/dto/getAndDeleteRating.dto';
 
 @Controller()
 @UseFilters(new ExceptionFilter())

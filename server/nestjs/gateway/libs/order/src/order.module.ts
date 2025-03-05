@@ -45,11 +45,6 @@ export class OrderModule implements OnModuleInit {
     ];
     const paymentMethod = [
       {
-        name: 'Stripe',
-        imgUrl:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSB1nacBhVfB9L9chvUPk35aYeg0bmYmP-Wag&s',
-      },
-      {
         name: 'Momo',
         imgUrl:
           'https://salt.tikicdn.com/ts/upload/ce/f6/e8/ea880ef285856f744e3ffb5d282d4b2d.jpg',

@@ -5,22 +5,28 @@ import * as path from 'path';
 import * as process from 'process';
 import axios from 'axios';
 import { SearchType } from '@libs/searching/searchType.enum';
-import { ProductFilterDto } from '@libs/product/dto/product/withoutUser/productFilter.dto';
 import { QueryDslQueryContainer } from '@elastic/elasticsearch/lib/api/types';
+
+import { readFile } from 'fs/promises';
+import { ProductFilterDto } from '@libs/product/dto/product/productFilter.dto';
 
 @Injectable()
 export class ElasticsearchService {
   private static isImported = false;
   private static LIMIT = 0;
   private readonly client: Client;
-  private readonly embeddedHost: string;
-  private readonly embeddedPort: string;
+  // private readonly embeddedHost: string;
+  // private readonly embeddedPort: string;
+  private ngrokUrl = 'https://a540-35-187-226-231.ngrok-free.app';
   private readonly elasticIndex: string;
 
   constructor(private readonly config: ConfigService) {
     ElasticsearchService.LIMIT = this.config.get('LIMIT_SEARCH');
-    this.embeddedHost = config.get('EMBEDDING_HOST');
-    this.embeddedPort = config.get('EMBEDDING_PORT');
+    // this.embeddedHost = config.get('EMBEDDING_HOST');
+    // this.embeddedPort = config.get('EMBEDDING_PORT');
+
+    // this.elasticIndex = config.get('ELASTIC_INDEX');
+    // this.elasticIndex = config.get('ELASTIC_INDEX_V2');
     this.elasticIndex = config.get('ELASTIC_INDEX');
 
     const node = `https://${config.get('ELASTIC_HOST')}:${config.get('ELASTIC_PORT')}`;
@@ -36,51 +42,53 @@ export class ElasticsearchService {
       },
     });
 
-    // if (!ElasticsearchService.isImported) {
-    //   ElasticsearchService.isImported = true;
-    //   (async () => {
-    //     try {
-    //       await this.client.indices.get({
-    //         index: this.elasticIndex,
-    //       });
-    //     } catch (_: any) {
-    //       console.log('Mapping ecommerce does not exist');
-    //       await this.getClient().indices.create({
-    //         index: this.elasticIndex,
-    //         mappings: {
-    //           properties: {
-    //             descriptionVector: {
-    //               type: 'dense_vector',
-    //               dims: 768,
-    //             },
-    //             imgVector: {
-    //               type: 'dense_vector',
-    //               dims: 768,
-    //             },
-    //           },
-    //         },
-    //       });
-    //     }
-    //
-    //     const records = (
-    //       await this.client.search({
-    //         index: this.elasticIndex,
-    //       })
-    //     ).hits.hits;
-    //
-    //     if (records.length === 0) {
-    //       const data = (await readFile('./vector.json')).toString();
-    //       // console.log(data);
-    //       const jsonData = JSON.parse(data);
-    //       for (const record of jsonData) {
-    //         void this.client.index({
-    //           index: this.elasticIndex,
-    //           body: record,
-    //         });
-    //       }
-    //     }
-    //   })();
-    // }
+    if (!ElasticsearchService.isImported) {
+      ElasticsearchService.isImported = true;
+      (async () => {
+        try {
+          await this.client.indices.get({
+            index: this.elasticIndex,
+          });
+        } catch (_: any) {
+          console.log('Mapping ecommerce does not exist');
+          await this.getClient().indices.create({
+            index: this.elasticIndex,
+            // mappings: {
+            //   properties: {
+            //     imgVector: {
+            //       type: 'dense_vector',
+            //       dims: 512,
+            //     },
+            //     imgDot: {
+            //       type: 'dense_vector',
+            //       dims: 512,
+            //       similarity: 'dot_product',
+            //     },
+            //   },
+            // },
+          });
+        }
+
+        const records = (
+          await this.client.search({
+            index: this.elasticIndex,
+          })
+        ).hits.hits;
+
+        if (records.length === 0) {
+          // const data = (await readFile('./vector.json')).toString();
+          const data = (await readFile('./raw_products.json')).toString();
+          // console.log(data);
+          const jsonData = JSON.parse(data);
+          for (const record of jsonData) {
+            void this.client.index({
+              index: this.elasticIndex,
+              body: record,
+            });
+          }
+        }
+      })();
+    }
   }
 
   async find5ProductsInSameCategory(categoryId: string, productId: string) {
@@ -168,44 +176,50 @@ export class ElasticsearchService {
   }
 
   async searchProductUsingKnn(productFilterDto: ProductFilterDto) {
-    const textEmbedding = await axios.post(
-      `http://${this.embeddedHost}:${this.embeddedPort}/convert/${productFilterDto.type === SearchType.TEXT ? 'text' : 'img'}`,
+    const res = await axios.post(
+      `${this.ngrokUrl}/convert/${productFilterDto.type === SearchType.TEXT ? 'text' : 'img'}`,
       { data: productFilterDto.keyword },
     );
 
-    const { page } = productFilterDto;
-    const query = this.createQueryBuilder(productFilterDto);
+    return {
+      totalPage: 1,
+      currentPage: 1,
+      data: res.data.data,
+    };
 
-    const filterPage = page ? page : 1;
-
-    const records = await this.getClient().search({
-      index: this.elasticIndex,
-      knn: {
-        query_vector: textEmbedding.data.data,
-        k: 20,
-        num_candidates: 20,
-        field: SearchType.TEXT ? 'descriptionVector' : 'imgVector',
-      },
-      query,
-      // sort: {
-      //   createdAt: {
-      //     order: 'desc',
-      //   },
-      // },
-      from: (filterPage - 1) * ElasticsearchService.LIMIT,
-      size: ElasticsearchService.LIMIT,
-      _source_includes: [
-        'id',
-        'name',
-        'thumbnailUrl',
-        'discountRate',
-        'price',
-        'ratingAverage',
-        'quantitySold.value',
-      ],
-    });
-
-    return this.returnData(records, filterPage);
+    // const { page } = productFilterDto;
+    // const query = this.createQueryBuilder(productFilterDto);
+    //
+    // const filterPage = page ? page : 1;
+    //
+    // const records = await this.getClient().search({
+    //   index: this.elasticIndex,
+    //   knn: {
+    //     query_vector: textEmbedding.data.data,
+    //     k: 20,
+    //     num_candidates: 20,
+    //     field: 'imgVector',
+    //   },
+    //   query,
+    //   // sort: {
+    //   //   createdAt: {
+    //   //     order: 'desc',
+    //   //   },
+    //   // },
+    //   from: (filterPage - 1) * ElasticsearchService.LIMIT,
+    //   size: ElasticsearchService.LIMIT,
+    //   _source_includes: [
+    //     'id',
+    //     'name',
+    //     'thumbnailUrl',
+    //     'discountRate',
+    //     'price',
+    //     'ratingAverage',
+    //     'quantitySold.value',
+    //   ],
+    // });
+    //
+    // return this.returnData(records, filterPage);
   }
 
   async getProduct(id: string) {
@@ -312,18 +326,23 @@ export class ElasticsearchService {
                 name: keyword,
               },
             },
+            {
+              match: {
+                description: keyword,
+              },
+            },
           ],
         },
       });
 
-      if (usingKnn && type === SearchType.TEXT) {
-        // @ts-ignore
-        mustQuery[0].bool.should.push({
-          match: {
-            description: keyword,
-          },
-        });
-      }
+      // if (usingKnn && type === SearchType.TEXT) {
+      //   // @ts-ignore
+      //   mustQuery[0].bool.should.push({
+      //     match: {
+      //       description: keyword,
+      //     },
+      //   });
+      // }
     }
 
     if (categories?.length && categories?.length > 0) {

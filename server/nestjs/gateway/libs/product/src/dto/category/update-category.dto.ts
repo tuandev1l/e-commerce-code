@@ -1,7 +1,10 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { UpdateCategoryDtoWithoutId } from '@libs/product/dto/category/update-category-wid.dto';
 
-export class UpdateCategoryDto extends UpdateCategoryDtoWithoutId {
+export class UpdateCategoryDto {
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
   @IsNotEmpty()
   @IsString()
   categoryId: string;

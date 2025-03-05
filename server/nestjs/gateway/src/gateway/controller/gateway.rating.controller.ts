@@ -14,10 +14,12 @@ import { GatewayService } from '@gateway/service/gateway.service';
 import { RATING_PREFIX } from '@constants/requestPrefix';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from '@user/entities/user.entity';
-import { CreateRatingDtoWithoutUser } from '@libs/rating/dto/withoutUser/createRating.dto';
 import { GetUser } from '@auth/decorator/get-user.decorator';
-import { UpdateRatingDtoWithoutUser } from '@libs/rating/dto/withoutUser/updateRating.dto';
 import { ExceptionFilter } from '@base/exception/rpc.exception.filter';
+import { AddIdParamToBody } from '@decorator/add-id-to-body.dectorator';
+import { AddUserToBody } from '@decorator/add-user-to-body.dectorator';
+import { UpdateRatingDto } from '@libs/rating/dto/updateRating.dto';
+import { CreateRatingDto } from '@libs/rating/dto/createRating.dto';
 
 @ApiTags('Gateway')
 @Controller(RATING_PREFIX)
@@ -40,13 +42,12 @@ export class GatewayRatingController {
   async updateRating(
     @Param('id') id: string,
     @GetUser() user: User,
-    @Body() updateRatingDto: UpdateRatingDtoWithoutUser,
+    @AddIdParamToBody({ paramDest: 'ratingId' })
+    @AddUserToBody()
+    @Body()
+    updateRatingDto: UpdateRatingDto,
   ) {
-    return this.service.updateRating({
-      ratingId: +id,
-      user,
-      ...updateRatingDto,
-    });
+    return this.service.updateRating(updateRatingDto);
   }
 
   @Get('user')
@@ -57,9 +58,11 @@ export class GatewayRatingController {
   @Post()
   async createRating(
     @GetUser() user: User,
-    @Body() createRatingDto: CreateRatingDtoWithoutUser,
+    @AddUserToBody()
+    @Body()
+    createRatingDto: CreateRatingDto,
   ) {
-    return this.service.createRating({ ...createRatingDto, user });
+    return this.service.createRating(createRatingDto);
   }
 
   @Delete(':id')
