@@ -13,7 +13,7 @@ services:
       - ./docker/postgres_data:/var/lib/postgresql/data
 
   rabbitmq:
-    image: rabbitmq:3.9.20-management-alpine
+    image: rabbitmq:4.0.5-management-alpine
     container_name: rabbitmq
     ports:
       - ${RABBITMQ_MAIN_PORT}:5672

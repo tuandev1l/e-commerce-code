@@ -1,0 +1,36 @@
+# # Ingress Configuration
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: fulllstack-app-ingress
+#   namespace: ecom
+# spec:
+#   rules:
+#     - host: 'ecommerce.localhost'
+#       http:
+#         paths:
+#           - path: '/api/v1/'
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: backend-svc
+#                 port:
+#                   number: 3000
+#           - path: '/'
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: frontend-svc
+#                 port:
+#                   number: 80
+
+#     # - host: 'api-ecommerce.localhost'
+#     #   http:
+#     #     paths:
+#     #       - path: '/'
+#     #         pathType: Prefix
+#     #         backend:
+#     #           service:
+#     #             name: backend-svc
+#     #             port:
+#     #               number: 3000

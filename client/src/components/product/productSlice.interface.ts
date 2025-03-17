@@ -13,6 +13,7 @@ export const productDefault: IProduct = {
   _id: '',
   name: '',
   shortDescription: '',
+  stopSelling: false,
   price: 0,
   listPrice: 0,
   originalPrice: 0,
@@ -57,10 +58,20 @@ export const productDefault: IProduct = {
     slug: '',
   },
   seller: {
-    id: '',
+    _id: '',
     name: '',
     logo: '',
     url: '',
+    address: {
+      country: '',
+      detailAddress: '',
+      district: '',
+      phoneNumber: '',
+      province: '',
+      uuid: '',
+      ward: '',
+      isDefault: false,
+    },
   },
   specifications: [
     {

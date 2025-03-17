@@ -2,7 +2,7 @@
 
 hide footbox
 autonumber
-participant Admin as admin
+actor Admin as admin
 control "AdminController" as adminController
 control "ShopController" as shopController
 entity "Shop" as shopEntity

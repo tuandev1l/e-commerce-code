@@ -17,6 +17,8 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
+    "noEmit": true,
+    "noEmitOnError": true,
     "paths": {
       "@libs/product/*": [
         "libs/product/src/*"

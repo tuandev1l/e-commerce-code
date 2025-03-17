@@ -204,7 +204,7 @@ export const Cart = ({}: Props) => {
                   <button
                     className={`w-full bg-red-600 text-white font-semibold py-2 rounded-md hover:cursor-pointer ${
                       !productSelected.length &&
-                      'disabled hover:cursor-not-allowed bg-red-300'
+                      'disabled hover:cursor-not-allowed bg-red-400'
                     }`}
                     disabled={!productSelected.length}
                     onClick={buyProductHandler}

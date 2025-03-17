@@ -44,7 +44,7 @@ const reportByWeek = () => {
   const data: IReport[] = [];
   while (day.isSameOrBefore(endOfWeek)) {
     const tmp: IReport = {
-      key: `${day.date()}-${day.month() + 1}`,
+      key: `${day.date()}-${day.month() + 1}-${day.year()}`,
       value: 0,
     };
     data.push(tmp);
@@ -58,7 +58,7 @@ const reportByMonth = () => {
   const data: IReport[] = [];
   while (day.isSameOrBefore(endOfMonth)) {
     const tmp: IReport = {
-      key: `${day.date()}-${day.month() + 1}`,
+      key: `${day.date()}-${day.month() + 1}-${day.year()}`,
       value: 0,
     };
     data.push(tmp);
@@ -72,7 +72,7 @@ const reportByYear = () => {
   const data: IReport[] = [];
   while (day.isSameOrBefore(endOfYear)) {
     const tmp: IReport = {
-      key: `${day.month() + 1}`,
+      key: `${day.month() + 1}-${day.year()}`,
       value: 0,
     };
     data.push(tmp);
@@ -107,7 +107,11 @@ export const ShopAdminStatistic = ({}: Props) => {
         const createOrder = moment(order.createdAt);
 
         const dataReportIdx = dataReport.findIndex(
-          (el) => el.key === `${createOrder.date()}-${createOrder.month() + 1}`
+          (el) =>
+            el.key ===
+            `${createOrder.date()}-${
+              createOrder.month() + 1
+            }-${createOrder.year()}`
         );
         if (dataReportIdx !== -1) {
           dataReport[dataReportIdx].value += 1;
@@ -171,7 +175,10 @@ export const ShopAdminStatistic = ({}: Props) => {
           const createOrder = moment(order.createdAt);
           const dataReportIdx = dataReport.findIndex(
             (el) =>
-              el.key === `${createOrder.date()}-${createOrder.month() + 1}`
+              el.key ===
+              `${createOrder.date()}-${
+                createOrder.month() + 1
+              }-${createOrder.year()}`
           );
           if (dataReportIdx !== -1) {
             dataReport[dataReportIdx].value += 1;
@@ -182,7 +189,8 @@ export const ShopAdminStatistic = ({}: Props) => {
         (data as unknown as IOrder[]).forEach((order) => {
           const createOrder = moment(order.createdAt);
           const dataReportIdx = dataReport.findIndex(
-            (el) => el.key === `${createOrder.month() + 1}`
+            (el) =>
+              el.key === `${createOrder.month() + 1}-${createOrder.year()}`
           );
           if (dataReportIdx !== -1) {
             dataReport[dataReportIdx].value += 1;

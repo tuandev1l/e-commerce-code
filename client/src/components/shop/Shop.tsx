@@ -147,6 +147,7 @@ export const Shop = ({}: Props) => {
             <div className='text-blue-500'>Xem tất cả</div>
           </div>
           {products.map((product) => (
+            // @ts-ignore
             <ProductItem product={product} />
           ))}
         </div>

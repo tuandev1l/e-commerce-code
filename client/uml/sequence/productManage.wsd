@@ -2,7 +2,7 @@
 
 hide footbox
 autonumber
-participant Shop as shop
+actor Shop as shop
 control "ShopController" as shopController
 entity "Shop" as shopEntity
 

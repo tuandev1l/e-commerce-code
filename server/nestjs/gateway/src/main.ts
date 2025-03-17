@@ -5,17 +5,26 @@ import { SwaggerConfig } from '@config';
 import { AppModule } from '@app.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors();
 
+  const configService = app.get<ConfigService>(ConfigService);
+
+  const user = configService.get('RABBITMQ_USER');
+  const password = configService.get('RABBITMQ_PASSWORD');
+  const host = configService.get('RABBITMQ_HOST');
+  const port = configService.get('RABBITMQ_MAIN_PORT');
+  const queueName = configService.get('RABBITMQ_QUEUE_NAME');
+
   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://guest:guest@localhost:5672'],
-      queue: 'e-commerce',
+      urls: [`amqp://${user}:${password}@${host}:${port}`],
+      queue: queueName,
       queueOptions: {
         durable: true,
       },

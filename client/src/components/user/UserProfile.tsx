@@ -1,21 +1,20 @@
-import { UserIcon } from '@heroicons/react/24/outline';
-import { Link } from 'react-router-dom';
-import { UserLayout } from './UserLayout';
+import { useMutation } from '@tanstack/react-query';
+import moment from 'moment';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { updateUserInfoApi } from '../../api/api';
+import { IAxiosError } from '../../config/axiosError.interface';
+import { Gender } from '../../enum/userGender.enum';
+import useToast from '../../hook/useToast';
 import {
   dobSelector,
   genderSelector,
   usernameSelector,
 } from '../../store/selector';
-import { useSelector } from 'react-redux';
-import { Gender } from '../../enum/userGender.enum';
-import { useMutation } from '@tanstack/react-query';
-import { updateUserInfoApi } from '../../api/api';
-import useToast from '../../hook/useToast';
 import { useAppDispatch } from '../../store/store';
-import { IAxiosError } from '../../config/axiosError.interface';
 import { updateUserInfo } from '../auth';
-import moment from 'moment';
+import { UserLayout } from './UserLayout';
 
 type Props = {};
 

@@ -30,6 +30,7 @@ export const pageSelector = (state: RootState) => state.searching.page;
 export const usingKnnSelector = (state: RootState) => state.searching.usingKnn;
 export const searchingTypeSelector = (state: RootState) => state.searching.type;
 export const totalPageSelector = (state: RootState) => state.product.totalPage;
+export const isLoadingSelector = (state: RootState) => state.product.isLoading;
 
 export const shopSelector = (state: RootState) => state.shop.shop;
 export const productsOfShopSelector = (state: RootState) => state.shop.products;

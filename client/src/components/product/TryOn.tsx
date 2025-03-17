@@ -17,9 +17,9 @@ export interface ITryOn {
   cloth_path: string;
 }
 
-const ngrokUrl = 'https://ad52-34-134-184-73.ngrok-free.app';
+const ngrokUrl = 'https://unicorn-pretty-dinosaur.ngrok-free.app';
 
-const override: CSSProperties = {
+export const override: CSSProperties = {
   position: 'absolute',
   top: '50%',
   left: '50%',
@@ -116,7 +116,7 @@ export const TryOn = ({ image }: Props) => {
           </li>
         </ul>
       </div>
-      <div className='flex gap-12 mt-4 items-center'>
+      <div className='flex gap-12 mt-4'>
         {/* Model path */}
         <div className=''>
           <div className='mb-2 flex justify-center'>
@@ -143,7 +143,9 @@ export const TryOn = ({ image }: Props) => {
 
         <div>
           <div className='flex mb-4 justify-center'>Ảnh quần áo muốn thử</div>
-          <img src={image} className='w-80 h-80' />
+          <div className='flex justify-center items-center flex-1 h-full'>
+            <img src={image} className='w-80 h-80' />
+          </div>
         </div>
 
         <div className='relative'>

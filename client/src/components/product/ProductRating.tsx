@@ -85,7 +85,7 @@ export const ProductRating = ({ productId }: Props) => {
           {fitlerBy.map((el, idx) => (
             <div
               className={`px-4 py-1 rounded-xl border-gray-200 border-2 ${
-                idx === selectedNumber && 'border-blue-600'
+                idx === selectedNumber && 'border-blue-6.00'
               }`}
               key={el}
               onClick={() => filterHandler(idx)}

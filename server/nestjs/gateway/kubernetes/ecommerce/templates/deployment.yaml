@@ -1,0 +1,161 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: ecom
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: tuantmit/ecommerce-app:backend
+          ports:
+            - containerPort: 3000
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: POSTGRES_PORT
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-configmap
+                  key: POSTGRES_HOST
+            - name: POSTGRES_SYNCHRONIZE
+              value: 'true'
+            - name: ES_ENABLE
+              value: 'true'
+            - name: ES_VERSION
+              value: '8.15.2'
+            - name: ELASTIC_USERNAME
+              value: elastic
+            - name: ELASTIC_PASSWORD
+              value: elastic
+            - name: ELASTIC_PORT
+              value: '9200'
+            - name: ELASTIC_HOST
+              value: elasticsearch-master
+            - name: ELASTIC_INDEX
+              value: ecommerce
+            - name: ELASTIC_INDEX_V2
+              value: ecommerce_v2
+            - name: ELASTIC_INDEX_V3
+              value: ecommerce_v3
+            - name: LIMIT_SEARCH
+              value: '16'
+            - name: RABBITMQ_MAIN_PORT
+              value: '5672'
+            - name: RABBITMQ_SUB_PORT
+              value: '15672'
+            - name: RABBITMQ_USER
+              value: tuantm
+            - name: RABBITMQ_PASSWORD
+              value: tuantm
+            - name: RABBITMQ_HOST
+              value: rabbitmq.ecom.svc.cluster.local
+            - name: RABBITMQ_QUEUE_NAME
+              value: e-commerce
+            - name: MONGODB_USERNAME
+              value: nexano4599
+            - name: MONGODB_PASSWORD
+              value: RSHfM9Ya8tuemcV3
+            - name: MONGODB_NAME
+              value: Cluster0
+            - name: JWT_SECRET
+              value: NybDIwwJqIwSdfuLqmYdQ1u5BcEJUqvy
+            - name: JWT_EXPIRE
+              value: 30d
+            - name: PASSWORD_SALT_LENGTH
+              value: '14'
+            - name: REDIS_HOST
+              value: redis-master.ecom.svc.cluster.local
+            - name: REDIS_PORT
+              value: '6379'
+            - name: REDIS_PASSWORD
+              value: 'tuantm'
+            - name: REDIS_CACHE_LOW
+              value: '600000' # 10 minute
+            - name: REDIS_CACHE_MEDIUM
+              value: '86400000' # 1 day
+            - name: REDIS_CACHE_HIGH
+              value: '259200000' # 3 days
+            - name: MAIL_HOST
+              value: smtp.gmail.com
+            - name: MAIL_USERNAME
+              value: tuanprogrammer001@gmail.com
+            - name: MAIL_PASSWORD
+              value: qphy zurp ngtv rdnx
+            - name: vnp_TmnCode
+              value: BXLHMOTK
+            - name: vnp_TxnRef
+              value: '08215813'
+            - name: vnp_HashSecret
+              value: Q43QQNXJQS3OTD7J407U097YLB3WYMVE
+            - name: vnp_ReturnUrl
+              value: http://localhost:5173/vnpay-payment
+            - name: vnp_Url
+              value: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+            - name: momoPartnerCode
+              value: MOMO
+            - name: momoAccessKey
+              value: F8BBA842ECF85
+            - name: momoSecretKey
+              value: K951B6PE1waDMi640xX08PD3vg6EkVlz
+            - name: momoRequestType
+              value: payWithCC
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: ecom
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: tuantmit/ecommerce-app:frontend-v5-elb-patch
+          ports:
+            - containerPort: 80
+          env:
+            - name: VITE_NODE_ENV
+              value: production
+            - name: VITE_BASE_URL
+              value: k8s-ecom-fulllsta-43708baa9e-908750486.ap-southeast-1.elb.amazonaws.com
+      #     volumeMounts:
+      #       - mountPath: /usr/share/nginx/html/.env
+      #         name: env-file
+      # volumes:
+      #   - name: env-file
+      #     configMap:
+      #       name: vite-configmap

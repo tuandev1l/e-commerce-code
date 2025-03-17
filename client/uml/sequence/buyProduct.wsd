@@ -2,7 +2,7 @@
 
 hide footbox
 autonumber
-participant Customer as customer
+actor Customer as customer
 boundary "Giao diện website" as web
 boundary "Giao diện chi tiết sản phẩm" as productDetail
 boundary "Giao diện giỏ hàng" as cart

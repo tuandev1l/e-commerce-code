@@ -13,8 +13,9 @@ export const ProductItem = ({ product }: Props) => {
   return (
     <div
       className={`rounded-lg border border-gray-200 bg-white shadow-sm p-6 hover:cursor-pointer`}
-      onClick={() =>
-        (document.location.href = `/product/${product._id ?? product.id}`)
+      onClick={
+        () => (document.location.href = `/product/${product._id ?? product.id}`)
+        // () => window.open(`/product/${product._id ?? product.id}`, '_blank')
       }
     >
       <div className={`${isMainPage ? 'h-56 w-full' : 'h-40 w-full'}`}>

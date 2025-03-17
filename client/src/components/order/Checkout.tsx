@@ -16,7 +16,7 @@ import {
   usernameSelector,
 } from '../../store/selector';
 
-type Props = {};
+// type Props = {};
 
 const Checkout = () => {
   const toast = useToast();

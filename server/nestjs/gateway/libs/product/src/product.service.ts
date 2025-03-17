@@ -278,8 +278,8 @@ export class ProductService {
         };
         delete newProduct.brand['_id'];
 
-        newProduct['descriptionVector'] = product['descriptionVector'];
-        newProduct['imgVector'] = product['imgVector'];
+        // newProduct['descriptionVector'] = product['descriptionVector'];
+        // newProduct['imgVector'] = product['imgVector'];
 
         savedProducts.push(newProduct);
       } catch (e) {
@@ -309,7 +309,8 @@ export class ProductService {
   }
 
   async findAll(productFilterDto: ProductFilterDto) {
-    const isElasticEnable = !!this.configService.get('ES_ENABLE');
+    const isElasticEnable =
+      this.configService.get('ES_ENABLE').toString().toLowerCase() === 'true';
     if (isElasticEnable) {
       if (productFilterDto.usingKnn) {
         return this.producerService.sendMessage(

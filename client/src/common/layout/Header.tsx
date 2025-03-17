@@ -15,6 +15,7 @@ import { logo } from '../../assets/images/image';
 import { logout } from '../../components/auth';
 import {
   getAllProducts,
+  setLoading,
   setTotalPage,
 } from '../../components/product/productSlice';
 import {
@@ -95,13 +96,15 @@ export const Header = ({}: Props) => {
     onError: (error: IAxiosError) => {
       toast({ type: 'error', message: error.message });
     },
+    onSettled: () => {
+      dispatch(setLoading(false));
+    },
     gcTime: 0,
   });
 
   const searchingHandler = async () => {
     dispatch(setPage(1));
-
-    console.log(imgUpload);
+    dispatch(setLoading(true));
 
     const productFilter: IProductFilter = {
       brands: brandsSelected,
@@ -144,7 +147,10 @@ export const Header = ({}: Props) => {
     <header className='w-full flex relative bg-white text-gray-500 gap-20 py-3 px-14'>
       <div
         onClick={() => {
-          window.location.href = 'http://localhost:5173';
+          window.location.href =
+            import.meta.env.VITE_NODE_ENV === 'development'
+              ? 'http://localhost:5173'
+              : 'http://ecommerce.localhost';
         }}
         className='hover:cursor-pointer'
       >

@@ -2,7 +2,7 @@
 
 hide footbox
 autonumber
-participant User as user
+actor User as user
 boundary "Giao diện website" as web
 boundary "Giao diện chỉnh sửa thông tin cá nhân" as updateInfo
 control "ProfileController" as controller

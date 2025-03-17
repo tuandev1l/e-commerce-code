@@ -1,11 +1,11 @@
-import { Link, useParams } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
+import { backToSellApi, deleteProductApi } from '../../api/api';
 import { priceSplit } from '../../common/price/priceSplit';
+import { IAxiosError } from '../../config/axiosError.interface';
 import useToast from '../../hook/useToast';
 import { IProduct } from '../../interfaces';
-import { useMutation } from '@tanstack/react-query';
-import { backToSellApi, deleteProductApi } from '../../api/api';
-import { IAxiosError } from '../../config/axiosError.interface';
 
 type Props = {
   product: IProduct;
@@ -13,7 +13,7 @@ type Props = {
 };
 
 export const ProductItemShop = ({ product, deleteProduct }: Props) => {
-  const shopId = useParams()['shopId'];
+  // const shopId = useParams()['shopId'];
   const toast = useToast();
 
   const { mutate } = useMutation({

@@ -2,7 +2,7 @@
 
 hide footbox
 autonumber
-participant User as user
+actor User as user
 boundary "Giao diện website" as web
 control "SearchController" as controller
 entity "Product" as productEntity

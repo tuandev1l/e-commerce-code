@@ -2,7 +2,7 @@
 
 hide footbox
 autonumber
-participant Customer as customer
+actor Customer as customer
 boundary "Giao diện đánh giá sản phẩm" as ratingUI
 control "RatingController" as ratingController
 entity "Rating" as ratingEntity

@@ -1,6 +1,7 @@
-import { CameraIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { CameraIcon } from '@heroicons/react/24/outline';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 import { Rating } from 'react-simple-star-rating';
 import {
@@ -15,14 +16,13 @@ import { IAxiosError } from '../../config/axiosError.interface';
 import { ICreateRatingDto } from '../../dto/createRating.dto';
 import { IUpdateRatingDto } from '../../dto/updateRating.dto';
 import { ORDER_STATUS } from '../../enum';
+import { Role } from '../../enum/role.user.enum';
 import useToast from '../../hook/useToast';
 import { IOrder, IOrderStatus } from '../../interfaces';
 import { IRatingImage } from '../../interfaces/ratingImage.interface';
+import { roleSelector } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { cancelOrder, removeOrderRating } from './orderSlice';
-import { useSelector } from 'react-redux';
-import { roleSelector } from '../../store/selector';
-import { Role } from '../../enum/role.user.enum';
 
 type Props = {
   order: IOrder;

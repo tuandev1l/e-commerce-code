@@ -1,14 +1,19 @@
 import axios, {
   AxiosError,
-  AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
+
 // @ts-ignore
-import { SERVER_ADD } from '@env';
+console.log(`BASE_URL: ${process.env.VITE_BASE_URL}`);
 
 export const instance = axios.create({
-  baseURL: 'http://localhost:3000/api/v1/',
+  baseURL:
+    import.meta.env.VITE_NODE_ENV === 'development'
+      ? 'http://localhost:3000/api/v1/'
+      : // : 'http://api-ecommerce.localhost/api/v1/',
+        // @ts-ignore
+        `http://k8s-ecom-fulllsta-43708baa9e-534604237.ap-southeast-1.elb.amazonaws.com/api/v1`,
 });
 
 instance.interceptors.request.use(function (

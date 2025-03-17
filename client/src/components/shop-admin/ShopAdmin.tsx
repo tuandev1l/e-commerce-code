@@ -52,12 +52,12 @@ export const ShopAdmin = ({}: Props) => {
     }
   }, [data]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setShopInfo({ ...shopInfo, [name]: value });
-  };
+  // const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setShopInfo({ ...shopInfo, [name]: value });
+  // };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (_: ChangeEvent<HTMLInputElement>) => {
     // setFormData({ ...formData, logo: e.target.files[0] });
   };
 

@@ -17,11 +17,13 @@ export class ElasticsearchService {
   private readonly client: Client;
   // private readonly embeddedHost: string;
   // private readonly embeddedPort: string;
-  private ngrokUrl = 'https://a540-35-187-226-231.ngrok-free.app';
+  private ngrokUrl = 'https://gentle-serval-first.ngrok-free.app';
   private readonly elasticIndex: string;
 
   constructor(private readonly config: ConfigService) {
     ElasticsearchService.LIMIT = this.config.get('LIMIT_SEARCH');
+    const isElasticEnable =
+      this.config.get('ES_ENABLE').toString().toLowerCase() === 'true';
     // this.embeddedHost = config.get('EMBEDDING_HOST');
     // this.embeddedPort = config.get('EMBEDDING_PORT');
 
@@ -29,65 +31,77 @@ export class ElasticsearchService {
     // this.elasticIndex = config.get('ELASTIC_INDEX_V2');
     this.elasticIndex = config.get('ELASTIC_INDEX');
 
-    const node = `https://${config.get('ELASTIC_HOST')}:${config.get('ELASTIC_PORT')}`;
-    this.client = new Client({
-      node,
-      auth: {
-        username: config.get('ELASTIC_USERNAME'),
-        password: config.get('ELASTIC_PASSWORD'),
-      },
-      tls: {
-        ca: `${path.resolve(process.cwd())}/http_ca.crt`,
-        rejectUnauthorized: false,
-      },
-    });
+    // (async () => {
+    //   const data = (
+    //     await readFile(path.join(__dirname, './data/vector.json'))
+    //   ).toString();
 
-    if (!ElasticsearchService.isImported) {
-      ElasticsearchService.isImported = true;
-      (async () => {
-        try {
-          await this.client.indices.get({
-            index: this.elasticIndex,
-          });
-        } catch (_: any) {
-          console.log('Mapping ecommerce does not exist');
-          await this.getClient().indices.create({
-            index: this.elasticIndex,
-            // mappings: {
-            //   properties: {
-            //     imgVector: {
-            //       type: 'dense_vector',
-            //       dims: 512,
-            //     },
-            //     imgDot: {
-            //       type: 'dense_vector',
-            //       dims: 512,
-            //       similarity: 'dot_product',
-            //     },
-            //   },
-            // },
-          });
-        }
+    //   console.log(data);
+    // })();
 
-        const records = (
-          await this.client.search({
-            index: this.elasticIndex,
-          })
-        ).hits.hits;
+    if (isElasticEnable) {
+      const node = `http://${config.get('ELASTIC_HOST')}:${config.get('ELASTIC_PORT')}`;
+      this.client = new Client({
+        node,
+        auth: {
+          username: config.get('ELASTIC_USERNAME'),
+          password: config.get('ELASTIC_PASSWORD'),
+        },
+        // tls: {
+        //   ca: `${path.resolve(process.cwd())}/http_ca.crt`,
+        //   rejectUnauthorized: false,
+        // },
+      });
 
-        if (records.length === 0) {
-          // const data = (await readFile('./vector.json')).toString();
-          const data = (await readFile('./raw_products.json')).toString();
-          // console.log(data);
-          const jsonData = JSON.parse(data);
-          for (const record of jsonData) {
-            void this.client.index({
+      if (!ElasticsearchService.isImported) {
+        ElasticsearchService.isImported = true;
+        (async () => {
+          try {
+            await this.client.indices.get({
               index: this.elasticIndex,
-              body: record,
+            });
+          } catch (_: any) {
+            console.log('Mapping ecommerce does not exist');
+            await this.getClient().indices.create({
+              index: this.elasticIndex,
+              // mappings: {
+              //   properties: {
+              //     imgVector: {
+              //       type: 'dense_vector',
+              //       dims: 512,
+              //     },
+              //     imgDot: {
+              //       type: 'dense_vector',
+              //       dims: 512,
+              //       similarity: 'dot_product',
+              //     },
+              //   },
+              // },
             });
           }
-        }
-      })();
+
+          const records = (
+            await this.client.search({
+              index: this.elasticIndex,
+            })
+          ).hits.hits;
+
+          if (records.length === 0) {
+            // const data = (await readFile('./vector.json')).toString();
+            const data = (
+              await readFile(path.join(__dirname, './data/vector.json'))
+            ).toString();
+            // console.log(data);
+            const jsonData = JSON.parse(data);
+            for (const record of jsonData) {
+              void this.client.index({
+                index: this.elasticIndex,
+                body: record,
+              });
+            }
+          }
+        })();
+      }
     }
   }
 
@@ -127,7 +141,7 @@ export class ElasticsearchService {
     const data = await this.client.search({
       query: {
         function_score: {
-          random_score: {},
+          // random_score: {},
         },
       },
       _source_includes: [

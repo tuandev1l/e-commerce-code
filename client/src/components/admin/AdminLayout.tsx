@@ -1,15 +1,10 @@
 import {
   AdjustmentsHorizontalIcon,
-  ArchiveBoxIcon,
-  CurrencyDollarIcon,
-  DocumentPlusIcon,
-  FlagIcon,
-  UserCircleIcon,
   StarIcon,
 } from '@heroicons/react/24/outline';
 import { ReactElement } from 'react';
 import { useSelector } from 'react-redux';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Layout } from '../../common/layout/Layout';
 import { usernameSelector } from '../../store/selector';
 

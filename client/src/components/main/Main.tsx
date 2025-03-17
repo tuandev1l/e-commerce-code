@@ -16,6 +16,7 @@ import {
   brandSelectedSelector,
   categorySelectedSelector,
   fromNumberSelector,
+  isLoadingSelector,
   keywordSelector,
   pageSelector,
   productsSelector,
@@ -35,6 +36,8 @@ import { setFromNumber, setPage, setToNumber } from '../product/searchingSlice';
 import { Brand } from './Brand';
 import { Category } from './Category';
 import './style.css';
+import BeatLoader from 'react-spinners/BeatLoader';
+// import { override } from '../product/TryOn';
 
 type Props = {};
 
@@ -61,6 +64,7 @@ export const Main = ({}: Props) => {
   const totalPage = useSelector(totalPageSelector);
   const usingKnn = useSelector(usingKnnSelector);
   const searchingType = useSelector(searchingTypeSelector);
+  const isLoading = useSelector(isLoadingSelector);
 
   useEffect(() => {
     return () => {
@@ -248,6 +252,16 @@ export const Main = ({}: Props) => {
               <h2 className='text-xl font-semibold text-gray-900 sm:text-2xl m-3'>
                 Tất cả sản phẩm
               </h2>
+              <div className='flex justify-center mb-4'>
+                <BeatLoader
+                  color={'red'}
+                  loading={isLoading}
+                  size={12}
+                  aria-label='Loading Spinner'
+                  data-testid='loader'
+                />
+              </div>
+
               <div className='px-4 mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-4 xl:grid-cols-4'>
                 {products.map((product) => (
                   <ProductItem key={product._id} product={product} />

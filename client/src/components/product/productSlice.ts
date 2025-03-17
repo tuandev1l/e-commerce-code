@@ -17,10 +17,18 @@ const productSlice = createSlice({
     setTotalPage: (state, { payload }) => {
       state.totalPage = payload;
     },
+    setLoading: (state, { payload }) => {
+      state.isLoading = payload;
+    },
   },
   extraReducers: () => {},
 });
 
-export const { getAllProducts, getDetailProduct, resetProduct, setTotalPage } =
-  productSlice.actions;
+export const {
+  getAllProducts,
+  getDetailProduct,
+  resetProduct,
+  setTotalPage,
+  setLoading,
+} = productSlice.actions;
 export default productSlice;

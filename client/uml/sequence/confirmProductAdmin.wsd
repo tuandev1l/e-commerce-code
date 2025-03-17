@@ -2,7 +2,7 @@
 
 hide footbox
 autonumber
-participant Admin as admin
+actor Admin as admin
 boundary "Giao diện duyệt trạng thái đơn hàng" as orderStatusUI
 control "AdminController" as adminController
 control "OrderController" as orderController

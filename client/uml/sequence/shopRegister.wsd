@@ -2,7 +2,7 @@
 
 hide footbox
 autonumber
-participant Customer as customer
+actor Customer as customer
 boundary "Giao diện đăng ký shop" as registerShopUI
 control "RegisterShopController" as registerShopController
 entity "Shop" as shopEntity

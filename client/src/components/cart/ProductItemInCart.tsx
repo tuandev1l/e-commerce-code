@@ -10,7 +10,6 @@ import {
 import { priceSplit } from '../../common/price/priceSplit';
 import { IAxiosError } from '../../config/axiosError.interface';
 import useToast from '../../hook/useToast';
-import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
 import { usernameSelector } from '../../store/selector';
 import { useAppDispatch } from '../../store/store';
 import { removeItemInCartDispatch } from './cartSlice';

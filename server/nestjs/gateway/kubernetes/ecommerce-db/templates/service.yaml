@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+  namespace: ecom
+  labels:
+    app: db
+spec:
+  type: ClusterIP # Use ClusterIP to expose the service internally within the cluster
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  selector:
+    app: db

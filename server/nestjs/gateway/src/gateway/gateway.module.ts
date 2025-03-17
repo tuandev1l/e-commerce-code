@@ -43,6 +43,9 @@ import { GatewayShopController } from '@gateway/controller/gateway.shop.controll
           transport: Transport.RMQ,
           options: {
             urls: [`amqp://${user}:${password}@${host}:${port}`],
+            // urls: [
+            //   'amqps://bawlehmb:be9T4hpzsA3TPpBiGuUWrXxypyUJPH8y@armadillo.rmq.cloudamqp.com/bawlehmb?connection_timeout=30',
+            // ],
             queue: queueName,
             queueOptions: {
               durable: true,

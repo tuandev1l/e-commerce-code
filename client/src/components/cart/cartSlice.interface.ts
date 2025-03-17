@@ -1,5 +1,4 @@
 import { IProductItem } from '../../interfaces';
-import { IProductItemMinimal } from '../../interfaces/productItemMinimal.interface';
 import { IProductMinimalWrapper } from '../../interfaces/productMinimalWrapper.interface';
 import { IUserAddress } from '../../interfaces/userAddress.interface';
 

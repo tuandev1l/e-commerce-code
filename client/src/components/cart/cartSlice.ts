@@ -1,19 +1,19 @@
-import { createSlice, current } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import { IProductItem } from '../../interfaces';
 import { IProductMinimalWrapper } from '../../interfaces/productMinimalWrapper.interface';
 import { cartInitalState } from './cartSlice.interface';
 
-const pickValueOfProduct = (productItem: IProductItem) => ({
-  uuid: productItem.uuid,
-  color: productItem.color,
-  size: productItem.size,
-  price: productItem.price,
-  quantity: productItem.quantity,
-  thumbnailUrl: productItem.thumbnailUrl,
-  name: productItem.name,
-  originalPrice: productItem.originalPrice,
-  discount: productItem.discount,
-});
+// const pickValueOfProduct = (productItem: IProductItem) => ({
+//   uuid: productItem.uuid,
+//   color: productItem.color,
+//   size: productItem.size,
+//   price: productItem.price,
+//   quantity: productItem.quantity,
+//   thumbnailUrl: productItem.thumbnailUrl,
+//   name: productItem.name,
+//   originalPrice: productItem.originalPrice,
+//   discount: productItem.discount,
+// });
 
 const cartSlice = createSlice({
   name: 'product',

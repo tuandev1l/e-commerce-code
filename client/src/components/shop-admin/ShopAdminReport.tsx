@@ -9,7 +9,7 @@ type Props = {
 Chart.register(...registerables);
 
 export const ShopAdminReport = ({ dataReport }: Props) => {
-  let delayed: boolean;
+  // let delayed: boolean;
 
   return (
     <Bar
